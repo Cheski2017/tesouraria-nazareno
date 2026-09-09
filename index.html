@@ -1069,6 +1069,7 @@ function carregarDadosJSONP(senha) {
       if (payload && payload.ok) resolve(payload.dados);
       else reject(new Error((payload && payload.error) || 'Senha incorreta.'));
     };
+    scriptEl.crossOrigin = 'anonymous';
     scriptEl.src = API_URL + '?senha=' + encodeURIComponent(senha) + '&callback=' + cbName;
     scriptEl.onerror = function () { cleanup(); reject(new Error('Falha ao conectar ao servidor.')); };
     document.body.appendChild(scriptEl);
