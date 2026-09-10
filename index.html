@@ -241,6 +241,7 @@
 
   /* ---------- KPI cards ---------- */
   .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (min-width: 861px) { #vg-kpis { grid-template-columns: repeat(3, 1fr); } }
   .kpi-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -910,11 +911,17 @@ function renderVisaoGeral() {
   const prevDespesas = hasPrev ? sumRange(DATA.totalDespesas, prevMeses) : 0;
   const prevSaldo = prevReceitas - prevDespesas;
 
+  const saldoVals = meses.map((m,i) => receitaVals[i] - despesaVals[i]);
+  const melhorIdx = saldoVals.length ? saldoVals.indexOf(Math.max(...saldoVals)) : -1;
+  const piorIdx = saldoVals.length ? saldoVals.indexOf(Math.min(...saldoVals)) : -1;
+
   document.getElementById('vg-kpis').innerHTML =
     kpiCard('Receitas Totais', brl(totalReceitas), ICON_UP, 'good', deltaHtml(totalReceitas, prevReceitas, hasPrev)) +
     kpiCard('Despesas Totais', brl(totalDespesas), ICON_DOWN, 'critical', deltaHtml(totalDespesas, prevDespesas, hasPrev)) +
     kpiCard('Saldo do Período', brlSigned(saldoPeriodo), ICON_WALLET, 'info', deltaHtml(saldoPeriodo, prevSaldo, hasPrev)) +
-    kpiCard('Saldo Acumulado', brlSigned(saldoAcumulado), ICON_BANK, 'accent', `<span class="kpi-delta flat">até ${mesLabelCurto(allMeses[ateIdx])}</span>`);
+    kpiCard('Saldo Acumulado', brlSigned(saldoAcumulado), ICON_BANK, 'accent', `<span class="kpi-delta flat">até ${mesLabelCurto(allMeses[ateIdx])}</span>`) +
+    kpiCard('Melhor Mês', melhorIdx>=0?brlSigned(saldoVals[melhorIdx]):'—', ICON_UP, 'good', `<span class="kpi-delta flat">${melhorIdx>=0?mesLabelLongo(meses[melhorIdx]):''}</span>`) +
+    kpiCard('Pior Mês', piorIdx>=0?brlSigned(saldoVals[piorIdx]):'—', ICON_DOWN, 'critical', `<span class="kpi-delta flat">${piorIdx>=0?mesLabelLongo(meses[piorIdx]):''}</span>`);
 
   buildComboChart(document.getElementById('vg-combo'), meses, receitaVals, despesaVals);
 
