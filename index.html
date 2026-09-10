@@ -508,6 +508,10 @@
           </div>
         </div>
         <div class="card">
+          <div class="card-head"><span class="card-title">Evolução do Saldo</span></div>
+          <div class="table-scroll"><table class="simple" id="vg-saldo-table"></table></div>
+        </div>
+        <div class="card">
           <div class="card-head">
             <span class="card-title">Movimentações recentes</span>
             <button class="card-link" id="vg-ver-todas">Ver todas →</button>
@@ -618,7 +622,7 @@ const MESES_PT_LONGO = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','J
 function mesLabelCurto(mesAno) { const [mm,yy]=mesAno.split('/'); return MESES_PT[parseInt(mm,10)-1]+'/'+yy.slice(2); }
 function mesLabelLongo(mesAno) { const [mm,yy]=mesAno.split('/'); return MESES_PT_LONGO[parseInt(mm,10)-1]+' de '+yy; }
 function mesNum(mesAno) { const [mm,yy]=mesAno.split('/'); return parseInt(yy,10)*12+parseInt(mm,10); }
-function brl(v) { return Math.abs(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}); }
+function brl(v) { return Math.abs(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2}); }
 function brlSigned(v) { return (v<0?'-':v>0?'+':'')+brl(v); }
 function brlFull(v) { return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
 function sum(obj) { return Object.values(obj).reduce((a,b)=>a+b,0); }
@@ -911,7 +915,7 @@ function renderVisaoGeral() {
 
   const [ , ateIdx] = currentRangeIdx();
   const acumMeses = allMeses.slice(0, ateIdx+1);
-  const saldoAcumulado = acumMeses.reduce((s,m)=>s+(DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0), 0);
+  const saldoAcumulado = (DATA.saldoInicial||0) + acumMeses.reduce((s,m)=>s+(DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0), 0);
 
   const prevMeses = previousRangeMeses();
   const hasPrev = !!prevMeses;
@@ -944,8 +948,28 @@ function renderVisaoGeral() {
   if (outrosVal > 0) { labels.push('Outras'); vals.push(outrosVal); colors.push(cssVar('--ink-mute','#8A90A6')); }
   buildDonut(document.getElementById('vg-donut'), document.getElementById('vg-donut-legend'), labels, vals, colors, vals.reduce((a,b)=>a+b,0));
 
+  buildSaldoTable(document.getElementById('vg-saldo-table'), meses);
+
   const movs = DATA.transacoes.filter(t => meses.includes(t.mesAno)).sort((a,b)=>parseDataBR(b.data)-parseDataBR(a.data)).slice(0,8);
   document.getElementById('vg-mov-table').innerHTML = movTableHtml(movs);
+}
+
+function buildSaldoTable(tableEl, meses) {
+  let thead = '<thead><tr><th class="left">Mês</th><th>Saldo Anterior</th><th>Receitas</th><th>Despesas</th><th>Saldo do Mês</th><th>Saldo Final</th></tr></thead>';
+  let tbody = '<tbody>';
+  const startIdx = allMeses.indexOf(meses[0]);
+  let saldoAnterior = startIdx >= 0
+    ? (DATA.saldoInicial||0) + allMeses.slice(0, startIdx).reduce((s,m)=>s+(DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0), 0)
+    : (DATA.saldoInicial||0);
+  meses.forEach(m => {
+    const rec = DATA.totalReceitas[m]||0, des = DATA.totalDespesas[m]||0;
+    const saldoMes = rec - des;
+    const saldoFinal = saldoAnterior + saldoMes;
+    tbody += `<tr><td class="left">${mesLabelCurto(m)}</td><td>${brlSigned(saldoAnterior)}</td><td>${brl(rec)}</td><td>${brl(des)}</td><td>${brlSigned(saldoMes)}</td><td><b>${brlSigned(saldoFinal)}</b></td></tr>`;
+    saldoAnterior = saldoFinal;
+  });
+  tbody += '</tbody>';
+  tableEl.innerHTML = thead + tbody;
 }
 
 function parseDataBR(d) { if (!d || typeof d !== 'string') return 0; const [dd,mm,yy] = d.split('/'); if (!dd || !mm || !yy) return 0; return new Date(+yy,+mm-1,+dd).getTime(); }
