@@ -341,6 +341,14 @@
   .alerta-card.info { background: var(--info-soft); color: var(--ink); border: 1px solid var(--info); }
   .alerta-card.info .alerta-icon { color: var(--info); }
 
+  .trend-stats { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--card-border); }
+  .trend-stat { display: flex; flex-direction: column; gap: 3px; min-width: 110px; }
+  .trend-stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-mute); }
+  .trend-stat-value { font-size: 19px; font-weight: 700; color: var(--ink); }
+  .trend-stat-value.critical { color: var(--critical); }
+  .trend-stat-value.good { color: var(--good); }
+  .trend-stat-note { font-size: 11.5px; color: var(--ink-soft); }
+
   /* ---------- Tables ---------- */
   .table-scroll { overflow-x: auto; }
   table.simple { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
@@ -564,6 +572,7 @@
           <div class="card">
             <div class="card-head"><span class="card-title">Evolução das Despesas</span></div>
             <div class="chart-scroll"><div class="chart-wrap" id="ds-trend"></div></div>
+            <div id="ds-trend-stats"></div>
           </div>
           <div class="card">
             <div class="card-head"><span class="card-title">Por categoria</span></div>
@@ -1052,6 +1061,37 @@ function buildAlertaDespesas(meses) {
   }
   return `<div class="alerta-card ${tier}">${ICON_ALERT}<span>${texto}</span></div>`;
 }
+function buildTrendStatsDespesas(meses, vals) {
+  if (vals.length < 3) return '';
+  let maiorAltaIdx = -1, maiorAltaPct = -Infinity;
+  let maiorQuedaIdx = -1, maiorQuedaPct = Infinity;
+  for (let i = 1; i < vals.length; i++) {
+    if (!vals[i-1]) continue;
+    const pct = ((vals[i] - vals[i-1]) / vals[i-1]) * 100;
+    if (pct > maiorAltaPct) { maiorAltaPct = pct; maiorAltaIdx = i; }
+    if (pct < maiorQuedaPct) { maiorQuedaPct = pct; maiorQuedaIdx = i; }
+  }
+  const metade = Math.floor(vals.length / 2);
+  const primeira = vals.slice(0, metade);
+  const segunda = vals.slice(vals.length - metade);
+  const mediaPrimeira = primeira.reduce((a,b)=>a+b, 0) / (primeira.length || 1);
+  const mediaSegunda = segunda.reduce((a,b)=>a+b, 0) / (segunda.length || 1);
+  const tendenciaPct = mediaPrimeira > 0 ? ((mediaSegunda - mediaPrimeira) / mediaPrimeira) * 100 : 0;
+  const tendenciaUp = tendenciaPct > 1, tendenciaDown = tendenciaPct < -1;
+  const tendenciaClasse = tendenciaUp ? 'critical' : tendenciaDown ? 'good' : '';
+  const tendenciaSeta = tendenciaUp ? '▲' : tendenciaDown ? '▼' : '→';
+
+  let html = '<div class="trend-stats">';
+  html += `<div class="trend-stat"><span class="trend-stat-label">Tendência</span><span class="trend-stat-value ${tendenciaClasse}">${tendenciaSeta} ${Math.abs(tendenciaPct).toFixed(1)}%</span><span class="trend-stat-note">${tendenciaUp?'aumento':tendenciaDown?'queda':'estável'} da 1ª pra 2ª metade do período</span></div>`;
+  if (maiorAltaIdx >= 0 && isFinite(maiorAltaPct)) {
+    html += `<div class="trend-stat"><span class="trend-stat-label">Maior alta mês a mês</span><span class="trend-stat-value critical">▲ ${maiorAltaPct.toFixed(1)}%</span><span class="trend-stat-note">${mesLabelLongo(meses[maiorAltaIdx])}</span></div>`;
+  }
+  if (maiorQuedaIdx >= 0 && isFinite(maiorQuedaPct)) {
+    html += `<div class="trend-stat"><span class="trend-stat-label">Maior queda mês a mês</span><span class="trend-stat-value good">▼ ${Math.abs(maiorQuedaPct).toFixed(1)}%</span><span class="trend-stat-note">${mesLabelLongo(meses[maiorQuedaIdx])}</span></div>`;
+  }
+  html += '</div>';
+  return html;
+}
 function hbarColor(pctTotal) {
   if (pctTotal >= 20) return cssVar('--critical','#C0453B');
   if (pctTotal >= 10) return cssVar('--accent','#B9852A');
@@ -1084,6 +1124,7 @@ function renderDespesas() {
     kpiCard('Salário Pastoral no Período', brl(sumRange(DATA.despesas['Salário Pastoral']||{}, meses)), ICON_DOWN, 'critical', `<span class="kpi-delta flat">${total>0?((sumRange(DATA.despesas['Salário Pastoral']||{},meses)/total)*100).toFixed(1):'0'}% do total</span>`);
 
   buildTrendChart(document.getElementById('ds-trend'), meses, vals, cssVar('--critical','#C0453B'));
+  document.getElementById('ds-trend-stats').innerHTML = buildTrendStatsDespesas(meses, vals);
 
   const cats = sortedCats(DATA.despesas, meses);
   const totals = cats.map(c => sumRange(DATA.despesas[c], meses));
