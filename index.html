@@ -330,6 +330,17 @@
   .hbar-legend span { display: inline-flex; align-items: center; gap: 5px; }
   .hbar-legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 
+  /* ---------- Alerta / insight ---------- */
+  .alerta-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 13px; line-height: 1.55; }
+  .alerta-card b { font-weight: 700; }
+  .alerta-icon { flex-shrink: 0; width: 20px; height: 20px; margin-top: 1px; }
+  .alerta-card.warn { background: var(--accent-soft); color: var(--ink); border: 1px solid var(--accent); }
+  .alerta-card.warn .alerta-icon { color: var(--accent); }
+  .alerta-card.critical { background: var(--critical-soft); color: var(--ink); border: 1px solid var(--critical); }
+  .alerta-card.critical .alerta-icon { color: var(--critical); }
+  .alerta-card.info { background: var(--info-soft); color: var(--ink); border: 1px solid var(--info); }
+  .alerta-card.info .alerta-icon { color: var(--info); }
+
   /* ---------- Tables ---------- */
   .table-scroll { overflow-x: auto; }
   table.simple { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
@@ -547,6 +558,7 @@
 
       <!-- ===== DESPESAS ===== -->
       <section class="section" id="sec-despesas">
+        <div id="ds-alerta"></div>
         <div class="kpis" id="ds-kpis"></div>
         <div class="grid-2">
           <div class="card">
@@ -757,6 +769,7 @@ const ICON_UP = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="curre
 const ICON_DOWN = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6 4-4 8 8"/><path d="M15 18h6v-6"/></svg>';
 const ICON_WALLET = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12.5h3.5v3H16a1.5 1.5 0 010-3z"/></svg>';
 const ICON_BANK = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l8-6 8 6"/><path d="M5 10v8M10 10v8M14 10v8M19 10v8"/><path d="M3 19h18"/></svg>';
+const ICON_ALERT = '<svg class="alerta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
 
 function previousRangeMeses() {
   const [de, ate] = currentRangeIdx();
@@ -1017,6 +1030,28 @@ function renderReceitas() {
 }
 
 /* ============ DESPESAS ============ */
+function buildAlertaDespesas(meses) {
+  if (meses.length < 2) return '';
+  const resultados = meses.map(m => (DATA.totalReceitas[m]||0) - (DATA.totalDespesas[m]||0));
+  const mesesDeficit = resultados.filter(r => r < 0).length;
+  if (mesesDeficit === 0) return '';
+  const mediaResultado = resultados.reduce((a,b)=>a+b, 0) / resultados.length;
+  const endIdxGlobal = allMeses.indexOf(meses[meses.length-1]);
+  const saldoAcumulado = (DATA.saldoInicial||0) + allMeses.slice(0, endIdxGlobal+1).reduce((s,m)=>s+(DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0), 0);
+  let tier = 'info';
+  let texto = `<b>${mesesDeficit} de ${meses.length} meses</b> do período fecharam com despesas maiores que as receitas, mas na média o período fica positivo (${brlSigned(mediaResultado)}/mês) — vale de olho, mas sem urgência.`;
+  if (mediaResultado < 0) {
+    if (saldoAcumulado > 0) {
+      const runway = Math.floor(saldoAcumulado / Math.abs(mediaResultado));
+      tier = 'warn';
+      texto = `<b>${mesesDeficit} de ${meses.length} meses</b> do período fecharam no negativo, e na média as despesas superam as receitas em <b>${brl(Math.abs(mediaResultado))}/mês</b>. É o saldo acumulado (hoje <b>${brl(saldoAcumulado)}</b>) que está cobrindo essa diferença — no ritmo atual, ele se esgotaria em cerca de <b>${runway} ${runway===1?'mês':'meses'}</b> se nada mudar. Pode ser hora de rever despesas ou reforçar a arrecadação.`;
+    } else {
+      tier = 'critical';
+      texto = `<b>${mesesDeficit} de ${meses.length} meses</b> do período fecharam no negativo e o saldo acumulado já não é suficiente para cobrir a diferença (${brlSigned(saldoAcumulado)} hoje). Recomenda-se ação imediata sobre despesas e/ou arrecadação.`;
+    }
+  }
+  return `<div class="alerta-card ${tier}">${ICON_ALERT}<span>${texto}</span></div>`;
+}
 function hbarColor(pctTotal) {
   if (pctTotal >= 20) return cssVar('--critical','#C0453B');
   if (pctTotal >= 10) return cssVar('--accent','#B9852A');
@@ -1039,6 +1074,8 @@ function renderDespesas() {
   const prevTotal = hasPrev ? sumRange(DATA.totalDespesas, prevMeses) : 0;
   const media = vals.length ? total/vals.length : 0;
   const maiorIdx = vals.indexOf(Math.max(...vals));
+
+  document.getElementById('ds-alerta').innerHTML = buildAlertaDespesas(meses);
 
   document.getElementById('ds-kpis').innerHTML =
     kpiCard('Total de Despesas', brl(total), ICON_DOWN, 'critical', deltaHtml(total, prevTotal, hasPrev)) +
