@@ -958,7 +958,7 @@ function renderVisaoGeral() {
 }
 
 function buildSaldoTable(tableEl, meses) {
-  let thead = '<thead><tr><th class="left">Mês</th><th>Saldo Anterior</th><th>Receitas</th><th>Despesas</th><th>Saldo do Mês</th><th>Saldo Final</th></tr></thead>';
+  let thead = '<thead><tr><th class="left">Mês</th><th>Saldo Anterior</th><th>Receitas</th><th>Despesas</th><th>Saldo Final</th><th>Resultado do Mês</th></tr></thead>';
   let tbody = '<tbody>';
   const startIdx = allMeses.indexOf(meses[0]);
   let saldoAnterior = startIdx >= 0
@@ -968,7 +968,7 @@ function buildSaldoTable(tableEl, meses) {
     const rec = DATA.totalReceitas[m]||0, des = DATA.totalDespesas[m]||0;
     const saldoMes = rec - des;
     const saldoFinal = saldoAnterior + saldoMes;
-    tbody += `<tr><td class="left">${mesLabelCurto(m)}</td><td>${brlSigned(saldoAnterior)}</td><td>${brl(rec)}</td><td>${brl(des)}</td><td>${brlSigned(saldoMes)}</td><td><b>${brlSigned(saldoFinal)}</b></td></tr>`;
+    tbody += `<tr><td class="left">${mesLabelCurto(m)}</td><td>${brlSigned(saldoAnterior)}</td><td>${brl(rec)}</td><td>${brl(des)}</td><td><b>${brlSigned(saldoFinal)}</b></td><td>${brlSigned(saldoMes)}</td></tr>`;
     saldoAnterior = saldoFinal;
   });
   tbody += '</tbody>';
