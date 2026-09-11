@@ -318,6 +318,15 @@
   .mini-legend-item .pct { color: var(--ink-mute); font-size: 10.5px; width: 36px; text-align: right; font-variant-numeric: tabular-nums; }
   .mini-legend-item .val { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
+  .outras-detalhe { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--card-border); width: 100%; }
+  .outras-detalhe-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-mute); margin-bottom: 8px; }
+  .outras-detalhe-list { display: flex; flex-direction: column; gap: 6px; }
+  .outras-detalhe-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .outras-detalhe-label { flex: 1; color: var(--ink-soft); }
+  .outras-detalhe-pct { color: var(--ink-mute); font-size: 10.5px; width: 36px; text-align: right; font-variant-numeric: tabular-nums; }
+  .outras-detalhe-value { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .outras-detalhe-row.outras-detalhe-mais { border-top: 1px dashed var(--card-border); padding-top: 7px; margin-top: 1px; font-style: italic; color: var(--ink-mute); }
+
   /* ---------- Horizontal bars ---------- */
   .hbar-list { display: flex; flex-direction: column; gap: 8px; }
   .hbar-row { display: grid; grid-template-columns: 150px 1fr 74px; align-items: center; gap: 10px; font-size: 12px; }
@@ -537,6 +546,7 @@
               <div class="donut-wrap" id="vg-donut"></div>
               <div class="mini-legend" id="vg-donut-legend"></div>
             </div>
+            <div id="vg-outras-detalhe"></div>
           </div>
         </div>
         <div class="card">
@@ -920,6 +930,29 @@ function buildDonut(wrapEl, legendEl, cats, totals, colors, grandTotal) {
   </div>`).join('');
 }
 
+function buildOutrasDetalhe(despesaCats, meses, arevisarTotal) {
+  const MAX_ITENS = 8;
+  const resto = despesaCats.slice(5).map(c => ({ cat: c, val: sumRange(DATA.despesas[c], meses) }));
+  if (arevisarTotal > 0) resto.push({ cat: 'A revisar', val: arevisarTotal });
+  if (!resto.length) return '';
+  resto.sort((a,b) => b.val - a.val);
+  const totalResto = resto.reduce((s,r) => s + r.val, 0);
+  const visiveis = resto.slice(0, MAX_ITENS);
+  const restantes = resto.slice(MAX_ITENS);
+  let html = '<div class="outras-detalhe"><div class="outras-detalhe-title">O que compõe "Outras"</div><div class="outras-detalhe-list">';
+  visiveis.forEach(r => {
+    const pct = totalResto > 0 ? (r.val/totalResto)*100 : 0;
+    html += `<div class="outras-detalhe-row"><span class="outras-detalhe-label">${r.cat}${r.cat==='A revisar'?' *':''}</span><span class="outras-detalhe-pct">${pct.toFixed(1)}%</span><span class="outras-detalhe-value">${brl(r.val)}</span></div>`;
+  });
+  if (restantes.length) {
+    const valRestantes = restantes.reduce((s,r) => s + r.val, 0);
+    const pctRestantes = totalResto > 0 ? (valRestantes/totalResto)*100 : 0;
+    html += `<div class="outras-detalhe-row outras-detalhe-mais"><span class="outras-detalhe-label">+ ${restantes.length} categoria${restantes.length>1?'s':''} menor${restantes.length>1?'es':''}</span><span class="outras-detalhe-pct">${pctRestantes.toFixed(1)}%</span><span class="outras-detalhe-value">${brl(valRestantes)}</span></div>`;
+  }
+  html += '</div></div>';
+  return html;
+}
+
 /* ============ Category × month table ============ */
 function buildCatTable(tableEl, cats, matrix, meses, colorClass) {
   let thead = '<thead><tr><th class="cat-col">Categoria</th>' + meses.map(m=>`<th>${mesLabelCurto(m)}</th>`).join('') + '<th>Total</th></tr></thead>';
@@ -983,6 +1016,7 @@ function renderVisaoGeral() {
   let labels = top.map(t=>t.cat), vals = top.map(t=>t.val), colors = labels.map((_,i)=>categoryColor(i,dark));
   if (outrosVal > 0) { labels.push('Outras'); vals.push(outrosVal); colors.push(cssVar('--ink-mute','#8A90A6')); }
   buildDonut(document.getElementById('vg-donut'), document.getElementById('vg-donut-legend'), labels, vals, colors, vals.reduce((a,b)=>a+b,0));
+  document.getElementById('vg-outras-detalhe').innerHTML = outrosVal > 0 ? buildOutrasDetalhe(despesaCats, meses, arevisarTotal) : '';
 
   buildSaldoTable(document.getElementById('vg-saldo-table'), meses);
 
