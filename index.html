@@ -1109,17 +1109,19 @@ function buildAlertaDespesas(meses) {
 const CATEGORIAS_ESSENCIAIS = ['Salário Pastoral', 'Água', 'Energia', 'Monitoramento/Segurança', 'Limpeza'];
 function buildCustoEssencial(meses) {
   if (!meses.length) return '';
-  const linhas = CATEGORIAS_ESSENCIAIS.map(cat => ({ cat, media: sumRange(DATA.despesas[cat] || {}, meses) / meses.length }));
+  const endIdx = allMeses.indexOf(meses[meses.length-1]);
+  const janela = allMeses.slice(Math.max(0, endIdx-2), endIdx+1);
+  const linhas = CATEGORIAS_ESSENCIAIS.map(cat => ({ cat, media: sumRange(DATA.despesas[cat] || {}, janela) / janela.length }));
   const totalMedia = linhas.reduce((s,l) => s + l.media, 0);
   let html = '<div class="essencial-box">';
-  html += '<div class="essencial-title">Custo Essencial Mensal (média do período)</div>';
+  html += `<div class="essencial-title">Custo Essencial Mensal (média dos últimos ${janela.length} ${janela.length===1?'mês':'meses'})</div>`;
   html += '<div class="essencial-list">';
   linhas.forEach(l => {
     html += `<div class="essencial-row"><span class="essencial-label">${l.cat}</span><span class="essencial-value">${brl(l.media)}</span></div>`;
   });
   html += `<div class="essencial-row essencial-total"><span class="essencial-label">Total essencial/mês</span><span class="essencial-value">${brl(totalMedia)}</span></div>`;
   html += '</div>';
-  html += `<div class="essencial-note">Média mensal só do que é indispensável pra manter a igreja funcionando (salário pastoral, água, luz, monitoramento e limpeza) — é o "chão" mínimo que a arrecadação do mês precisa cobrir.</div>`;
+  html += `<div class="essencial-note">Média dos últimos ${janela.length===1?'1 mês':janela.length+' meses'} (${mesLabelCurto(janela[0])}${janela.length>1?' a '+mesLabelCurto(janela[janela.length-1]):''}) só do que é indispensável pra manter a igreja funcionando (salário pastoral, água, luz, monitoramento e limpeza) — é o "chão" mínimo que a arrecadação do mês precisa cobrir.</div>`;
   html += '</div>';
   return html;
 }
