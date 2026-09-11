@@ -349,6 +349,16 @@
   .trend-stat-value.good { color: var(--good); }
   .trend-stat-note { font-size: 11.5px; color: var(--ink-soft); }
 
+  .essencial-box { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--card-border); }
+  .essencial-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-mute); margin-bottom: 10px; }
+  .essencial-list { display: flex; flex-direction: column; gap: 7px; }
+  .essencial-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }
+  .essencial-label { color: var(--ink-soft); }
+  .essencial-value { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .essencial-row.essencial-total { border-top: 1px solid var(--card-border); padding-top: 8px; margin-top: 2px; }
+  .essencial-row.essencial-total .essencial-label, .essencial-row.essencial-total .essencial-value { font-weight: 700; color: var(--ink); font-size: 14px; }
+  .essencial-note { margin-top: 10px; font-size: 11.5px; color: var(--ink-mute); line-height: 1.5; }
+
   /* ---------- Tables ---------- */
   .table-scroll { overflow-x: auto; }
   table.simple { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
@@ -573,6 +583,7 @@
             <div class="card-head"><span class="card-title">Evolução das Despesas</span></div>
             <div class="chart-scroll"><div class="chart-wrap" id="ds-trend"></div></div>
             <div id="ds-trend-stats"></div>
+            <div id="ds-essencial"></div>
           </div>
           <div class="card">
             <div class="card-head"><span class="card-title">Por categoria</span></div>
@@ -1061,6 +1072,23 @@ function buildAlertaDespesas(meses) {
   }
   return `<div class="alerta-card ${tier}">${ICON_ALERT}<span>${texto}</span></div>`;
 }
+const CATEGORIAS_ESSENCIAIS = ['Salário Pastoral', 'Água', 'Energia', 'Monitoramento/Segurança', 'Limpeza'];
+function buildCustoEssencial(meses) {
+  if (!meses.length) return '';
+  const linhas = CATEGORIAS_ESSENCIAIS.map(cat => ({ cat, media: sumRange(DATA.despesas[cat] || {}, meses) / meses.length }));
+  const totalMedia = linhas.reduce((s,l) => s + l.media, 0);
+  let html = '<div class="essencial-box">';
+  html += '<div class="essencial-title">Custo Essencial Mensal (média do período)</div>';
+  html += '<div class="essencial-list">';
+  linhas.forEach(l => {
+    html += `<div class="essencial-row"><span class="essencial-label">${l.cat}</span><span class="essencial-value">${brl(l.media)}</span></div>`;
+  });
+  html += `<div class="essencial-row essencial-total"><span class="essencial-label">Total essencial/mês</span><span class="essencial-value">${brl(totalMedia)}</span></div>`;
+  html += '</div>';
+  html += `<div class="essencial-note">Média mensal só do que é indispensável pra manter a igreja funcionando (salário pastoral, água, luz, monitoramento e limpeza) — é o "chão" mínimo que a arrecadação do mês precisa cobrir.</div>`;
+  html += '</div>';
+  return html;
+}
 function buildTrendStatsDespesas(meses, vals) {
   if (vals.length < 3) return '';
   let maiorAltaIdx = -1, maiorAltaPct = -Infinity;
@@ -1125,6 +1153,7 @@ function renderDespesas() {
 
   buildTrendChart(document.getElementById('ds-trend'), meses, vals, cssVar('--critical','#C0453B'));
   document.getElementById('ds-trend-stats').innerHTML = buildTrendStatsDespesas(meses, vals);
+  document.getElementById('ds-essencial').innerHTML = buildCustoEssencial(meses);
 
   const cats = sortedCats(DATA.despesas, meses);
   const totals = cats.map(c => sumRange(DATA.despesas[c], meses));
