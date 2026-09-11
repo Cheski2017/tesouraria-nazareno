@@ -326,6 +326,9 @@
   .hbar-track { background: var(--page-bg); border: 1px solid var(--card-border); border-radius: 3px; height: 14px; overflow: hidden; }
   .hbar-fill { height: 100%; border-radius: 2px; }
   .hbar-value { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; white-space: nowrap; }
+  .hbar-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--card-border); font-size: 11px; color: var(--ink-mute); }
+  .hbar-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .hbar-legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 
   /* ---------- Tables ---------- */
   .table-scroll { overflow-x: auto; }
@@ -1013,6 +1016,20 @@ function renderReceitas() {
 }
 
 /* ============ DESPESAS ============ */
+function hbarColor(pctTotal) {
+  if (pctTotal >= 20) return cssVar('--critical','#C0453B');
+  if (pctTotal >= 10) return cssVar('--accent','#B9852A');
+  if (pctTotal >= 5) return cssVar('--info','#2F6FE0');
+  return cssVar('--good','#1E8E5A');
+}
+function hbarLegendHtml() {
+  return `<div class="hbar-legend">
+    <span><span class="hbar-legend-dot" style="background:${cssVar('--critical','#C0453B')}"></span>≥ 20% do total</span>
+    <span><span class="hbar-legend-dot" style="background:${cssVar('--accent','#B9852A')}"></span>10–20%</span>
+    <span><span class="hbar-legend-dot" style="background:${cssVar('--info','#2F6FE0')}"></span>5–10%</span>
+    <span><span class="hbar-legend-dot" style="background:${cssVar('--good','#1E8E5A')}"></span>&lt; 5%</span>
+  </div>`;
+}
 function renderDespesas() {
   const meses = mesesInRange();
   const vals = meses.map(m => DATA.totalDespesas[m]||0);
@@ -1036,12 +1053,14 @@ function renderDespesas() {
   document.getElementById('ds-hbars').innerHTML = cats.map((cat,i) => {
     const pending = cat === 'A revisar';
     const widthPct = Math.max(1.5, (totals[i]/maxV)*100);
+    const pctTotal = total > 0 ? (totals[i]/total)*100 : 0;
+    const barColor = pending ? cssVar('--ink-mute','#8A90A6') : hbarColor(pctTotal);
     return `<div class="hbar-row${pending?' pending':''}">
       <span class="hbar-label" title="${cat}">${cat}${pending?' *':''}</span>
-      <span class="hbar-track"><span class="hbar-fill" style="width:${widthPct}%;background:${pending?cssVar('--ink-mute','#8A90A6'):cssVar('--critical','#C0453B')}"></span></span>
-      <span class="hbar-value">${brl(totals[i])}</span>
+      <span class="hbar-track"><span class="hbar-fill" style="width:${widthPct}%;background:${barColor}"></span></span>
+      <span class="hbar-value" title="${pctTotal.toFixed(1)}% do total">${brl(totals[i])}</span>
     </div>`;
-  }).join('');
+  }).join('') + hbarLegendHtml();
 
   buildCatTable(document.getElementById('ds-table'), cats, DATA.despesas, meses);
 }
