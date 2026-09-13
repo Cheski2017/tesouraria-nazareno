@@ -1389,6 +1389,8 @@ const CUSTOS_ESSENCIAIS_FIXOS = [
   { cat: 'Água', valor: 310 },
   { cat: 'Energia', valor: 155 },
   { cat: 'Monitoramento/Segurança', valor: 133 },
+  { cat: 'Repasse Associação', valor: 700 },
+  { cat: 'Oferta Missões', valor: 150 },
 ];
 function buildCustoEssencial() {
   const totalFixo = CUSTOS_ESSENCIAIS_FIXOS.reduce((s,l) => s + l.valor, 0);
