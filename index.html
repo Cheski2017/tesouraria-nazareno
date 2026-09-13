@@ -865,25 +865,27 @@ function buildComboChart(container, meses, receitaVals, despesaVals, tituloResul
 
 /* ============ Single-series trend bar chart ============ */
 function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo) {
-  const W = Math.max(700, meses.length * 56), H = 220;
-  const M = { top: 12, right: 12, bottom: 24, left: 58 };
+  const W = Math.max(700, meses.length * 76), H = 220;
+  const M = { top: 22, right: 12, bottom: 24, left: 58 };
   const plotW = W-M.left-M.right, plotH = H-M.top-M.bottom;
-  const groupW = plotW/meses.length, barW = Math.min(22, groupW*0.55);
-  const maxVal = Math.max(...vals, 1), yMax = maxVal*1.1;
+  const groupW = plotW/meses.length, barW = Math.min(40, groupW*0.72);
+  const maxVal = Math.max(...vals, 1), yMax = maxVal*1.22;
   const yScale = v => plotH - (v/yMax)*plotH;
-  const cLine = cssVar('--line','#E7E9F1'), cMute = cssVar('--ink-mute','#8A90A6');
+  const cLine = cssVar('--line','#E7E9F1'), cMute = cssVar('--ink-mute','#8A90A6'), cInk = cssVar('--ink','#1B1F33');
   const media = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
   const corUnica = !colorAbaixo;
+  const brlCompact = v => Math.round(v).toLocaleString('pt-BR');
 
   let gridlines='', steps=4;
   for (let i=0;i<=steps;i++){ const v=yMax*(i/steps); const y=yScale(v);
     gridlines += `<line x1="0" y1="${y}" x2="${plotW}" y2="${y}" stroke="${cLine}" stroke-width="1"/><text x="-8" y="${y+4}" text-anchor="end" font-size="10" fill="${cMute}">${brl(v)}</text>`; }
 
-  let bars='', xLabels='', hitAreas='';
+  let bars='', xLabels='', hitAreas='', valLabels='';
   meses.forEach((m,i)=>{
     const gx=i*groupW, cx=gx+groupW/2, y=yScale(vals[i]), h=plotH-y;
     const fill = corUnica ? colorAcima : (vals[i] >= media ? colorAcima : colorAbaixo);
     bars += `<rect x="${cx-barW/2}" y="${y}" width="${barW}" height="${Math.max(h,0.5)}" rx="3" fill="${fill}"/>`;
+    valLabels += `<text x="${cx}" y="${y-7}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${cInk}">${brlCompact(vals[i])}</text>`;
     xLabels += `<text x="${cx}" y="${plotH+18}" text-anchor="middle" font-size="10.5" fill="${cMute}">${mesLabelCurto(m)}</text>`;
     hitAreas += `<rect data-i="${i}" x="${gx}" y="0" width="${groupW}" height="${plotH}" fill="transparent" style="cursor:pointer"/>`;
   });
@@ -894,7 +896,7 @@ function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo) {
     const cBg = cssVar('--card-bg','#FFFFFF');
     linhaMedia = `<line x1="0" y1="${yMedia}" x2="${plotW}" y2="${yMedia}" stroke="${cMute}" stroke-width="1.3" stroke-dasharray="5 4"/><rect x="${-10-labelW}" y="${yMedia-8}" width="${labelW}" height="15" fill="${cBg}"/><text x="-8" y="${yMedia+4}" text-anchor="end" font-size="10" font-weight="700" fill="${cMute}">${mediaLabel}</text>`;
   }
-  container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><g transform="translate(${M.left},${M.top})">${gridlines}${bars}${linhaMedia}${xLabels}${hitAreas}</g></svg><div class="tooltip" id="${container.id}-tt"></div>`;
+  container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><g transform="translate(${M.left},${M.top})">${gridlines}${bars}${linhaMedia}${valLabels}${xLabels}${hitAreas}</g></svg><div class="tooltip" id="${container.id}-tt"></div>`;
   const tt = document.getElementById(container.id+'-tt');
   container.querySelectorAll('rect[data-i]').forEach(el=>{
     el.addEventListener('mousemove', e=>{
