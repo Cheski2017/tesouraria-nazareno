@@ -527,6 +527,7 @@
     <nav id="nav-list"></nav>
 
     <div class="sidebar-footer">
+      <button class="theme-toggle" id="fullscreen-toggle" type="button"><svg class="icon" id="fullscreen-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3"/><path d="M21 8V5a2 2 0 00-2-2h-3"/><path d="M3 16v3a2 2 0 002 2h3"/><path d="M16 21h3a2 2 0 002-2v-3"/></svg><span id="fullscreen-toggle-label">Tela cheia</span></button>
       <div class="verse"><b>2 Coríntios 9:7</b><br>“Cada um contribua segundo propôs no seu coração, não com tristeza ou por necessidade; porque Deus ama a quem dá com alegria.”</div>
       <div class="sync-note" id="sync-note">Dados ao vivo da aba Base</div>
       <button class="theme-toggle" id="theme-toggle" type="button"><svg class="icon" id="theme-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/></svg><span id="theme-toggle-label">Tema escuro</span></button>
@@ -752,6 +753,26 @@ document.getElementById('theme-toggle').addEventListener('click', function () {
   updateThemeToggleUI(next);
   if (DATA) renderSection(currentSection);
 });
+
+/* ============ Tela cheia ============ */
+const ICON_FS_ENTER = '<path d="M8 3H5a2 2 0 00-2 2v3"/><path d="M21 8V5a2 2 0 00-2-2h-3"/><path d="M3 16v3a2 2 0 002 2h3"/><path d="M16 21h3a2 2 0 002-2v-3"/>';
+const ICON_FS_EXIT = '<path d="M8 3v3a2 2 0 01-2 2H3"/><path d="M21 8h-3a2 2 0 01-2-2V3"/><path d="M3 16h3a2 2 0 012 2v3"/><path d="M16 21v-3a2 2 0 012-2h3"/>';
+function updateFullscreenToggleUI() {
+  const isFs = !!document.fullscreenElement;
+  const icon = document.getElementById('fullscreen-toggle-icon');
+  const label = document.getElementById('fullscreen-toggle-label');
+  if (icon) icon.innerHTML = isFs ? ICON_FS_EXIT : ICON_FS_ENTER;
+  if (label) label.textContent = isFs ? 'Sair da tela cheia' : 'Tela cheia';
+}
+updateFullscreenToggleUI();
+document.getElementById('fullscreen-toggle').addEventListener('click', function () {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(function () {});
+  } else {
+    document.exitFullscreen().catch(function () {});
+  }
+});
+document.addEventListener('fullscreenchange', updateFullscreenToggleUI);
 
 /* ============ Sidebar nav ============ */
 const NAV_ICONS = {
