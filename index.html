@@ -864,7 +864,7 @@ function buildComboChart(container, meses, receitaVals, despesaVals, tituloResul
 }
 
 /* ============ Single-series trend bar chart ============ */
-function buildTrendChart(container, meses, vals, color) {
+function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo) {
   const W = Math.max(700, meses.length * 56), H = 220;
   const M = { top: 12, right: 12, bottom: 24, left: 58 };
   const plotW = W-M.left-M.right, plotH = H-M.top-M.bottom;
@@ -872,6 +872,8 @@ function buildTrendChart(container, meses, vals, color) {
   const maxVal = Math.max(...vals, 1), yMax = maxVal*1.1;
   const yScale = v => plotH - (v/yMax)*plotH;
   const cLine = cssVar('--line','#E7E9F1'), cMute = cssVar('--ink-mute','#8A90A6');
+  const media = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+  const corUnica = !colorAbaixo;
 
   let gridlines='', steps=4;
   for (let i=0;i<=steps;i++){ const v=yMax*(i/steps); const y=yScale(v);
@@ -880,16 +882,25 @@ function buildTrendChart(container, meses, vals, color) {
   let bars='', xLabels='', hitAreas='';
   meses.forEach((m,i)=>{
     const gx=i*groupW, cx=gx+groupW/2, y=yScale(vals[i]), h=plotH-y;
-    bars += `<rect x="${cx-barW/2}" y="${y}" width="${barW}" height="${Math.max(h,0.5)}" rx="3" fill="${color}"/>`;
+    const fill = corUnica ? colorAcima : (vals[i] >= media ? colorAcima : colorAbaixo);
+    bars += `<rect x="${cx-barW/2}" y="${y}" width="${barW}" height="${Math.max(h,0.5)}" rx="3" fill="${fill}"/>`;
     xLabels += `<text x="${cx}" y="${plotH+18}" text-anchor="middle" font-size="10.5" fill="${cMute}">${mesLabelCurto(m)}</text>`;
     hitAreas += `<rect data-i="${i}" x="${gx}" y="0" width="${groupW}" height="${plotH}" fill="transparent" style="cursor:pointer"/>`;
   });
-  container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><g transform="translate(${M.left},${M.top})">${gridlines}${bars}${xLabels}${hitAreas}</g></svg><div class="tooltip" id="${container.id}-tt"></div>`;
+  let linhaMedia = '';
+  if (!corUnica && vals.length > 1) {
+    const yMedia = yScale(media);
+    const mediaLabel = brl(media), labelW = mediaLabel.length*6 + 6;
+    const cBg = cssVar('--card-bg','#FFFFFF');
+    linhaMedia = `<line x1="0" y1="${yMedia}" x2="${plotW}" y2="${yMedia}" stroke="${cMute}" stroke-width="1.3" stroke-dasharray="5 4"/><rect x="${-10-labelW}" y="${yMedia-8}" width="${labelW}" height="15" fill="${cBg}"/><text x="-8" y="${yMedia+4}" text-anchor="end" font-size="10" font-weight="700" fill="${cMute}">${mediaLabel}</text>`;
+  }
+  container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><g transform="translate(${M.left},${M.top})">${gridlines}${bars}${linhaMedia}${xLabels}${hitAreas}</g></svg><div class="tooltip" id="${container.id}-tt"></div>`;
   const tt = document.getElementById(container.id+'-tt');
   container.querySelectorAll('rect[data-i]').forEach(el=>{
     el.addEventListener('mousemove', e=>{
       const i=+el.getAttribute('data-i'); const rect=container.getBoundingClientRect();
-      tt.innerHTML = `<div class="t-title">${mesLabelLongo(meses[i])}</div>${brl(vals[i])}`;
+      const vsMedia = !corUnica && vals.length>1 ? `<br>${vals[i]>=media?'▲':'▼'} ${brlSigned(vals[i]-media)} vs média` : '';
+      tt.innerHTML = `<div class="t-title">${mesLabelLongo(meses[i])}</div>${brl(vals[i])}${vsMedia}`;
       tt.style.left=(e.clientX-rect.left+14)+'px'; tt.style.top=(e.clientY-rect.top-10)+'px'; tt.classList.add('show');
     });
     el.addEventListener('mouseleave', ()=>tt.classList.remove('show'));
@@ -1072,7 +1083,7 @@ function renderReceitas() {
     kpiCard('Melhor Mês', vals.length?brl(vals[maiorIdx]):'—', ICON_BANK, 'accent', `<span class="kpi-delta flat">${vals.length?mesLabelLongo(meses[maiorIdx]):''}</span>`) +
     kpiCard('Dízimos no Período', brl(sumRange(DATA.receitas['Dízimo']||{}, meses)), ICON_UP, 'good', `<span class="kpi-delta flat">${total>0?((sumRange(DATA.receitas['Dízimo']||{},meses)/total)*100).toFixed(1):'0'}% do total</span>`);
 
-  buildTrendChart(document.getElementById('rc-trend'), meses, vals, cssVar('--good','#1E8E5A'));
+  buildTrendChart(document.getElementById('rc-trend'), meses, vals, cssVar('--good','#1E8E5A'), cssVar('--critical','#C0453B'));
 
   const cats = sortedCats(DATA.receitas, meses);
   const totals = cats.map(c => sumRange(DATA.receitas[c], meses));
@@ -1190,7 +1201,7 @@ function renderDespesas() {
     kpiCard('Maior Mês', vals.length?brl(vals[maiorIdx]):'—', ICON_BANK, 'accent', `<span class="kpi-delta flat">${vals.length?mesLabelLongo(meses[maiorIdx]):''}</span>`) +
     kpiCard('Salário Pastoral no Período', brl(sumRange(DATA.despesas['Salário Pastoral']||{}, meses)), ICON_DOWN, 'critical', `<span class="kpi-delta flat">${total>0?((sumRange(DATA.despesas['Salário Pastoral']||{},meses)/total)*100).toFixed(1):'0'}% do total</span>`);
 
-  buildTrendChart(document.getElementById('ds-trend'), meses, vals, cssVar('--critical','#C0453B'));
+  buildTrendChart(document.getElementById('ds-trend'), meses, vals, cssVar('--critical','#C0453B'), cssVar('--good','#1E8E5A'));
   document.getElementById('ds-trend-stats').innerHTML = buildTrendStatsDespesas(meses, vals);
   document.getElementById('ds-essencial').innerHTML = buildCustoEssencial();
 
