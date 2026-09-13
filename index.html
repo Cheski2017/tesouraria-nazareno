@@ -491,22 +491,122 @@
     .hbar-label { font-size: 11px; }
     .hbar-value { font-size: 11px; }
   }
+
+  /* ---------- Login (NazaControl) ---------- */
+  #login-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(52,211,153,0.10), transparent 42%),
+      radial-gradient(circle at 85% 78%, rgba(52,211,153,0.07), transparent 46%),
+      linear-gradient(160deg, #0a0f1a 0%, #0e1f22 55%, #12302a 100%);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .login-wrap { width: 100%; max-width: 380px; }
+  .login-card {
+    background: rgba(15,23,32,0.88);
+    border: 1px solid rgba(148,163,184,0.18);
+    border-radius: 18px;
+    padding: 34px 30px 26px;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    display: flex; flex-direction: column; gap: 16px;
+    color: #E2E8F0;
+  }
+  .login-logo-wrap {
+    width: 76px; height: 76px; border-radius: 50%;
+    background: #0b1220; border: 1px solid rgba(148,163,184,0.25);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 6px; padding: 12px; box-sizing: border-box;
+  }
+  .login-logo-wrap img { width: 100%; height: 100%; object-fit: contain; }
+  .login-title { text-align: center; }
+  .login-title h1 { font-size: 25px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.01em; color: #F8FAFC; }
+  .login-title h1 span { color: #34D399; }
+  .login-title .lt-sub1 { font-size: 12px; color: #94A3B8; margin: 0; }
+  .login-title .lt-sub2 { font-size: 10.5px; color: #64748B; margin: 3px 0 0; letter-spacing: 0.02em; }
+  .login-field { display: flex; flex-direction: column; gap: 6px; }
+  .login-field-label-row { display: flex; align-items: center; justify-content: space-between; }
+  .login-field label { font-size: 12px; font-weight: 600; color: #CBD5E1; }
+  .login-forgot { font-size: 11px; color: #34D399; cursor: pointer; background: none; border: none; padding: 0; font-family: inherit; }
+  .login-forgot:hover { text-decoration: underline; }
+  .login-input-wrap { position: relative; display: flex; align-items: center; }
+  .login-input-wrap .li-icon { position: absolute; left: 12px; width: 15px; height: 15px; color: #64748B; pointer-events: none; }
+  .login-input-wrap input {
+    width: 100%; box-sizing: border-box;
+    padding: 10px 12px 10px 36px;
+    background: #0b1220; border: 1px solid rgba(148,163,184,0.25); border-radius: 9px;
+    color: #F1F5F9; font-size: 13.5px; font-family: inherit;
+  }
+  .login-input-wrap input::placeholder { color: #475569; }
+  .login-input-wrap input:focus { outline: none; border-color: #34D399; box-shadow: 0 0 0 3px rgba(52,211,153,0.15); }
+  .login-input-wrap .li-eye { position: absolute; right: 10px; background: none; border: none; color: #64748B; cursor: pointer; padding: 4px; display: flex; }
+  .login-input-wrap .li-eye:hover { color: #CBD5E1; }
+  .login-input-wrap .li-eye svg { width: 15px; height: 15px; }
+  .login-msg-info { font-size: 11px; color: #94A3B8; margin-top: -6px; display: none; line-height: 1.5; }
+  .login-remember { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #94A3B8; cursor: pointer; }
+  .login-remember input { accent-color: #10B981; width: 15px; height: 15px; }
+  .login-submit {
+    background: linear-gradient(135deg, #34D399, #10B981);
+    color: #06281C; border: none; border-radius: 9px; padding: 12px;
+    font-size: 13.5px; font-weight: 800; cursor: pointer; letter-spacing: 0.01em;
+  }
+  .login-submit:hover { filter: brightness(1.06); }
+  .login-submit:disabled { opacity: 0.7; cursor: default; }
+  .login-error { color: #FCA5A5; font-size: 12px; background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); padding: 8px 10px; border-radius: 8px; display: none; }
+  .login-footer { border-top: 1px solid rgba(148,163,184,0.15); padding-top: 14px; text-align: center; }
+  .login-footer .lf-mod { font-size: 11px; color: #94A3B8; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .login-footer .lf-mod svg { width: 13px; height: 13px; color: #34D399; flex-shrink: 0; }
+  .login-footer .lf-items { font-size: 10.5px; color: #64748B; margin-top: 3px; }
+  .login-copy { text-align: center; font-size: 11px; color: #64748B; margin-top: 18px; }
 </style>
 </head>
 <body>
 
-<div id="login-overlay" style="position:fixed;inset:0;z-index:99999;background:var(--sidebar-bg);display:flex;align-items:center;justify-content:center;padding:20px;">
-  <form id="login-form" style="background:var(--card-bg);border-radius:14px;padding:32px 28px;max-width:340px;width:100%;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;">
-    <div style="text-align:center;">
-      <div style="font-size:14.5px;font-weight:700;color:var(--ink);letter-spacing:0.02em;">TESOURARIA</div>
-      <div style="font-size:11.5px;color:var(--ink-mute);margin-top:2px;">Igreja Nazareno Guarapuava</div>
-    </div>
-    <label style="font-size:12.5px;font-weight:600;color:var(--ink-soft);">Senha de acesso
-      <input id="login-senha" type="password" required autocomplete="current-password" style="margin-top:6px;width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--card-border);font-size:14px;font-family:inherit;box-sizing:border-box;">
-    </label>
-    <div id="login-error" style="display:none;color:var(--critical);font-size:12px;"></div>
-    <button id="login-submit" type="submit" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px;font-size:13.5px;font-weight:700;cursor:pointer;">Entrar</button>
-  </form>
+<div id="login-overlay">
+  <div class="login-wrap">
+    <form id="login-form" class="login-card">
+      <div class="login-logo-wrap"><img src="logo.jpg" alt="Logo Igreja Evangélica Nazareno"></div>
+      <div class="login-title">
+        <h1>Naza<span>Control</span></h1>
+        <p class="lt-sub1">Igreja Evangélica Nazareno de Guarapuava</p>
+        <p class="lt-sub2">Sistema de Controle Financeiro • Tesouraria</p>
+      </div>
+
+      <div class="login-field">
+        <label for="login-user">Usuário</label>
+        <div class="login-input-wrap">
+          <svg class="li-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg>
+          <input id="login-user" type="text" autocomplete="username" placeholder="Usuário" required>
+        </div>
+      </div>
+
+      <div class="login-field">
+        <div class="login-field-label-row">
+          <label for="login-senha">Senha</label>
+          <button type="button" class="login-forgot" id="login-forgot">Esqueceu a senha?</button>
+        </div>
+        <div class="login-input-wrap">
+          <svg class="li-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+          <input id="login-senha" type="password" autocomplete="current-password" placeholder="••••••••" required>
+          <button type="button" class="li-eye" id="login-eye" aria-label="Mostrar senha"><svg id="login-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+      </div>
+      <div class="login-msg-info" id="login-forgot-msg">Fale com o tesoureiro responsável para redefinir sua senha.</div>
+
+      <label class="login-remember"><input type="checkbox" id="login-remember"> Lembrar meu acesso neste dispositivo</label>
+
+      <div id="login-error" class="login-error"></div>
+
+      <button id="login-submit" type="submit" class="login-submit">Acessar Sistema</button>
+
+      <div class="login-footer">
+        <div class="lf-mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>Módulo Tesouraria &amp; Gestão Financeira</div>
+        <div class="lf-items">Entradas • Saídas • Saldos • DRE</div>
+      </div>
+    </form>
+    <p class="login-copy">© NazaControl — Sistema Interno</p>
+  </div>
 </div>
 
 <div class="shell">
@@ -1575,20 +1675,48 @@ function initDashboard() {
 (function () {
   const overlay = document.getElementById('login-overlay');
   const form = document.getElementById('login-form');
+  const userInput = document.getElementById('login-user');
   const input = document.getElementById('login-senha');
   const errEl = document.getElementById('login-error');
   const btn = document.getElementById('login-submit');
+  const rememberEl = document.getElementById('login-remember');
+  const eyeBtn = document.getElementById('login-eye');
+  const eyeIcon = document.getElementById('login-eye-icon');
+  const forgotBtn = document.getElementById('login-forgot');
+  const forgotMsg = document.getElementById('login-forgot-msg');
 
-  function tentarLogin(senha) {
+  const ICON_EYE = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/>';
+  const ICON_EYE_OFF = '<path d="M17.94 17.94A10.94 10.94 0 0112 19c-7 0-11-7-11-7a18.66 18.66 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 7 11 7a18.5 18.5 0 01-2.16 3.19"/><path d="M14.12 14.12a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+
+  eyeBtn.addEventListener('click', function () {
+    const isPw = input.type === 'password';
+    input.type = isPw ? 'text' : 'password';
+    eyeIcon.innerHTML = isPw ? ICON_EYE_OFF : ICON_EYE;
+  });
+
+  forgotBtn.addEventListener('click', function () {
+    forgotMsg.style.display = forgotMsg.style.display === 'block' ? 'none' : 'block';
+  });
+
+  function tentarLogin(usuario, senha) {
+    if (String(usuario||'').trim().toLowerCase() !== 'admin') {
+      errEl.textContent = 'Usuário ou senha incorretos.';
+      errEl.style.display = 'block';
+      return;
+    }
     btn.disabled = true; btn.textContent = 'Conectando… (pode levar alguns segundos)';
     errEl.style.display = 'none';
     carregarDadosJSONP(senha).then(function (dados) {
       DATA = dados;
-      try { localStorage.setItem('tesouraria-senha', senha); } catch (e) {}
+      if (rememberEl.checked) {
+        try { localStorage.setItem('tesouraria-senha', senha); localStorage.setItem('tesouraria-user', usuario); } catch (e) {}
+      } else {
+        try { localStorage.removeItem('tesouraria-senha'); localStorage.removeItem('tesouraria-user'); } catch (e) {}
+      }
       overlay.style.display = 'none';
       initDashboard();
     }).catch(function (err) {
-      btn.disabled = false; btn.textContent = 'Entrar';
+      btn.disabled = false; btn.textContent = 'Acessar Sistema';
       errEl.textContent = err.message || 'Senha incorreta.';
       errEl.style.display = 'block';
       input.value = '';
@@ -1598,12 +1726,13 @@ function initDashboard() {
 
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
-    tentarLogin(input.value);
+    tentarLogin(userInput.value, input.value);
   });
 
-  let saved = null;
-  try { saved = localStorage.getItem('tesouraria-senha'); } catch (e) {}
-  if (saved) { input.value = saved; }
+  let savedUser = null, savedSenha = null;
+  try { savedUser = localStorage.getItem('tesouraria-user'); savedSenha = localStorage.getItem('tesouraria-senha'); } catch (e) {}
+  if (savedUser) userInput.value = savedUser;
+  if (savedSenha) { input.value = savedSenha; rememberEl.checked = true; }
 })();
 </script>
 </body>
