@@ -1007,16 +1007,16 @@ function previousRangeMeses() {
 
 /* ============ Combo chart (Receitas x Despesas x Saldo) ============ */
 function buildComboChart(container, meses, receitaVals, despesaVals, tituloResultado) {
-  const W = Math.max(700, meses.length * 62);
+  const W = Math.max(700, meses.length * 76);
   const H = 280;
-  const M = { top: 14, right: 16, bottom: 26, left: 62 };
+  const M = { top: 28, right: 16, bottom: 26, left: 62 };
   const plotW = W - M.left - M.right, plotH = H - M.top - M.bottom;
   const groupW = plotW / meses.length;
-  const barW = Math.min(15, groupW * 0.28);
+  const barW = Math.min(30, groupW * 0.32);
   const resultadoVals = meses.map((m,i) => receitaVals[i] - despesaVals[i]);
   const maxVal = Math.max(...receitaVals, ...despesaVals, 1);
   const minRes = Math.min(...resultadoVals, 0);
-  const yMax = maxVal * 1.08, yMin = Math.min(minRes * 1.15, 0);
+  const yMax = maxVal * 1.2, yMin = Math.min(minRes * 1.3, 0);
   const yScale = v => plotH - ((v - yMin) / (yMax - yMin)) * plotH;
 
   const cGood = cssVar('--good','#1E8E5A'), cCrit = cssVar('--critical','#C0453B'),
@@ -1029,23 +1029,28 @@ function buildComboChart(container, meses, receitaVals, despesaVals, tituloResul
   const zeroY = yScale(0);
   gridlines += `<line x1="0" y1="${zeroY}" x2="${plotW}" y2="${zeroY}" stroke="${cMute}" stroke-width="1.1"/>`;
 
-  let bars='', dots='', linePath='', hitAreas='', xLabels='';
+  let bars='', dots='', linePath='', hitAreas='', xLabels='', valLabels='', saldoLabels='';
   meses.forEach((m,i)=>{
     const gx=i*groupW, cx=gx+groupW/2;
     const rY=yScale(receitaVals[i]), dY=yScale(despesaVals[i]);
     const rH=plotH-rY, dH=plotH-dY;
-    const rx=cx-barW-2, dx=cx+2;
+    const rx=cx-barW-1.5, dx=cx+1.5;
     bars += `<rect x="${rx}" y="${rY}" width="${barW}" height="${Math.max(rH,0.5)}" rx="2" fill="${cGood}"/>`;
     bars += `<rect x="${dx}" y="${dY}" width="${barW}" height="${Math.max(dH,0.5)}" rx="2" fill="${cCrit}"/>`;
+    valLabels += `<text x="${rx+barW/2}" y="${rY-6}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${cGood}">${brl(receitaVals[i])}</text>`;
+    valLabels += `<text x="${dx+barW/2}" y="${dY-6}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${cCrit}">${brl(despesaVals[i])}</text>`;
     const py=yScale(resultadoVals[i]);
     linePath += (i===0?'M':'L')+cx+','+py+' ';
+    const saldoLabel = brlSigned(resultadoVals[i]);
+    const lw = saldoLabel.length*5.4+6;
+    saldoLabels += `<rect x="${cx-lw/2}" y="${py-22}" width="${lw}" height="13" rx="3" fill="${cCard}" opacity="0.9"/><text x="${cx}" y="${py-12}" text-anchor="middle" font-size="9" font-weight="700" fill="${cInfo}">${saldoLabel}</text>`;
     dots += `<circle cx="${cx}" cy="${py}" r="3.4" fill="${cInfo}" stroke="${cCard}" stroke-width="1.5"/>`;
     xLabels += `<text x="${cx}" y="${plotH+20}" text-anchor="middle" font-size="10.5" fill="${cMute}">${mesLabelCurto(m)}</text>`;
     hitAreas += `<rect data-i="${i}" x="${gx}" y="0" width="${groupW}" height="${plotH}" fill="transparent" style="cursor:pointer"/>`;
   });
 
   container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><g transform="translate(${M.left},${M.top})">
-      ${gridlines}${bars}<path d="${linePath}" fill="none" stroke="${cInfo}" stroke-width="2"/>${dots}${xLabels}${hitAreas}
+      ${gridlines}${bars}${valLabels}<path d="${linePath}" fill="none" stroke="${cInfo}" stroke-width="2"/>${saldoLabels}${dots}${xLabels}${hitAreas}
     </g></svg><div class="tooltip" id="${container.id}-tt"></div>`;
   const tt = document.getElementById(container.id+'-tt');
   container.querySelectorAll('rect[data-i]').forEach(el=>{
