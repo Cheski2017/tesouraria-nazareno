@@ -1106,22 +1106,25 @@ function buildAlertaDespesas(meses) {
   }
   return `<div class="alerta-card ${tier}">${ICON_ALERT}<span>${texto}</span></div>`;
 }
-const CATEGORIAS_ESSENCIAIS = ['Salário Pastoral', 'Água', 'Energia', 'Monitoramento/Segurança', 'Limpeza'];
-function buildCustoEssencial(meses) {
-  if (!meses.length) return '';
-  const endIdx = allMeses.indexOf(meses[meses.length-1]);
-  const janela = allMeses.slice(Math.max(0, endIdx-2), endIdx+1);
-  const linhas = CATEGORIAS_ESSENCIAIS.map(cat => ({ cat, media: sumRange(DATA.despesas[cat] || {}, janela) / janela.length }));
-  const totalMedia = linhas.reduce((s,l) => s + l.media, 0);
+const CUSTOS_ESSENCIAIS_FIXOS = [
+  { cat: 'Salário Pastoral', valor: 3026.11 },
+  { cat: 'Aplicação Cooperativa', valor: 55 },
+  { cat: 'Tarifa Bancária', valor: 42 },
+  { cat: 'Água', valor: 310 },
+  { cat: 'Energia', valor: 155 },
+  { cat: 'Monitoramento/Segurança', valor: 133 },
+];
+function buildCustoEssencial() {
+  const totalFixo = CUSTOS_ESSENCIAIS_FIXOS.reduce((s,l) => s + l.valor, 0);
   let html = '<div class="essencial-box">';
-  html += `<div class="essencial-title">Custo Essencial Mensal (média dos últimos ${janela.length} ${janela.length===1?'mês':'meses'})</div>`;
+  html += '<div class="essencial-title">Custo Essencial Mensal (fixo aproximado)</div>';
   html += '<div class="essencial-list">';
-  linhas.forEach(l => {
-    html += `<div class="essencial-row"><span class="essencial-label">${l.cat}</span><span class="essencial-value">${brl(l.media)}</span></div>`;
+  CUSTOS_ESSENCIAIS_FIXOS.forEach(l => {
+    html += `<div class="essencial-row"><span class="essencial-label">${l.cat}</span><span class="essencial-value">${brl(l.valor)}</span></div>`;
   });
-  html += `<div class="essencial-row essencial-total"><span class="essencial-label">Total essencial/mês</span><span class="essencial-value">${brl(totalMedia)}</span></div>`;
+  html += `<div class="essencial-row essencial-total"><span class="essencial-label">Total essencial/mês</span><span class="essencial-value">${brl(totalFixo)}</span></div>`;
   html += '</div>';
-  html += `<div class="essencial-note">Média dos últimos ${janela.length===1?'1 mês':janela.length+' meses'} (${mesLabelCurto(janela[0])}${janela.length>1?' a '+mesLabelCurto(janela[janela.length-1]):''}) só do que é indispensável pra manter a igreja funcionando (salário pastoral, água, luz, monitoramento e limpeza) — é o "chão" mínimo que a arrecadação do mês precisa cobrir.</div>`;
+  html += `<div class="essencial-note">Valores fixos aproximados (definidos manualmente) — é o "chão" mínimo que a arrecadação do mês precisa cobrir pra manter a igreja funcionando.</div>`;
   html += '</div>';
   return html;
 }
@@ -1189,7 +1192,7 @@ function renderDespesas() {
 
   buildTrendChart(document.getElementById('ds-trend'), meses, vals, cssVar('--critical','#C0453B'));
   document.getElementById('ds-trend-stats').innerHTML = buildTrendStatsDespesas(meses, vals);
-  document.getElementById('ds-essencial').innerHTML = buildCustoEssencial(meses);
+  document.getElementById('ds-essencial').innerHTML = buildCustoEssencial();
 
   const cats = sortedCats(DATA.despesas, meses);
   const totals = cats.map(c => sumRange(DATA.despesas[c], meses));
