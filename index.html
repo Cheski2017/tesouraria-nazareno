@@ -866,7 +866,7 @@ function buildComboChart(container, meses, receitaVals, despesaVals, tituloResul
 /* ============ Single-series trend bar chart ============ */
 function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo) {
   const W = Math.max(700, meses.length * 76), H = 220;
-  const M = { top: 22, right: 12, bottom: 24, left: 58 };
+  const M = { top: 22, right: 12, bottom: 24, left: 96 };
   const plotW = W-M.left-M.right, plotH = H-M.top-M.bottom;
   const groupW = plotW/meses.length, barW = Math.min(40, groupW*0.72);
   const maxVal = Math.max(...vals, 1), yMax = maxVal*1.22;
@@ -874,7 +874,7 @@ function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo) {
   const cLine = cssVar('--line','#E7E9F1'), cMute = cssVar('--ink-mute','#8A90A6'), cInk = cssVar('--ink','#1B1F33');
   const media = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
   const corUnica = !colorAbaixo;
-  const brlCompact = v => Math.round(v).toLocaleString('pt-BR');
+  const brlCompact = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
 
   let gridlines='', steps=4;
   for (let i=0;i<=steps;i++){ const v=yMax*(i/steps); const y=yScale(v);
@@ -892,7 +892,7 @@ function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo) {
   let linhaMedia = '';
   if (!corUnica && vals.length > 1) {
     const yMedia = yScale(media);
-    const mediaLabel = brl(media), labelW = mediaLabel.length*6 + 6;
+    const mediaLabel = brl(media), labelW = mediaLabel.length*6.5 + 8;
     const cBg = cssVar('--card-bg','#FFFFFF');
     linhaMedia = `<line x1="0" y1="${yMedia}" x2="${plotW}" y2="${yMedia}" stroke="${cMute}" stroke-width="1.3" stroke-dasharray="5 4"/><rect x="${-10-labelW}" y="${yMedia-8}" width="${labelW}" height="15" fill="${cBg}"/><text x="-8" y="${yMedia+4}" text-anchor="end" font-size="10" font-weight="700" fill="${cMute}">${mediaLabel}</text>`;
   }
