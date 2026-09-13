@@ -874,7 +874,6 @@ function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo) {
   const cLine = cssVar('--line','#E7E9F1'), cMute = cssVar('--ink-mute','#8A90A6'), cInk = cssVar('--ink','#1B1F33');
   const media = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
   const corUnica = !colorAbaixo;
-  const brlCompact = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
 
   let gridlines='', steps=4;
   for (let i=0;i<=steps;i++){ const v=yMax*(i/steps); const y=yScale(v);
@@ -885,7 +884,7 @@ function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo) {
     const gx=i*groupW, cx=gx+groupW/2, y=yScale(vals[i]), h=plotH-y;
     const fill = corUnica ? colorAcima : (vals[i] >= media ? colorAcima : colorAbaixo);
     bars += `<rect x="${cx-barW/2}" y="${y}" width="${barW}" height="${Math.max(h,0.5)}" rx="3" fill="${fill}"/>`;
-    valLabels += `<text x="${cx}" y="${y-7}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${cInk}">${brlCompact(vals[i])}</text>`;
+    valLabels += `<text x="${cx}" y="${y-7}" text-anchor="middle" font-size="10" font-weight="700" fill="${cInk}">${brl(vals[i])}</text>`;
     xLabels += `<text x="${cx}" y="${plotH+18}" text-anchor="middle" font-size="10.5" fill="${cMute}">${mesLabelCurto(m)}</text>`;
     hitAreas += `<rect data-i="${i}" x="${gx}" y="0" width="${groupW}" height="${plotH}" fill="transparent" style="cursor:pointer"/>`;
   });
