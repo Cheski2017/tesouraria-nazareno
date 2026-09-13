@@ -780,6 +780,11 @@
           <div class="legend-row" id="comp-legend"></div>
           <div class="chart-scroll"><div class="chart-wrap" id="comp-chart"></div></div>
         </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">Dizimistas por Mês</span></div>
+          <div class="chart-scroll"><div class="chart-wrap" id="comp-dizimistas-chart"></div></div>
+          <div id="comp-dizimistas-stats"></div>
+        </div>
       </section>
 
       <!-- ===== DRE ===== -->
@@ -1035,7 +1040,8 @@ function buildComboChart(container, meses, receitaVals, despesaVals, tituloResul
 }
 
 /* ============ Single-series trend bar chart ============ */
-function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo) {
+function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo, fmt) {
+  fmt = fmt || brl;
   const W = Math.max(700, meses.length * 76), H = 220;
   const M = { top: 22, right: 12, bottom: 24, left: 96 };
   const plotW = W-M.left-M.right, plotH = H-M.top-M.bottom;
@@ -1055,14 +1061,14 @@ function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo) {
     const gx=i*groupW, cx=gx+groupW/2, y=yScale(vals[i]), h=plotH-y;
     const fill = corUnica ? colorAcima : (vals[i] >= media ? colorAcima : colorAbaixo);
     bars += `<rect x="${cx-barW/2}" y="${y}" width="${barW}" height="${Math.max(h,0.5)}" rx="3" fill="${fill}"/>`;
-    valLabels += `<text x="${cx}" y="${y-7}" text-anchor="middle" font-size="10" font-weight="700" fill="${cInk}">${brl(vals[i])}</text>`;
+    valLabels += `<text x="${cx}" y="${y-7}" text-anchor="middle" font-size="10" font-weight="700" fill="${cInk}">${fmt(vals[i])}</text>`;
     xLabels += `<text x="${cx}" y="${plotH+18}" text-anchor="middle" font-size="10.5" fill="${cMute}">${mesLabelCurto(m)}</text>`;
     hitAreas += `<rect data-i="${i}" x="${gx}" y="0" width="${groupW}" height="${plotH}" fill="transparent" style="cursor:pointer"/>`;
   });
   let linhaMedia = '';
   if (!corUnica && vals.length > 1) {
     const yMedia = yScale(media);
-    const mediaLabel = brl(media), labelW = mediaLabel.length*6.5 + 8;
+    const mediaLabel = fmt(media), labelW = mediaLabel.length*6.5 + 8;
     const cBg = cssVar('--card-bg','#FFFFFF');
     linhaMedia = `<line x1="0" y1="${yMedia}" x2="${plotW}" y2="${yMedia}" stroke="${cMute}" stroke-width="1.3" stroke-dasharray="5 4"/><rect x="${-10-labelW}" y="${yMedia-8}" width="${labelW}" height="15" fill="${cBg}"/><text x="-8" y="${yMedia+4}" text-anchor="end" font-size="10" font-weight="700" fill="${cMute}">${mediaLabel}</text>`;
   }
@@ -1071,8 +1077,9 @@ function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo) {
   container.querySelectorAll('rect[data-i]').forEach(el=>{
     el.addEventListener('mousemove', e=>{
       const i=+el.getAttribute('data-i'); const rect=container.getBoundingClientRect();
-      const vsMedia = !corUnica && vals.length>1 ? `<br>${vals[i]>=media?'▲':'▼'} ${brlSigned(vals[i]-media)} vs média` : '';
-      tt.innerHTML = `<div class="t-title">${mesLabelLongo(meses[i])}</div>${brl(vals[i])}${vsMedia}`;
+      const diff = vals[i]-media;
+      const vsMedia = !corUnica && vals.length>1 ? `<br>${diff>=0?'▲':'▼'} ${diff>=0?'+':'-'}${fmt(Math.abs(diff))} vs média` : '';
+      tt.innerHTML = `<div class="t-title">${mesLabelLongo(meses[i])}</div>${fmt(vals[i])}${vsMedia}`;
       tt.style.left=(e.clientX-rect.left+14)+'px'; tt.style.top=(e.clientY-rect.top-10)+'px'; tt.classList.add('show');
     });
     el.addEventListener('mouseleave', ()=>tt.classList.remove('show'));
@@ -1560,6 +1567,22 @@ function renderComparativo() {
 
   document.getElementById('comp-chart').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><g transform="translate(${M.left},${M.top})">${gridlines}${bars}${xLabels}</g></svg>`;
   document.getElementById('comp-legend').innerHTML = years.map((y,i) => `<span class="legend-item"><span class="legend-swatch" style="background:${yearColors[i]}"></span>${y}</span>`).join('');
+
+  renderDizimistas(meses);
+}
+
+function renderDizimistas(meses) {
+  const counts = meses.map(m => DATA.transacoes.filter(t => t.mesAno === m && t.categoria === 'Dízimo' && (t.entrada||0) > 0).length);
+  const media = counts.length ? counts.reduce((a,b)=>a+b, 0) / counts.length : 0;
+  const fmtInt = v => Math.round(v).toString();
+  buildTrendChart(document.getElementById('comp-dizimistas-chart'), meses, counts, cssVar('--good','#1E8E5A'), cssVar('--critical','#C0453B'), fmtInt);
+
+  let html = '<div class="essencial-box"><div class="essencial-list">';
+  html += `<div class="essencial-row essencial-total"><span class="essencial-label">Média mensal de dizimistas</span><span class="essencial-value">${media.toFixed(1)} ${Math.round(media)===1?'lançamento/mês':'lançamentos/mês'}</span></div>`;
+  html += '</div>';
+  html += '<div class="essencial-note">Contagem baseada no número de lançamentos de Dízimo por mês (não em pessoas cadastradas) — se alguém dizimar mais de uma vez no mesmo mês, cada lançamento conta separadamente.</div>';
+  html += '</div>';
+  document.getElementById('comp-dizimistas-stats').innerHTML = html;
 }
 
 /* ============ DRE ============ */
