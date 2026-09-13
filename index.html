@@ -878,7 +878,7 @@ function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo) {
 
   let gridlines='', steps=4;
   for (let i=0;i<=steps;i++){ const v=yMax*(i/steps); const y=yScale(v);
-    gridlines += `<line x1="0" y1="${y}" x2="${plotW}" y2="${y}" stroke="${cLine}" stroke-width="1"/><text x="-8" y="${y+4}" text-anchor="end" font-size="10" fill="${cMute}">${brl(v)}</text>`; }
+    gridlines += `<line x1="0" y1="${y}" x2="${plotW}" y2="${y}" stroke="${cLine}" stroke-width="1"/>`; }
 
   let bars='', xLabels='', hitAreas='', valLabels='';
   meses.forEach((m,i)=>{
