@@ -1118,7 +1118,7 @@ function buildAlertaDespesas(meses) {
   return `<div class="alerta-card ${tier}">${ICON_ALERT}<span>${texto}</span></div>`;
 }
 const CUSTOS_ESSENCIAIS_FIXOS = [
-  { cat: 'Salário Pastoral', valor: 3026.11 },
+  { cat: 'Folha Pastoral', valor: 3026.11 },
   { cat: 'Aplicação Cooperativa', valor: 55 },
   { cat: 'Tarifa Bancária', valor: 42 },
   { cat: 'Água', valor: 310 },
@@ -1199,7 +1199,7 @@ function renderDespesas() {
     kpiCard('Total de Despesas', brl(total), ICON_DOWN, 'critical', deltaHtml(total, prevTotal, hasPrev)) +
     kpiCard('Média Mensal', brl(media), ICON_WALLET, 'info', `<span class="kpi-delta flat">${meses.length} meses</span>`) +
     kpiCard('Maior Mês', vals.length?brl(vals[maiorIdx]):'—', ICON_BANK, 'accent', `<span class="kpi-delta flat">${vals.length?mesLabelLongo(meses[maiorIdx]):''}</span>`) +
-    kpiCard('Salário Pastoral no Período', brl(sumRange(DATA.despesas['Salário Pastoral']||{}, meses)), ICON_DOWN, 'critical', `<span class="kpi-delta flat">${total>0?((sumRange(DATA.despesas['Salário Pastoral']||{},meses)/total)*100).toFixed(1):'0'}% do total</span>`);
+    kpiCard('Folha Pastoral no Período', brl(sumRange(DATA.despesas['Folha Pastoral']||{}, meses)), ICON_DOWN, 'critical', `<span class="kpi-delta flat">${total>0?((sumRange(DATA.despesas['Folha Pastoral']||{},meses)/total)*100).toFixed(1):'0'}% do total</span>`);
 
   buildTrendChart(document.getElementById('ds-trend'), meses, vals, cssVar('--critical','#C0453B'), cssVar('--good','#1E8E5A'));
   document.getElementById('ds-trend-stats').innerHTML = buildTrendStatsDespesas(meses, vals);
