@@ -1007,12 +1007,12 @@ function previousRangeMeses() {
 
 /* ============ Combo chart (Receitas x Despesas x Saldo) ============ */
 function buildComboChart(container, meses, receitaVals, despesaVals, tituloResultado) {
-  const W = Math.max(700, meses.length * 76);
+  const W = Math.max(700, meses.length * 150);
   const H = 280;
   const M = { top: 28, right: 16, bottom: 26, left: 62 };
   const plotW = W - M.left - M.right, plotH = H - M.top - M.bottom;
   const groupW = plotW / meses.length;
-  const barW = Math.min(30, groupW * 0.32);
+  const barW = Math.min(40, groupW * 0.26);
   const resultadoVals = meses.map((m,i) => receitaVals[i] - despesaVals[i]);
   const maxVal = Math.max(...receitaVals, ...despesaVals, 1);
   const minRes = Math.min(...resultadoVals, 0);
@@ -1034,11 +1034,11 @@ function buildComboChart(container, meses, receitaVals, despesaVals, tituloResul
     const gx=i*groupW, cx=gx+groupW/2;
     const rY=yScale(receitaVals[i]), dY=yScale(despesaVals[i]);
     const rH=plotH-rY, dH=plotH-dY;
-    const rx=cx-barW-1.5, dx=cx+1.5;
+    const rx=cx-barW-7, dx=cx+7;
     bars += `<rect x="${rx}" y="${rY}" width="${barW}" height="${Math.max(rH,0.5)}" rx="2" fill="${cGood}"/>`;
     bars += `<rect x="${dx}" y="${dY}" width="${barW}" height="${Math.max(dH,0.5)}" rx="2" fill="${cCrit}"/>`;
-    valLabels += `<text x="${rx+barW/2}" y="${rY-6}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${cGood}">${brl(receitaVals[i])}</text>`;
-    valLabels += `<text x="${dx+barW/2}" y="${dY-6}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${cCrit}">${brl(despesaVals[i])}</text>`;
+    valLabels += `<text x="${rx+barW/2}" y="${rY-6}" text-anchor="middle" font-size="10" font-weight="700" fill="${cGood}">${brl(receitaVals[i])}</text>`;
+    valLabels += `<text x="${dx+barW/2}" y="${dY-6}" text-anchor="middle" font-size="10" font-weight="700" fill="${cCrit}">${brl(despesaVals[i])}</text>`;
     const py=yScale(resultadoVals[i]);
     linePath += (i===0?'M':'L')+cx+','+py+' ';
     const saldoLabel = brlSigned(resultadoVals[i]);
