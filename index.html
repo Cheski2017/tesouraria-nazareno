@@ -311,19 +311,29 @@
   .dre-result td { border-top: 2px solid var(--ink); font-weight: 800; font-size: 15px; padding-top: 12px; }
   .dre-result.positive .dre-value { color: var(--good); }
   .dre-result.negative .dre-value { color: var(--critical); }
-  .dre-mensal-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-mute); margin: 28px 0 10px; text-align: center; }
-  .dre-table-mensal { max-width: none; }
-  .dre-table-mensal thead th { padding: 6px 8px 10px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-mute); border-bottom: 1px solid var(--card-border); text-align: right; white-space: nowrap; }
-  .dre-table-mensal thead th.dre-cat-label { text-align: left; padding-left: 8px !important; }
-  .dre-table-mensal td { padding: 6px 8px; }
-  .dre-table-mensal td.dre-cat-label { padding-left: 8px !important; color: var(--ink); font-weight: 600; }
-  .dre-table-mensal tbody tr:nth-child(even) { background: var(--page-bg); }
   .dre-value.dre-pos { color: var(--good); }
   .dre-value.dre-neg { color: var(--critical); }
+
+  /* ---------- DRE Mensal (horizontal, compacto) ---------- */
+  .dre-mensal-row { display: flex; gap: 18px; overflow-x: auto; padding-bottom: 10px; align-items: flex-start; }
+  .dre-mes-col { flex-shrink: 0; min-width: 250px; border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 16px; }
+  .dre-mensal-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-mute); margin: 0 0 10px; text-align: center; }
+  .dre-table-compact { width: auto; max-width: none; margin: 0; border-collapse: collapse; font-size: 12px; }
+  .dre-table-compact td { padding: 3px 0; }
+  .dre-table-compact .dre-section-title td { padding-top: 12px; font-size: 10px; }
+  .dre-table-compact .dre-cat-label { padding-left: 10px !important; white-space: nowrap; }
+  .dre-table-compact .dre-value { padding-left: 16px; white-space: nowrap; }
+  .dre-table-compact .dre-subtotal td { padding-top: 6px; }
+  .dre-table-compact .dre-result td { padding-top: 8px; font-size: 12.5px; }
+
   @media print {
-    body * { visibility: hidden; }
-    #dre-print-area, #dre-print-area * { visibility: visible; }
-    #dre-print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 24px; }
+    body:not([data-print-alvo]) * { visibility: hidden; }
+    body[data-print-alvo="geral"] * { visibility: hidden; }
+    body[data-print-alvo="geral"] #dre-print-geral, body[data-print-alvo="geral"] #dre-print-geral * { visibility: visible; }
+    body[data-print-alvo="mensal"] * { visibility: hidden; }
+    body[data-print-alvo="mensal"] #dre-print-mensal, body[data-print-alvo="mensal"] #dre-print-mensal * { visibility: visible; }
+    #dre-print-geral, #dre-print-mensal { position: absolute; left: 0; top: 0; width: 100%; padding: 24px; }
+    .dre-mensal-row { overflow: visible; flex-wrap: wrap; }
   }
 
   .legend-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); }
@@ -818,11 +828,21 @@
           <div class="card-head">
             <span class="card-title">DRE — Demonstração do Resultado</span>
             <div class="dre-export-actions">
-              <button class="btn-dre-export" id="dre-export-xlsx" type="button">Exportar Excel</button>
-              <button class="btn-dre-export" id="dre-export-pdf" type="button">Exportar PDF</button>
+              <button class="btn-dre-export" id="dre-export-xlsx-geral" type="button">Exportar Excel</button>
+              <button class="btn-dre-export" id="dre-export-pdf-geral" type="button">Exportar PDF</button>
             </div>
           </div>
-          <div id="dre-content"></div>
+          <div id="dre-geral-content"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">DRE Mensal — Mês a Mês</span>
+            <div class="dre-export-actions">
+              <button class="btn-dre-export" id="dre-export-xlsx-mensal" type="button">Exportar Excel</button>
+              <button class="btn-dre-export" id="dre-export-pdf-mensal" type="button">Exportar PDF</button>
+            </div>
+          </div>
+          <div id="dre-mensal-content"></div>
         </div>
       </section>
 
@@ -1658,7 +1678,7 @@ function renderAplicacoes() {
 /* ============ DRE ============ */
 let dreExportData = null;
 
-function dreBlocoHtml(receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, saldoAnterior, resultado, saldoFinal) {
+function dreBlocoHtml(receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, saldoAnterior, resultado, saldoFinal, compact) {
   let rows = '<tr class="dre-section-title"><td colspan="2">Receitas</td></tr>';
   receitaCats.forEach((c,i) => { if (receitaTotais[i]>0) rows += `<tr><td class="dre-cat-label">${c}</td><td class="dre-value">${brl(receitaTotais[i])}</td></tr>`; });
   rows += `<tr class="dre-subtotal"><td>Total de Receitas</td><td class="dre-value">${brl(totalReceitas)}</td></tr>`;
@@ -1673,7 +1693,7 @@ function dreBlocoHtml(receitaCats, receitaTotais, totalReceitas, despesaCats, de
   rows += `<tr><td class="dre-cat-label">Saldo Anterior</td><td class="dre-value">${brlSigned(saldoAnterior)}</td></tr>`;
   rows += `<tr><td class="dre-cat-label">Resultado do Período</td><td class="dre-value">${brlSigned(resultado)}</td></tr>`;
   rows += `<tr class="dre-subtotal"><td>Saldo Final</td><td class="dre-value">${brlSigned(saldoFinal)}</td></tr>`;
-  return `<table class="dre-table">${rows}</table>`;
+  return `<table class="dre-table${compact?' dre-table-compact':''}">${rows}</table>`;
 }
 
 function renderDRE() {
@@ -1694,9 +1714,18 @@ function renderDRE() {
 
   const periodoLabel = !meses.length ? '' : meses.length===1 ? mesLabelLongo(meses[0]) : mesLabelLongo(meses[0])+' a '+mesLabelLongo(meses[meses.length-1]);
 
-  const blocoPrincipal = dreBlocoHtml(receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, saldoAnterior, resultado, saldoFinal);
+  const blocoPrincipal = dreBlocoHtml(receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, saldoAnterior, resultado, saldoFinal, false);
 
-  let mensalHtml = '';
+  document.getElementById('dre-geral-content').innerHTML = `
+    <div id="dre-print-geral">
+      <div class="dre-header">
+        <div class="dre-igreja">Igreja Evangélica Nazareno Guarapuava</div>
+        <div class="dre-periodo">DRE — Demonstração do Resultado — ${periodoLabel}</div>
+      </div>
+      ${blocoPrincipal}
+    </div>`;
+
+  let mensalCols = '';
   const mensalDados = [];
   if (meses.length > 1) {
     let saldoCorrente = saldoAnterior;
@@ -1711,27 +1740,33 @@ function renderDRE() {
       const saldoIni = saldoCorrente;
       const saldoFimMes = saldoIni + resMes;
       saldoCorrente = saldoFimMes;
-      mensalHtml += `<div class="dre-mensal-title">${mesLabelLongo(m)}</div>` +
-        dreBlocoHtml(recCatsMes, recTotaisMes, totRecMes, desCatsMes, desTotaisMes, totDesMes, saldoIni, resMes, saldoFimMes);
+      mensalCols += `<div class="dre-mes-col"><div class="dre-mensal-title">${mesLabelCurto(m)}</div>` +
+        dreBlocoHtml(recCatsMes, recTotaisMes, totRecMes, desCatsMes, desTotaisMes, totDesMes, saldoIni, resMes, saldoFimMes, true) +
+        '</div>';
       mensalDados.push({ m, recCats: recCatsMes, recTotais: recTotaisMes, totRec: totRecMes, desCats: desCatsMes, desTotais: desTotaisMes, totDes: totDesMes, saldoIni, resMes, saldoFim: saldoFimMes });
     });
   }
 
-  document.getElementById('dre-content').innerHTML = `
-    <div id="dre-print-area">
+  document.getElementById('dre-mensal-content').innerHTML = meses.length > 1 ? `
+    <div id="dre-print-mensal">
       <div class="dre-header">
         <div class="dre-igreja">Igreja Evangélica Nazareno Guarapuava</div>
-        <div class="dre-periodo">DRE — Demonstração do Resultado — ${periodoLabel}</div>
+        <div class="dre-periodo">DRE Mensal — Mês a Mês — ${periodoLabel}</div>
       </div>
-      ${blocoPrincipal}
-      ${mensalHtml}
-    </div>`;
+      <div class="dre-mensal-row">${mensalCols}</div>
+    </div>` : `<div class="essencial-note">Selecione um período com mais de um mês para ver o detalhamento mensal.</div>`;
 
   dreExportData = { periodoLabel, receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, resultado, saldoAnterior, saldoFinal, mensalDados };
 }
 
-document.getElementById('dre-export-pdf').addEventListener('click', () => window.print());
-document.getElementById('dre-export-xlsx').addEventListener('click', () => {
+function imprimirDRE(alvo) {
+  document.body.setAttribute('data-print-alvo', alvo);
+  window.print();
+}
+document.getElementById('dre-export-pdf-geral').addEventListener('click', () => imprimirDRE('geral'));
+document.getElementById('dre-export-pdf-mensal').addEventListener('click', () => imprimirDRE('mensal'));
+
+document.getElementById('dre-export-xlsx-geral').addEventListener('click', () => {
   if (!dreExportData || typeof XLSX === 'undefined') return;
   const d = dreExportData;
   const aoa = [];
@@ -1756,32 +1791,34 @@ document.getElementById('dre-export-xlsx').addEventListener('click', () => {
   ws['!cols'] = [{ wch: 38 }, { wch: 16 }];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'DRE');
+  XLSX.writeFile(wb, 'DRE_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.xlsx');
+});
 
-  if (d.mensalDados && d.mensalDados.length > 1) {
-    const aoaMensal = [
-      ['Igreja Evangélica Nazareno Guarapuava'],
-      ['DRE Mensal — Mês a Mês — ' + d.periodoLabel],
-    ];
-    d.mensalDados.forEach(md => {
-      aoaMensal.push([]);
-      aoaMensal.push([mesLabelLongo(md.m).toUpperCase()]);
-      aoaMensal.push(['RECEITAS']);
-      md.recCats.forEach((c,i) => aoaMensal.push([c, md.recTotais[i]]));
-      aoaMensal.push(['Total de Receitas', md.totRec]);
-      aoaMensal.push(['DESPESAS']);
-      md.desCats.forEach((c,i) => aoaMensal.push([c + (c==='A revisar'?' *':''), md.desTotais[i]]));
-      aoaMensal.push(['Total de Despesas', md.totDes]);
-      aoaMensal.push(['Resultado do Período', md.resMes]);
-      aoaMensal.push(['Saldo Anterior', md.saldoIni]);
-      aoaMensal.push(['Saldo Final', md.saldoFim]);
-    });
-    const wsMensal = XLSX.utils.aoa_to_sheet(aoaMensal);
-    wsMensal['!cols'] = [{ wch: 38 }, { wch: 16 }];
-    XLSX.utils.book_append_sheet(wb, wsMensal, 'DRE Mensal');
-  }
-
-  const nomeArquivo = 'DRE_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.xlsx';
-  XLSX.writeFile(wb, nomeArquivo);
+document.getElementById('dre-export-xlsx-mensal').addEventListener('click', () => {
+  if (!dreExportData || typeof XLSX === 'undefined' || !dreExportData.mensalDados || dreExportData.mensalDados.length < 2) return;
+  const d = dreExportData;
+  const aoaMensal = [
+    ['Igreja Evangélica Nazareno Guarapuava'],
+    ['DRE Mensal — Mês a Mês — ' + d.periodoLabel],
+  ];
+  d.mensalDados.forEach(md => {
+    aoaMensal.push([]);
+    aoaMensal.push([mesLabelLongo(md.m).toUpperCase()]);
+    aoaMensal.push(['RECEITAS']);
+    md.recCats.forEach((c,i) => aoaMensal.push([c, md.recTotais[i]]));
+    aoaMensal.push(['Total de Receitas', md.totRec]);
+    aoaMensal.push(['DESPESAS']);
+    md.desCats.forEach((c,i) => aoaMensal.push([c + (c==='A revisar'?' *':''), md.desTotais[i]]));
+    aoaMensal.push(['Total de Despesas', md.totDes]);
+    aoaMensal.push(['Resultado do Período', md.resMes]);
+    aoaMensal.push(['Saldo Anterior', md.saldoIni]);
+    aoaMensal.push(['Saldo Final', md.saldoFim]);
+  });
+  const wsMensal = XLSX.utils.aoa_to_sheet(aoaMensal);
+  wsMensal['!cols'] = [{ wch: 38 }, { wch: 16 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, wsMensal, 'DRE Mensal');
+  XLSX.writeFile(wb, 'DRE_Mensal_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.xlsx');
 });
 
 /* ============ Carregamento de dados (JSONP) ============ */
