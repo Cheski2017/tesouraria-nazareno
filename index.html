@@ -1657,6 +1657,25 @@ function renderAplicacoes() {
 
 /* ============ DRE ============ */
 let dreExportData = null;
+
+function dreBlocoHtml(receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, saldoAnterior, resultado, saldoFinal) {
+  let rows = '<tr class="dre-section-title"><td colspan="2">Receitas</td></tr>';
+  receitaCats.forEach((c,i) => { if (receitaTotais[i]>0) rows += `<tr><td class="dre-cat-label">${c}</td><td class="dre-value">${brl(receitaTotais[i])}</td></tr>`; });
+  rows += `<tr class="dre-subtotal"><td>Total de Receitas</td><td class="dre-value">${brl(totalReceitas)}</td></tr>`;
+
+  rows += '<tr class="dre-section-title"><td colspan="2">Despesas</td></tr>';
+  despesaCats.forEach((c,i) => { if (despesaTotais[i]>0) rows += `<tr><td class="dre-cat-label">${c}${c==='A revisar'?' *':''}</td><td class="dre-value">${brl(despesaTotais[i])}</td></tr>`; });
+  rows += `<tr class="dre-subtotal"><td>Total de Despesas</td><td class="dre-value">${brl(totalDespesas)}</td></tr>`;
+
+  rows += `<tr class="dre-result ${resultado>=0?'positive':'negative'}"><td>Resultado do Período</td><td class="dre-value">${brlSigned(resultado)}</td></tr>`;
+
+  rows += '<tr class="dre-section-title"><td colspan="2">Saldo em Caixa</td></tr>';
+  rows += `<tr><td class="dre-cat-label">Saldo Anterior</td><td class="dre-value">${brlSigned(saldoAnterior)}</td></tr>`;
+  rows += `<tr><td class="dre-cat-label">Resultado do Período</td><td class="dre-value">${brlSigned(resultado)}</td></tr>`;
+  rows += `<tr class="dre-subtotal"><td>Saldo Final</td><td class="dre-value">${brlSigned(saldoFinal)}</td></tr>`;
+  return `<table class="dre-table">${rows}</table>`;
+}
+
 function renderDRE() {
   const meses = mesesInRange();
   const receitaCats = sortedCats(DATA.receitas, meses);
@@ -1675,26 +1694,28 @@ function renderDRE() {
 
   const periodoLabel = !meses.length ? '' : meses.length===1 ? mesLabelLongo(meses[0]) : mesLabelLongo(meses[0])+' a '+mesLabelLongo(meses[meses.length-1]);
 
-  let rows = '<tr class="dre-section-title"><td colspan="2">Receitas</td></tr>';
-  receitaCats.forEach((c,i) => { if (receitaTotais[i]>0) rows += `<tr><td class="dre-cat-label">${c}</td><td class="dre-value">${brl(receitaTotais[i])}</td></tr>`; });
-  rows += `<tr class="dre-subtotal"><td>Total de Receitas</td><td class="dre-value">${brl(totalReceitas)}</td></tr>`;
+  const blocoPrincipal = dreBlocoHtml(receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, saldoAnterior, resultado, saldoFinal);
 
-  rows += '<tr class="dre-section-title"><td colspan="2">Despesas</td></tr>';
-  despesaCats.forEach((c,i) => { if (despesaTotais[i]>0) rows += `<tr><td class="dre-cat-label">${c}${c==='A revisar'?' *':''}</td><td class="dre-value">${brl(despesaTotais[i])}</td></tr>`; });
-  rows += `<tr class="dre-subtotal"><td>Total de Despesas</td><td class="dre-value">${brl(totalDespesas)}</td></tr>`;
-
-  rows += `<tr class="dre-result ${resultado>=0?'positive':'negative'}"><td>Resultado do Período</td><td class="dre-value">${brlSigned(resultado)}</td></tr>`;
-
-  rows += '<tr class="dre-section-title"><td colspan="2">Saldo em Caixa</td></tr>';
-  rows += `<tr><td class="dre-cat-label">Saldo Anterior</td><td class="dre-value">${brlSigned(saldoAnterior)}</td></tr>`;
-  rows += `<tr><td class="dre-cat-label">Resultado do Período</td><td class="dre-value">${brlSigned(resultado)}</td></tr>`;
-  rows += `<tr class="dre-subtotal"><td>Saldo Final</td><td class="dre-value">${brlSigned(saldoFinal)}</td></tr>`;
-
-  const mensalTables = meses.length > 1 ? `
-    <div class="dre-mensal-title">Receitas — Detalhamento Mensal</div>
-    <div class="table-scroll"><table class="simple" id="dre-receitas-table"></table></div>
-    <div class="dre-mensal-title">Despesas — Detalhamento Mensal</div>
-    <div class="table-scroll"><table class="simple" id="dre-despesas-table"></table></div>` : '';
+  let mensalHtml = '';
+  const mensalDados = [];
+  if (meses.length > 1) {
+    let saldoCorrente = saldoAnterior;
+    meses.forEach(m => {
+      const recCatsMes = receitaCats.filter(c => ((DATA.receitas[c]||{})[m]||0) > 0);
+      const recTotaisMes = recCatsMes.map(c => (DATA.receitas[c]||{})[m]||0);
+      const totRecMes = recTotaisMes.reduce((a,b)=>a+b, 0);
+      const desCatsMes = despesaCats.filter(c => ((DATA.despesas[c]||{})[m]||0) > 0);
+      const desTotaisMes = desCatsMes.map(c => (DATA.despesas[c]||{})[m]||0);
+      const totDesMes = desTotaisMes.reduce((a,b)=>a+b, 0);
+      const resMes = totRecMes - totDesMes;
+      const saldoIni = saldoCorrente;
+      const saldoFimMes = saldoIni + resMes;
+      saldoCorrente = saldoFimMes;
+      mensalHtml += `<div class="dre-mensal-title">${mesLabelLongo(m)}</div>` +
+        dreBlocoHtml(recCatsMes, recTotaisMes, totRecMes, desCatsMes, desTotaisMes, totDesMes, saldoIni, resMes, saldoFimMes);
+      mensalDados.push({ m, recCats: recCatsMes, recTotais: recTotaisMes, totRec: totRecMes, desCats: desCatsMes, desTotais: desTotaisMes, totDes: totDesMes, saldoIni, resMes, saldoFim: saldoFimMes });
+    });
+  }
 
   document.getElementById('dre-content').innerHTML = `
     <div id="dre-print-area">
@@ -1702,16 +1723,11 @@ function renderDRE() {
         <div class="dre-igreja">Igreja Evangélica Nazareno Guarapuava</div>
         <div class="dre-periodo">DRE — Demonstração do Resultado — ${periodoLabel}</div>
       </div>
-      <table class="dre-table">${rows}</table>
-      ${mensalTables}
+      ${blocoPrincipal}
+      ${mensalHtml}
     </div>`;
 
-  if (meses.length > 1) {
-    buildCatTable(document.getElementById('dre-receitas-table'), receitaCats, DATA.receitas, meses);
-    buildCatTable(document.getElementById('dre-despesas-table'), despesaCats, DATA.despesas, meses);
-  }
-
-  dreExportData = { periodoLabel, meses, receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, resultado, saldoAnterior, saldoFinal };
+  dreExportData = { periodoLabel, receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, resultado, saldoAnterior, saldoFinal, mensalDados };
 }
 
 document.getElementById('dre-export-pdf').addEventListener('click', () => window.print());
@@ -1741,43 +1757,27 @@ document.getElementById('dre-export-xlsx').addEventListener('click', () => {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'DRE');
 
-  if (d.meses && d.meses.length > 1) {
-    const mesesHead = d.meses.map(m => mesLabelCurto(m));
-    const catCols = [{ wch: 32 }].concat(d.meses.map(() => ({ wch: 13 })), [{ wch: 14 }]);
-
-    const aoaRec = [
+  if (d.mensalDados && d.mensalDados.length > 1) {
+    const aoaMensal = [
       ['Igreja Evangélica Nazareno Guarapuava'],
-      ['Receitas — Detalhamento Mensal — ' + d.periodoLabel],
-      [],
-      ['Categoria', ...mesesHead, 'Total'],
+      ['DRE Mensal — Mês a Mês — ' + d.periodoLabel],
     ];
-    d.receitaCats.forEach(c => {
-      const vals = d.meses.map(m => (DATA.receitas[c]||{})[m]||0);
-      const tot = vals.reduce((a,b)=>a+b, 0);
-      aoaRec.push([c, ...vals, tot]);
+    d.mensalDados.forEach(md => {
+      aoaMensal.push([]);
+      aoaMensal.push([mesLabelLongo(md.m).toUpperCase()]);
+      aoaMensal.push(['RECEITAS']);
+      md.recCats.forEach((c,i) => aoaMensal.push([c, md.recTotais[i]]));
+      aoaMensal.push(['Total de Receitas', md.totRec]);
+      aoaMensal.push(['DESPESAS']);
+      md.desCats.forEach((c,i) => aoaMensal.push([c + (c==='A revisar'?' *':''), md.desTotais[i]]));
+      aoaMensal.push(['Total de Despesas', md.totDes]);
+      aoaMensal.push(['Resultado do Período', md.resMes]);
+      aoaMensal.push(['Saldo Anterior', md.saldoIni]);
+      aoaMensal.push(['Saldo Final', md.saldoFim]);
     });
-    const totRecRow = d.meses.map(m => d.receitaCats.reduce((s,c)=>s+((DATA.receitas[c]||{})[m]||0),0));
-    aoaRec.push(['Total', ...totRecRow, d.totalReceitas]);
-    const wsRec = XLSX.utils.aoa_to_sheet(aoaRec);
-    wsRec['!cols'] = catCols;
-    XLSX.utils.book_append_sheet(wb, wsRec, 'Receitas Mensal');
-
-    const aoaDes = [
-      ['Igreja Evangélica Nazareno Guarapuava'],
-      ['Despesas — Detalhamento Mensal — ' + d.periodoLabel],
-      [],
-      ['Categoria', ...mesesHead, 'Total'],
-    ];
-    d.despesaCats.forEach(c => {
-      const vals = d.meses.map(m => (DATA.despesas[c]||{})[m]||0);
-      const tot = vals.reduce((a,b)=>a+b, 0);
-      aoaDes.push([c + (c==='A revisar'?' *':''), ...vals, tot]);
-    });
-    const totDesRow = d.meses.map(m => d.despesaCats.reduce((s,c)=>s+((DATA.despesas[c]||{})[m]||0),0));
-    aoaDes.push(['Total', ...totDesRow, d.totalDespesas]);
-    const wsDes = XLSX.utils.aoa_to_sheet(aoaDes);
-    wsDes['!cols'] = catCols;
-    XLSX.utils.book_append_sheet(wb, wsDes, 'Despesas Mensal');
+    const wsMensal = XLSX.utils.aoa_to_sheet(aoaMensal);
+    wsMensal['!cols'] = [{ wch: 38 }, { wch: 16 }];
+    XLSX.utils.book_append_sheet(wb, wsMensal, 'DRE Mensal');
   }
 
   const nomeArquivo = 'DRE_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.xlsx';
