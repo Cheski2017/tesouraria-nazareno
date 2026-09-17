@@ -311,6 +311,15 @@
   .dre-result td { border-top: 2px solid var(--ink); font-weight: 800; font-size: 15px; padding-top: 12px; }
   .dre-result.positive .dre-value { color: var(--good); }
   .dre-result.negative .dre-value { color: var(--critical); }
+  .dre-mensal-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-mute); margin: 28px 0 10px; text-align: center; }
+  .dre-table-mensal { max-width: none; }
+  .dre-table-mensal thead th { padding: 6px 8px 10px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-mute); border-bottom: 1px solid var(--card-border); text-align: right; white-space: nowrap; }
+  .dre-table-mensal thead th.dre-cat-label { text-align: left; padding-left: 8px !important; }
+  .dre-table-mensal td { padding: 6px 8px; }
+  .dre-table-mensal td.dre-cat-label { padding-left: 8px !important; color: var(--ink); font-weight: 600; }
+  .dre-table-mensal tbody tr:nth-child(even) { background: var(--page-bg); }
+  .dre-value.dre-pos { color: var(--good); }
+  .dre-value.dre-neg { color: var(--critical); }
   @media print {
     body * { visibility: hidden; }
     #dre-print-area, #dre-print-area * { visibility: visible; }
@@ -1681,6 +1690,21 @@ function renderDRE() {
   rows += `<tr><td class="dre-cat-label">Resultado do Período</td><td class="dre-value">${brlSigned(resultado)}</td></tr>`;
   rows += `<tr class="dre-subtotal"><td>Saldo Final</td><td class="dre-value">${brlSigned(saldoFinal)}</td></tr>`;
 
+  let saldoCorrente = saldoAnterior;
+  const mensal = meses.map(m => {
+    const rec = DATA.totalReceitas[m]||0, des = DATA.totalDespesas[m]||0, res = rec-des;
+    const saldoIni = saldoCorrente;
+    saldoCorrente += res;
+    return { m, rec, des, res, saldoIni, saldoFim: saldoCorrente };
+  });
+  let mensalRows = '';
+  mensal.forEach(r => {
+    mensalRows += `<tr><td class="dre-cat-label">${mesLabelCurto(r.m)}</td><td class="dre-value">${brl(r.rec)}</td><td class="dre-value">${brl(r.des)}</td><td class="dre-value ${r.res>=0?'dre-pos':'dre-neg'}">${brlSigned(r.res)}</td><td class="dre-value"><b>${brlSigned(r.saldoFim)}</b></td></tr>`;
+  });
+  const mensalTable = meses.length > 1 ? `
+    <div class="dre-mensal-title">DRE Mensal — Mês a Mês</div>
+    <div class="table-scroll"><table class="dre-table dre-table-mensal"><thead><tr><th class="dre-cat-label">Mês</th><th class="dre-value">Receitas</th><th class="dre-value">Despesas</th><th class="dre-value">Resultado</th><th class="dre-value">Saldo Final</th></tr></thead><tbody>${mensalRows}</tbody></table></div>` : '';
+
   document.getElementById('dre-content').innerHTML = `
     <div id="dre-print-area">
       <div class="dre-header">
@@ -1688,9 +1712,10 @@ function renderDRE() {
         <div class="dre-periodo">DRE — Demonstração do Resultado — ${periodoLabel}</div>
       </div>
       <table class="dre-table">${rows}</table>
+      ${mensalTable}
     </div>`;
 
-  dreExportData = { periodoLabel, receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, resultado, saldoAnterior, saldoFinal };
+  dreExportData = { periodoLabel, receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, resultado, saldoAnterior, saldoFinal, mensal };
 }
 
 document.getElementById('dre-export-pdf').addEventListener('click', () => window.print());
@@ -1719,6 +1744,20 @@ document.getElementById('dre-export-xlsx').addEventListener('click', () => {
   ws['!cols'] = [{ wch: 38 }, { wch: 16 }];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'DRE');
+
+  if (d.mensal && d.mensal.length > 1) {
+    const aoaMensal = [
+      ['Igreja Evangélica Nazareno Guarapuava'],
+      ['DRE Mensal — Mês a Mês — ' + d.periodoLabel],
+      [],
+      ['Mês', 'Receitas', 'Despesas', 'Resultado', 'Saldo Final'],
+    ];
+    d.mensal.forEach(r => aoaMensal.push([mesLabelCurto(r.m), r.rec, r.des, r.res, r.saldoFim]));
+    const wsMensal = XLSX.utils.aoa_to_sheet(aoaMensal);
+    wsMensal['!cols'] = [{ wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
+    XLSX.utils.book_append_sheet(wb, wsMensal, 'DRE Mensal');
+  }
+
   const nomeArquivo = 'DRE_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.xlsx';
   XLSX.writeFile(wb, nomeArquivo);
 });
