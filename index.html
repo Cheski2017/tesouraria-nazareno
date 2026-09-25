@@ -334,7 +334,38 @@
     body[data-print-alvo="mensal"] #dre-print-mensal, body[data-print-alvo="mensal"] #dre-print-mensal * { visibility: visible; }
     #dre-print-geral, #dre-print-mensal { position: absolute; left: 0; top: 0; width: 100%; padding: 24px; }
     .dre-mensal-row { overflow: visible; flex-wrap: wrap; }
+    body[data-print-alvo="apresentacao"] * { visibility: hidden; }
+    body[data-print-alvo="apresentacao"] #apres-print-area, body[data-print-alvo="apresentacao"] #apres-print-area * { visibility: visible; }
+    #apres-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+    .apres-slide { page-break-after: always; break-after: page; box-shadow: none !important; border-radius: 0 !important; width: 100% !important; max-width: none !important; height: 100vh !important; }
   }
+
+  /* ---------- Apresentação ---------- */
+  .apres-actions-note { font-size: 11.5px; color: var(--ink-mute); margin-top: 8px; }
+  .apres-slide {
+    aspect-ratio: 16/9; width: 100%; max-width: 880px; margin: 0 auto 26px;
+    border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.12); position: relative; overflow: hidden;
+  }
+  .apres-slide.dark { background: linear-gradient(160deg, #17213D 0%, #1F2C52 100%); color: #fff; }
+  .apres-slide.light { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--ink); }
+  .apres-eyebrow { font-size: clamp(14px, 2vw, 20px); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-mute); margin-bottom: 14px; }
+  .apres-slide.dark .apres-eyebrow { color: #B9C2E0; }
+  .apres-big { font-size: clamp(40px, 7vw, 88px); font-weight: 800; line-height: 1; letter-spacing: -0.01em; text-align: center; }
+  .apres-big.good { color: var(--good); }
+  .apres-big.critical { color: var(--critical); }
+  .apres-big.accent { color: var(--accent); }
+  .apres-sub { font-size: clamp(13px, 1.6vw, 18px); color: var(--ink-mute); margin-top: 16px; text-align: center; }
+  .apres-slide.dark .apres-sub { color: #B9C2E0; }
+  .apres-cols { display: flex; gap: 48px; width: 100%; justify-content: center; align-items: center; }
+  .apres-col { display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .apres-divider { width: 1px; align-self: stretch; background: var(--card-border); }
+  .apres-slide.dark .apres-divider { background: rgba(255,255,255,0.18); }
+  .apres-capa-igreja { font-size: clamp(20px, 3vw, 34px); font-weight: 800; text-align: center; }
+  .apres-capa-sub { font-size: clamp(16px, 2.2vw, 24px); color: var(--accent); font-weight: 700; margin-top: 10px; text-align: center; }
+  .apres-capa-periodo { font-size: clamp(12px, 1.6vw, 16px); color: #B9C2E0; margin-top: 18px; text-align: center; }
+  .apres-badge { position: absolute; top: 18px; right: 22px; font-size: 11px; color: var(--ink-mute); }
+  .apres-slide.dark .apres-badge { color: #8894BE; }
 
   .legend-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); }
   .legend-item { display: inline-flex; align-items: center; gap: 6px; }
@@ -846,11 +877,27 @@
         </div>
       </section>
 
+      <!-- ===== APRESENTAÇÃO ===== -->
+      <section class="section" id="sec-apresentacao">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Apresentação — Slides para Projetor</span>
+            <div class="dre-export-actions">
+              <button class="btn-dre-export" id="apres-export-pptx" type="button">Exportar PowerPoint</button>
+              <button class="btn-dre-export" id="apres-export-pdf" type="button">Exportar PDF</button>
+            </div>
+          </div>
+          <div class="apres-actions-note">Dica: no PDF, escolha orientação Paisagem na caixa de impressão para os slides ficarem cheios na tela.</div>
+          <div id="apres-content" style="margin-top:18px;"></div>
+        </div>
+      </section>
+
     </div>
   </main>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <script>
 /* ============ Config ============ */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyA0q9vsOycs1Qy8T3vz7yw_ARM4eUsk1Q6V1SiV7JQ5ymTwgs9bbhCBoR8dxniT_YU/exec';
@@ -933,6 +980,7 @@ const NAV_ICONS = {
   comp: '<rect x="4" y="10" width="4" height="10"/><rect x="10" y="4" width="4" height="16"/><rect x="16" y="7" width="4" height="13"/>',
   dre: '<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v3h3"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="18" x2="13" y2="18"/>',
   aplic: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v5c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 11v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>',
+  apres: '<rect x="2" y="4" width="20" height="13" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
 };
 function navIcon(key, stroked) {
   const inner = NAV_ICONS[key];
@@ -948,6 +996,7 @@ const SECTIONS = [
   { id: 'comp', label: 'Comparativo', title: 'Comparativo Anual', sub: 'Mesmo mês, anos diferentes, lado a lado', icon: navIcon('comp', false) },
   { id: 'aplic', label: 'Aplicações', title: 'Aplicações', sub: 'Saldo em fundos e aplicações financeiras', icon: navIcon('aplic', true) },
   { id: 'dre', label: 'DRE', title: 'DRE', sub: 'Demonstração do Resultado do período selecionado', icon: navIcon('dre', true) },
+  { id: 'apresentacao', label: 'Apresentação', title: 'Apresentação', sub: 'Slides com os principais números para exibir no projetor', icon: navIcon('apres', true) },
 ];
 
 let currentSection = 'geral';
@@ -997,6 +1046,7 @@ function renderSection(id) {
   else if (id === 'comp') renderComparativo();
   else if (id === 'aplic') renderAplicacoes();
   else if (id === 'dre') renderDRE();
+  else if (id === 'apresentacao') renderApresentacao();
 }
 
 /* ============ KPI helpers ============ */
@@ -1819,6 +1869,137 @@ document.getElementById('dre-export-xlsx-mensal').addEventListener('click', () =
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, wsMensal, 'DRE Mensal');
   XLSX.writeFile(wb, 'DRE_Mensal_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.xlsx');
+});
+
+/* ============ APRESENTAÇÃO ============ */
+let apresData = null;
+
+function apresSlideHtml(kind, contentHtml) {
+  return `<div class="apres-slide ${kind}">${contentHtml}</div>`;
+}
+
+function renderApresentacao() {
+  const meses = mesesInRange();
+  if (!meses.length) { document.getElementById('apres-content').innerHTML = ''; apresData = null; return; }
+
+  const periodoLabel = meses.length===1 ? mesLabelLongo(meses[0]) : mesLabelLongo(meses[0])+' a '+mesLabelLongo(meses[meses.length-1]);
+  const receitaVals = meses.map(m => DATA.totalReceitas[m]||0);
+  const despesaVals = meses.map(m => DATA.totalDespesas[m]||0);
+  const totalReceitas = receitaVals.reduce((a,b)=>a+b, 0);
+  const totalDespesas = despesaVals.reduce((a,b)=>a+b, 0);
+  const mediaReceita = totalReceitas / meses.length;
+  const mediaDespesa = totalDespesas / meses.length;
+
+  const dizimistasCounts = meses.map(m => DATA.transacoes.filter(t => t.mesAno===m && t.categoria==='Dízimo' && (t.entrada||0)>0).length);
+  const mediaDizimistas = dizimistasCounts.reduce((a,b)=>a+b, 0) / meses.length;
+
+  const resultadoVals = meses.map((m,i) => receitaVals[i]-despesaVals[i]);
+  const melhorIdx = resultadoVals.indexOf(Math.max(...resultadoVals));
+  const piorIdx = resultadoVals.indexOf(Math.min(...resultadoVals));
+
+  const slides = [];
+
+  slides.push({ kind:'dark', html:`
+    <div class="apres-capa-igreja">Igreja Evangélica Nazareno Guarapuava</div>
+    <div class="apres-capa-sub">Relatório Financeiro</div>
+    <div class="apres-capa-periodo">${periodoLabel}</div>` });
+
+  slides.push({ kind:'light', html:`
+    <div class="apres-eyebrow">Receitas Totais</div>
+    <div class="apres-big good">${brl(totalReceitas)}</div>
+    <div class="apres-sub">${periodoLabel}</div>` });
+
+  slides.push({ kind:'light', html:`
+    <div class="apres-eyebrow">Despesas Totais</div>
+    <div class="apres-big critical">${brl(totalDespesas)}</div>
+    <div class="apres-sub">${periodoLabel}</div>` });
+
+  slides.push({ kind:'light', html:`
+    <div class="apres-eyebrow">Média Mensal</div>
+    <div class="apres-cols">
+      <div class="apres-col"><div class="apres-eyebrow">Receitas</div><div class="apres-big good" style="font-size:clamp(28px,4.5vw,56px)">${brl(mediaReceita)}</div></div>
+      <div class="apres-divider"></div>
+      <div class="apres-col"><div class="apres-eyebrow">Despesas</div><div class="apres-big critical" style="font-size:clamp(28px,4.5vw,56px)">${brl(mediaDespesa)}</div></div>
+    </div>
+    <div class="apres-sub">${meses.length} meses — ${periodoLabel}</div>` });
+
+  slides.push({ kind:'light', html:`
+    <div class="apres-eyebrow">Dizimistas — Média Mensal</div>
+    <div class="apres-big accent">${mediaDizimistas.toFixed(1)}</div>
+    <div class="apres-sub">lançamentos de dízimo por mês, em média</div>` });
+
+  slides.push({ kind:'light', html:`
+    <div class="apres-eyebrow">Melhor Mês × Pior Mês</div>
+    <div class="apres-cols">
+      <div class="apres-col"><div class="apres-eyebrow">Melhor Mês</div><div class="apres-big good" style="font-size:clamp(24px,4vw,48px)">${brlSigned(resultadoVals[melhorIdx])}</div><div class="apres-sub">${mesLabelLongo(meses[melhorIdx])}</div></div>
+      <div class="apres-divider"></div>
+      <div class="apres-col"><div class="apres-eyebrow">Pior Mês</div><div class="apres-big critical" style="font-size:clamp(24px,4vw,48px)">${brlSigned(resultadoVals[piorIdx])}</div><div class="apres-sub">${mesLabelLongo(meses[piorIdx])}</div></div>
+    </div>` });
+
+  document.getElementById('apres-content').innerHTML = `<div id="apres-print-area">${slides.map(s=>apresSlideHtml(s.kind, s.html)).join('')}</div>`;
+
+  apresData = { periodoLabel, totalReceitas, totalDespesas, mediaReceita, mediaDespesa, mediaDizimistas,
+    melhorMes: { label: mesLabelLongo(meses[melhorIdx]), valor: resultadoVals[melhorIdx] },
+    piorMes: { label: mesLabelLongo(meses[piorIdx]), valor: resultadoVals[piorIdx] } };
+}
+
+document.getElementById('apres-export-pdf').addEventListener('click', () => {
+  document.body.setAttribute('data-print-alvo', 'apresentacao');
+  window.print();
+});
+
+document.getElementById('apres-export-pptx').addEventListener('click', () => {
+  if (!apresData || typeof PptxGenJS === 'undefined') return;
+  const d = apresData;
+  const pptx = new PptxGenJS();
+  pptx.defineLayout({ name: 'CHURCH', width: 13.33, height: 7.5 });
+  pptx.layout = 'CHURCH';
+  const NAVY = '17213D', GREEN = '1E8E5A', RED = 'C0453B', GOLD = 'B9852A', MUTE = '8A90A6', WHITE = 'FFFFFF';
+
+  let s = pptx.addSlide();
+  s.background = { color: NAVY };
+  s.addText('Igreja Evangélica Nazareno Guarapuava', { x:0.5, y:2.9, w:12.33, h:1, align:'center', fontSize:32, bold:true, color:WHITE });
+  s.addText('Relatório Financeiro', { x:0.5, y:3.9, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:GOLD });
+  s.addText(d.periodoLabel, { x:0.5, y:4.6, w:12.33, h:0.6, align:'center', fontSize:16, color:'CBD5E1' });
+
+  s = pptx.addSlide();
+  s.background = { color: WHITE };
+  s.addText('RECEITAS TOTAIS', { x:0.5, y:1.4, w:12.33, h:0.8, align:'center', fontSize:24, bold:true, color:MUTE });
+  s.addText(brl(d.totalReceitas), { x:0.5, y:2.4, w:12.33, h:2, align:'center', fontSize:88, bold:true, color:GREEN });
+  s.addText(d.periodoLabel, { x:0.5, y:4.7, w:12.33, h:0.6, align:'center', fontSize:18, color:MUTE });
+
+  s = pptx.addSlide();
+  s.background = { color: WHITE };
+  s.addText('DESPESAS TOTAIS', { x:0.5, y:1.4, w:12.33, h:0.8, align:'center', fontSize:24, bold:true, color:MUTE });
+  s.addText(brl(d.totalDespesas), { x:0.5, y:2.4, w:12.33, h:2, align:'center', fontSize:88, bold:true, color:RED });
+  s.addText(d.periodoLabel, { x:0.5, y:4.7, w:12.33, h:0.6, align:'center', fontSize:18, color:MUTE });
+
+  s = pptx.addSlide();
+  s.background = { color: WHITE };
+  s.addText('MÉDIA MENSAL', { x:0.5, y:0.7, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:MUTE });
+  s.addText('Receitas', { x:0.5, y:2.0, w:6.16, h:0.6, align:'center', fontSize:20, bold:true, color:MUTE });
+  s.addText(brl(d.mediaReceita), { x:0.5, y:2.7, w:6.16, h:1.4, align:'center', fontSize:48, bold:true, color:GREEN });
+  s.addText('Despesas', { x:6.66, y:2.0, w:6.16, h:0.6, align:'center', fontSize:20, bold:true, color:MUTE });
+  s.addText(brl(d.mediaDespesa), { x:6.66, y:2.7, w:6.16, h:1.4, align:'center', fontSize:48, bold:true, color:RED });
+  s.addText(d.periodoLabel, { x:0.5, y:4.6, w:12.33, h:0.6, align:'center', fontSize:16, color:MUTE });
+
+  s = pptx.addSlide();
+  s.background = { color: WHITE };
+  s.addText('DIZIMISTAS — MÉDIA MENSAL', { x:0.5, y:1.4, w:12.33, h:0.8, align:'center', fontSize:24, bold:true, color:MUTE });
+  s.addText(d.mediaDizimistas.toFixed(1), { x:0.5, y:2.4, w:12.33, h:2, align:'center', fontSize:88, bold:true, color:GOLD });
+  s.addText('lançamentos de dízimo por mês, em média', { x:0.5, y:4.7, w:12.33, h:0.6, align:'center', fontSize:16, color:MUTE });
+
+  s = pptx.addSlide();
+  s.background = { color: WHITE };
+  s.addText('MELHOR MÊS × PIOR MÊS', { x:0.5, y:0.7, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:MUTE });
+  s.addText('Melhor Mês', { x:0.5, y:1.9, w:6.16, h:0.6, align:'center', fontSize:18, bold:true, color:MUTE });
+  s.addText(brlSigned(d.melhorMes.valor), { x:0.5, y:2.6, w:6.16, h:1.2, align:'center', fontSize:40, bold:true, color:GREEN });
+  s.addText(d.melhorMes.label, { x:0.5, y:3.75, w:6.16, h:0.5, align:'center', fontSize:16, color:MUTE });
+  s.addText('Pior Mês', { x:6.66, y:1.9, w:6.16, h:0.6, align:'center', fontSize:18, bold:true, color:MUTE });
+  s.addText(brlSigned(d.piorMes.valor), { x:6.66, y:2.6, w:6.16, h:1.2, align:'center', fontSize:40, bold:true, color:RED });
+  s.addText(d.piorMes.label, { x:6.66, y:3.75, w:6.16, h:0.5, align:'center', fontSize:16, color:MUTE });
+
+  pptx.writeFile({ fileName: 'Apresentacao_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.pptx' });
 });
 
 /* ============ Carregamento de dados (JSONP) ============ */
