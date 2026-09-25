@@ -367,6 +367,15 @@
   .apres-badge { position: absolute; top: 18px; right: 22px; font-size: 11px; color: var(--ink-mute); }
   .apres-slide.dark .apres-badge { color: #8894BE; }
 
+  /* ---------- Meu Painel ---------- */
+  .mp-groups { display: flex; flex-direction: column; gap: 18px; }
+  .mp-group-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-mute); margin-bottom: 8px; }
+  .mp-group-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+  .mp-check-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft); cursor: pointer; padding: 4px 0; }
+  .mp-check-item input { width: 15px; height: 15px; accent-color: var(--accent); flex-shrink: 0; }
+  .mp-empty { text-align: center; color: var(--ink-mute); font-size: 13px; padding: 40px 20px; }
+  .mp-widget-card { margin-bottom: 20px; }
+
   .legend-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); }
   .legend-item { display: inline-flex; align-items: center; gap: 6px; }
   .legend-swatch { width: 10px; height: 10px; border-radius: 2px; }
@@ -892,6 +901,18 @@
         </div>
       </section>
 
+      <!-- ===== MEU PAINEL ===== -->
+      <section class="section" id="sec-meupainel">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Personalizar Painel</span>
+            <button class="card-link" id="mp-toggle-personalizar" type="button">Ocultar opções</button>
+          </div>
+          <div id="mp-opcoes"></div>
+        </div>
+        <div id="mp-widgets"></div>
+      </section>
+
     </div>
   </main>
 </div>
@@ -981,6 +1002,7 @@ const NAV_ICONS = {
   dre: '<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v3h3"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="18" x2="13" y2="18"/>',
   aplic: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v5c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 11v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>',
   apres: '<rect x="2" y="4" width="20" height="13" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+  meupainel: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
 };
 function navIcon(key, stroked) {
   const inner = NAV_ICONS[key];
@@ -997,6 +1019,7 @@ const SECTIONS = [
   { id: 'aplic', label: 'Aplicações', title: 'Aplicações', sub: 'Saldo em fundos e aplicações financeiras', icon: navIcon('aplic', true) },
   { id: 'dre', label: 'DRE', title: 'DRE', sub: 'Demonstração do Resultado do período selecionado', icon: navIcon('dre', true) },
   { id: 'apresentacao', label: 'Apresentação', title: 'Apresentação', sub: 'Slides com os principais números para exibir no projetor', icon: navIcon('apres', true) },
+  { id: 'meupainel', label: 'Meu Painel', title: 'Meu Painel', sub: 'Escolha os indicadores, gráficos e tabelas que quer ver aqui', icon: navIcon('meupainel', false) },
 ];
 
 let currentSection = 'geral';
@@ -1047,6 +1070,7 @@ function renderSection(id) {
   else if (id === 'aplic') renderAplicacoes();
   else if (id === 'dre') renderDRE();
   else if (id === 'apresentacao') renderApresentacao();
+  else if (id === 'meupainel') renderMeuPainel();
 }
 
 /* ============ KPI helpers ============ */
@@ -2000,6 +2024,180 @@ document.getElementById('apres-export-pptx').addEventListener('click', () => {
   s.addText(d.piorMes.label, { x:6.66, y:3.75, w:6.16, h:0.5, align:'center', fontSize:16, color:MUTE });
 
   pptx.writeFile({ fileName: 'Apresentacao_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.pptx' });
+});
+
+/* ============ MEU PAINEL ============ */
+const MP_STORAGE_KEY = 'tesouraria-meupainel';
+const MP_DEFAULT_SELECTED = ['receitas-totais', 'despesas-totais', 'saldo-periodo', 'saldo-acumulado', 'chart-combo', 'tabela-saldo'];
+
+const MP_KPIS = [
+  { id: 'receitas-totais', label: 'Receitas Totais', build: (meses) =>
+      kpiCard('Receitas Totais', brl(sumRange(DATA.totalReceitas, meses)), ICON_UP, 'good', `<span class="kpi-delta flat">${meses.length} meses</span>`) },
+  { id: 'despesas-totais', label: 'Despesas Totais', build: (meses) =>
+      kpiCard('Despesas Totais', brl(sumRange(DATA.totalDespesas, meses)), ICON_DOWN, 'critical', `<span class="kpi-delta flat">${meses.length} meses</span>`) },
+  { id: 'saldo-periodo', label: 'Saldo do Período', build: (meses) => {
+      const saldo = sumRange(DATA.totalReceitas, meses) - sumRange(DATA.totalDespesas, meses);
+      return kpiCard('Saldo do Período', brlSigned(saldo), ICON_WALLET, 'info', `<span class="kpi-delta flat">${meses.length} meses</span>`);
+    } },
+  { id: 'saldo-acumulado', label: 'Saldo Acumulado', build: () => {
+      const [, ateIdx] = currentRangeIdx();
+      const acumMeses = allMeses.slice(0, ateIdx+1);
+      const saldo = (DATA.saldoInicial||0) + acumMeses.reduce((s,m)=>s+(DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0), 0);
+      return kpiCard('Saldo Acumulado', brlSigned(saldo), ICON_BANK, 'accent', `<span class="kpi-delta flat">até ${mesLabelCurto(allMeses[ateIdx])}</span>`);
+    } },
+  { id: 'melhor-mes', label: 'Melhor Mês', build: (meses) => {
+      if (!meses.length) return kpiCard('Melhor Mês', '—', ICON_UP, 'good', '');
+      const vals = meses.map(m => (DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0));
+      const idx = vals.indexOf(Math.max(...vals));
+      return kpiCard('Melhor Mês', brlSigned(vals[idx]), ICON_UP, 'good', `<span class="kpi-delta flat">${mesLabelLongo(meses[idx])}</span>`);
+    } },
+  { id: 'pior-mes', label: 'Pior Mês', build: (meses) => {
+      if (!meses.length) return kpiCard('Pior Mês', '—', ICON_DOWN, 'critical', '');
+      const vals = meses.map(m => (DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0));
+      const idx = vals.indexOf(Math.min(...vals));
+      return kpiCard('Pior Mês', brlSigned(vals[idx]), ICON_DOWN, 'critical', `<span class="kpi-delta flat">${mesLabelLongo(meses[idx])}</span>`);
+    } },
+  { id: 'media-receitas', label: 'Média Mensal de Receitas', build: (meses) => {
+      const media = meses.length ? sumRange(DATA.totalReceitas, meses)/meses.length : 0;
+      return kpiCard('Média Mensal de Receitas', brl(media), ICON_WALLET, 'good', `<span class="kpi-delta flat">${meses.length} meses</span>`);
+    } },
+  { id: 'media-despesas', label: 'Média Mensal de Despesas', build: (meses) => {
+      const media = meses.length ? sumRange(DATA.totalDespesas, meses)/meses.length : 0;
+      return kpiCard('Média Mensal de Despesas', brl(media), ICON_WALLET, 'critical', `<span class="kpi-delta flat">${meses.length} meses</span>`);
+    } },
+  { id: 'dizimistas-media', label: 'Dizimistas — Média Mensal', build: (meses) => {
+      const counts = meses.map(m => DATA.transacoes.filter(t => t.mesAno===m && t.categoria==='Dízimo' && (t.entrada||0)>0).length);
+      const media = counts.length ? counts.reduce((a,b)=>a+b,0)/counts.length : 0;
+      return kpiCard('Dizimistas — Média Mensal', media.toFixed(1), ICON_UP, 'accent', `<span class="kpi-delta flat">lançamentos/mês</span>`);
+    } },
+  { id: 'saldo-aplicacoes', label: 'Saldo em Aplicações', build: () => {
+      const [, ateIdx] = currentRangeIdx();
+      const acumMeses = allMeses.slice(0, ateIdx+1);
+      const saldo = APLICACOES_CATS.reduce((s,c) => s + sumRange(DATA.despesas[c]||{}, acumMeses), 0);
+      return kpiCard('Saldo em Aplicações', brl(saldo), ICON_BANK, 'accent', `<span class="kpi-delta flat">até ${mesLabelCurto(allMeses[ateIdx])}</span>`);
+    } },
+];
+
+const MP_WIDGETS = [
+  { id: 'chart-receitas', group: 'graficos', label: 'Evolução das Receitas', renderInto: (body, meses) => {
+      body.innerHTML = '<div class="chart-scroll"><div class="chart-wrap"></div></div>';
+      const vals = meses.map(m => DATA.totalReceitas[m]||0);
+      buildTrendChart(body.querySelector('.chart-wrap'), meses, vals, cssVar('--good','#1E8E5A'), cssVar('--critical','#C0453B'));
+    } },
+  { id: 'chart-despesas', group: 'graficos', label: 'Evolução das Despesas', renderInto: (body, meses) => {
+      body.innerHTML = '<div class="chart-scroll"><div class="chart-wrap"></div></div>';
+      const vals = meses.map(m => DATA.totalDespesas[m]||0);
+      buildTrendChart(body.querySelector('.chart-wrap'), meses, vals, cssVar('--critical','#C0453B'), cssVar('--good','#1E8E5A'));
+    } },
+  { id: 'chart-combo', group: 'graficos', label: 'Receitas × Despesas × Saldo', renderInto: (body, meses) => {
+      body.innerHTML = '<div class="chart-scroll"><div class="chart-wrap"></div></div>';
+      const receitaVals = meses.map(m => DATA.totalReceitas[m]||0);
+      const despesaVals = meses.map(m => DATA.totalDespesas[m]||0);
+      buildComboChart(body.querySelector('.chart-wrap'), meses, receitaVals, despesaVals);
+    } },
+  { id: 'donut-despesas', group: 'graficos', label: 'Distribuição das Despesas', renderInto: (body, meses) => {
+      body.innerHTML = '<div class="donut-row"><div class="donut-wrap"></div><div class="mini-legend"></div></div>';
+      const dark = isDarkMode();
+      const cats = sortedCats(DATA.despesas, meses);
+      const totals = cats.map(c => sumRange(DATA.despesas[c], meses));
+      const colors = cats.map((c,i) => c==='A revisar' ? cssVar('--ink-mute','#8A90A6') : categoryColor(i,dark));
+      buildDonut(body.querySelector('.donut-wrap'), body.querySelector('.mini-legend'), cats, totals, colors, totals.reduce((a,b)=>a+b,0));
+    } },
+  { id: 'donut-receitas', group: 'graficos', label: 'Distribuição das Receitas', renderInto: (body, meses) => {
+      body.innerHTML = '<div class="donut-row"><div class="donut-wrap"></div><div class="mini-legend"></div></div>';
+      const dark = isDarkMode();
+      const cats = sortedCats(DATA.receitas, meses);
+      const totals = cats.map(c => sumRange(DATA.receitas[c], meses));
+      const colors = cats.map((c,i) => c==='A revisar' ? cssVar('--ink-mute','#8A90A6') : categoryColor(i,dark));
+      buildDonut(body.querySelector('.donut-wrap'), body.querySelector('.mini-legend'), cats, totals, colors, totals.reduce((a,b)=>a+b,0));
+    } },
+  { id: 'chart-dizimistas', group: 'graficos', label: 'Dizimistas por Mês', renderInto: (body, meses) => {
+      body.innerHTML = '<div class="chart-scroll"><div class="chart-wrap"></div></div>';
+      const counts = meses.map(m => DATA.transacoes.filter(t => t.mesAno===m && t.categoria==='Dízimo' && (t.entrada||0)>0).length);
+      buildTrendChart(body.querySelector('.chart-wrap'), meses, counts, cssVar('--good','#1E8E5A'), cssVar('--critical','#C0453B'), v => Math.round(v).toString());
+    } },
+  { id: 'tabela-saldo', group: 'tabelas', label: 'Evolução do Saldo', renderInto: (body, meses) => {
+      body.innerHTML = '<div class="table-scroll"><table class="simple"></table></div>';
+      buildSaldoTable(body.querySelector('table'), meses);
+    } },
+  { id: 'tabela-mov', group: 'tabelas', label: 'Movimentações Recentes', renderInto: (body, meses) => {
+      body.innerHTML = '<div class="table-scroll"><table class="simple"></table></div>';
+      const movs = DATA.transacoes.filter(t => meses.includes(t.mesAno)).sort((a,b)=>parseDataBR(b.data)-parseDataBR(a.data)).slice(0,8);
+      body.querySelector('table').innerHTML = movTableHtml(movs);
+    } },
+  { id: 'tabela-essencial', group: 'tabelas', label: 'Custo Essencial Mensal', renderInto: (body) => {
+      body.innerHTML = buildCustoEssencial();
+    } },
+];
+
+function mpGetSelected() {
+  try {
+    const raw = localStorage.getItem(MP_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return MP_DEFAULT_SELECTED.slice();
+}
+function mpSetSelected(ids) {
+  try { localStorage.setItem(MP_STORAGE_KEY, JSON.stringify(ids)); } catch (e) {}
+}
+
+function renderMeuPainelOpcoes(selected) {
+  const grupoHtml = (titulo, itens) => {
+    const itensHtml = itens.map(it => `<label class="mp-check-item"><input type="checkbox" data-mp-id="${it.id}" ${selected.includes(it.id)?'checked':''}>${it.label}</label>`).join('');
+    return `<div><div class="mp-group-title">${titulo}</div><div class="mp-group-items">${itensHtml}</div></div>`;
+  };
+  document.getElementById('mp-opcoes').innerHTML = `<div class="mp-groups">
+    ${grupoHtml('Indicadores', MP_KPIS)}
+    ${grupoHtml('Gráficos', MP_WIDGETS.filter(w => w.group==='graficos'))}
+    ${grupoHtml('Tabelas', MP_WIDGETS.filter(w => w.group==='tabelas'))}
+  </div>`;
+  document.getElementById('mp-opcoes').querySelectorAll('input[data-mp-id]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const sel = mpGetSelected();
+      const id = inp.getAttribute('data-mp-id');
+      const idx = sel.indexOf(id);
+      if (inp.checked && idx===-1) sel.push(id);
+      if (!inp.checked && idx!==-1) sel.splice(idx,1);
+      mpSetSelected(sel);
+      renderMeuPainelWidgets(sel);
+    });
+  });
+}
+
+function renderMeuPainelWidgets(selected) {
+  const meses = mesesInRange();
+  const kpisSelected = MP_KPIS.filter(k => selected.includes(k.id));
+  const widgetsSelected = MP_WIDGETS.filter(w => selected.includes(w.id));
+
+  if (!kpisSelected.length && !widgetsSelected.length) {
+    document.getElementById('mp-widgets').innerHTML = '<div class="card"><div class="mp-empty">Nenhum item selecionado. Marque acima o que você quer ver aqui.</div></div>';
+    return;
+  }
+
+  let html = '';
+  if (kpisSelected.length) html += `<div class="kpis" style="margin-bottom:20px;">${kpisSelected.map(k => k.build(meses)).join('')}</div>`;
+  widgetsSelected.forEach(w => {
+    html += `<div class="card mp-widget-card"><div class="card-head"><span class="card-title">${w.label}</span></div><div class="mp-widget-body" data-mp-body="${w.id}"></div></div>`;
+  });
+  document.getElementById('mp-widgets').innerHTML = html;
+
+  widgetsSelected.forEach(w => {
+    const body = document.querySelector(`[data-mp-body="${w.id}"]`);
+    if (body) w.renderInto(body, meses);
+  });
+}
+
+function renderMeuPainel() {
+  const selected = mpGetSelected();
+  renderMeuPainelOpcoes(selected);
+  renderMeuPainelWidgets(selected);
+}
+
+document.getElementById('mp-toggle-personalizar').addEventListener('click', function () {
+  const opcoesEl = document.getElementById('mp-opcoes');
+  const hidden = opcoesEl.style.display === 'none';
+  opcoesEl.style.display = hidden ? '' : 'none';
+  this.textContent = hidden ? 'Ocultar opções' : 'Mostrar opções';
 });
 
 /* ============ Carregamento de dados (JSONP) ============ */
