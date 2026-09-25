@@ -336,7 +336,9 @@
     .dre-mensal-row { overflow: visible; flex-wrap: wrap; }
     body[data-print-alvo="apresentacao"] * { visibility: hidden; }
     body[data-print-alvo="apresentacao"] #apres-print-area, body[data-print-alvo="apresentacao"] #apres-print-area * { visibility: visible; }
-    #apres-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+    body[data-print-alvo="meupainel"] * { visibility: hidden; }
+    body[data-print-alvo="meupainel"] #mp-print-area, body[data-print-alvo="meupainel"] #mp-print-area * { visibility: visible; }
+    #apres-print-area, #mp-print-area { position: absolute; left: 0; top: 0; width: 100%; }
     .apres-slide { page-break-after: always; break-after: page; box-shadow: none !important; border-radius: 0 !important; width: 100% !important; max-width: none !important; height: 100vh !important; }
   }
 
@@ -375,6 +377,10 @@
   .mp-check-item input { width: 15px; height: 15px; accent-color: var(--accent); flex-shrink: 0; }
   .mp-empty { text-align: center; color: var(--ink-mute); font-size: 13px; padding: 40px 20px; }
   .mp-widget-card { margin-bottom: 20px; }
+  .apres-slide .apres-donut-body { display: flex; align-items: center; justify-content: center; gap: 40px; width: 100%; flex-wrap: wrap; }
+  .apres-slide .apres-donut-body .donut-wrap { transform: scale(1.5); margin: 10px 30px; }
+  .apres-slide .apres-donut-body .mini-legend { font-size: 15px; min-width: 220px; }
+  .apres-slide .apres-donut-body .mini-legend-item .val { font-size: 15px; }
 
   .legend-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); }
   .legend-item { display: inline-flex; align-items: center; gap: 6px; }
@@ -905,12 +911,22 @@
       <section class="section" id="sec-meupainel">
         <div class="card">
           <div class="card-head">
-            <span class="card-title">Personalizar Painel</span>
+            <span class="card-title">Personalizar Apresentação</span>
             <button class="card-link" id="mp-toggle-personalizar" type="button">Ocultar opções</button>
           </div>
           <div id="mp-opcoes"></div>
         </div>
-        <div id="mp-widgets"></div>
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Minha Apresentação</span>
+            <div class="dre-export-actions">
+              <button class="btn-dre-export" id="mp-export-pptx" type="button">Exportar PowerPoint</button>
+              <button class="btn-dre-export" id="mp-export-pdf" type="button">Exportar PDF</button>
+            </div>
+          </div>
+          <div class="apres-actions-note">Dica: no PDF, escolha orientação Paisagem na caixa de impressão para os slides ficarem cheios na tela.</div>
+          <div id="mp-content" style="margin-top:18px;"></div>
+        </div>
       </section>
 
     </div>
@@ -2026,109 +2042,82 @@ document.getElementById('apres-export-pptx').addEventListener('click', () => {
   pptx.writeFile({ fileName: 'Apresentacao_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.pptx' });
 });
 
-/* ============ MEU PAINEL ============ */
+/* ============ MEU PAINEL (apresentação personalizada) ============ */
 const MP_STORAGE_KEY = 'tesouraria-meupainel';
-const MP_DEFAULT_SELECTED = ['receitas-totais', 'despesas-totais', 'saldo-periodo', 'saldo-acumulado', 'chart-combo', 'tabela-saldo'];
+const MP_DEFAULT_SELECTED = ['receitas-totais', 'despesas-totais', 'media-receitas', 'media-despesas', 'dizimistas-media', 'melhor-mes', 'pior-mes'];
 
-const MP_KPIS = [
-  { id: 'receitas-totais', label: 'Receitas Totais', build: (meses) =>
-      kpiCard('Receitas Totais', brl(sumRange(DATA.totalReceitas, meses)), ICON_UP, 'good', `<span class="kpi-delta flat">${meses.length} meses</span>`) },
-  { id: 'despesas-totais', label: 'Despesas Totais', build: (meses) =>
-      kpiCard('Despesas Totais', brl(sumRange(DATA.totalDespesas, meses)), ICON_DOWN, 'critical', `<span class="kpi-delta flat">${meses.length} meses</span>`) },
-  { id: 'saldo-periodo', label: 'Saldo do Período', build: (meses) => {
+function mpPeriodoLabel(meses) {
+  if (!meses.length) return '';
+  return meses.length===1 ? mesLabelLongo(meses[0]) : mesLabelLongo(meses[0])+' a '+mesLabelLongo(meses[meses.length-1]);
+}
+
+const MP_METRICAS = [
+  { id: 'receitas-totais', label: 'Receitas Totais', compute: (meses) =>
+      ({ value: brl(sumRange(DATA.totalReceitas, meses)), color: 'good', sub: mpPeriodoLabel(meses) }) },
+  { id: 'despesas-totais', label: 'Despesas Totais', compute: (meses) =>
+      ({ value: brl(sumRange(DATA.totalDespesas, meses)), color: 'critical', sub: mpPeriodoLabel(meses) }) },
+  { id: 'saldo-periodo', label: 'Saldo do Período', compute: (meses) => {
       const saldo = sumRange(DATA.totalReceitas, meses) - sumRange(DATA.totalDespesas, meses);
-      return kpiCard('Saldo do Período', brlSigned(saldo), ICON_WALLET, 'info', `<span class="kpi-delta flat">${meses.length} meses</span>`);
+      return { value: brlSigned(saldo), color: saldo>=0?'good':'critical', sub: mpPeriodoLabel(meses) };
     } },
-  { id: 'saldo-acumulado', label: 'Saldo Acumulado', build: () => {
+  { id: 'saldo-acumulado', label: 'Saldo Acumulado', compute: () => {
       const [, ateIdx] = currentRangeIdx();
       const acumMeses = allMeses.slice(0, ateIdx+1);
       const saldo = (DATA.saldoInicial||0) + acumMeses.reduce((s,m)=>s+(DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0), 0);
-      return kpiCard('Saldo Acumulado', brlSigned(saldo), ICON_BANK, 'accent', `<span class="kpi-delta flat">até ${mesLabelCurto(allMeses[ateIdx])}</span>`);
+      return { value: brlSigned(saldo), color: 'accent', sub: 'até '+mesLabelCurto(allMeses[ateIdx]) };
     } },
-  { id: 'melhor-mes', label: 'Melhor Mês', build: (meses) => {
-      if (!meses.length) return kpiCard('Melhor Mês', '—', ICON_UP, 'good', '');
+  { id: 'melhor-mes', label: 'Melhor Mês', compute: (meses) => {
+      if (!meses.length) return { value: '—', color: 'good', sub: '' };
       const vals = meses.map(m => (DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0));
       const idx = vals.indexOf(Math.max(...vals));
-      return kpiCard('Melhor Mês', brlSigned(vals[idx]), ICON_UP, 'good', `<span class="kpi-delta flat">${mesLabelLongo(meses[idx])}</span>`);
+      return { value: brlSigned(vals[idx]), color: 'good', sub: mesLabelLongo(meses[idx]) };
     } },
-  { id: 'pior-mes', label: 'Pior Mês', build: (meses) => {
-      if (!meses.length) return kpiCard('Pior Mês', '—', ICON_DOWN, 'critical', '');
+  { id: 'pior-mes', label: 'Pior Mês', compute: (meses) => {
+      if (!meses.length) return { value: '—', color: 'critical', sub: '' };
       const vals = meses.map(m => (DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0));
       const idx = vals.indexOf(Math.min(...vals));
-      return kpiCard('Pior Mês', brlSigned(vals[idx]), ICON_DOWN, 'critical', `<span class="kpi-delta flat">${mesLabelLongo(meses[idx])}</span>`);
+      return { value: brlSigned(vals[idx]), color: 'critical', sub: mesLabelLongo(meses[idx]) };
     } },
-  { id: 'media-receitas', label: 'Média Mensal de Receitas', build: (meses) => {
+  { id: 'media-receitas', label: 'Média Mensal de Receitas', compute: (meses) => {
       const media = meses.length ? sumRange(DATA.totalReceitas, meses)/meses.length : 0;
-      return kpiCard('Média Mensal de Receitas', brl(media), ICON_WALLET, 'good', `<span class="kpi-delta flat">${meses.length} meses</span>`);
+      return { value: brl(media), color: 'good', sub: meses.length+' meses — '+mpPeriodoLabel(meses) };
     } },
-  { id: 'media-despesas', label: 'Média Mensal de Despesas', build: (meses) => {
+  { id: 'media-despesas', label: 'Média Mensal de Despesas', compute: (meses) => {
       const media = meses.length ? sumRange(DATA.totalDespesas, meses)/meses.length : 0;
-      return kpiCard('Média Mensal de Despesas', brl(media), ICON_WALLET, 'critical', `<span class="kpi-delta flat">${meses.length} meses</span>`);
+      return { value: brl(media), color: 'critical', sub: meses.length+' meses — '+mpPeriodoLabel(meses) };
     } },
-  { id: 'dizimistas-media', label: 'Dizimistas — Média Mensal', build: (meses) => {
+  { id: 'dizimistas-media', label: 'Dizimistas — Média Mensal', compute: (meses) => {
       const counts = meses.map(m => DATA.transacoes.filter(t => t.mesAno===m && t.categoria==='Dízimo' && (t.entrada||0)>0).length);
       const media = counts.length ? counts.reduce((a,b)=>a+b,0)/counts.length : 0;
-      return kpiCard('Dizimistas — Média Mensal', media.toFixed(1), ICON_UP, 'accent', `<span class="kpi-delta flat">lançamentos/mês</span>`);
+      return { value: media.toFixed(1), color: 'accent', sub: 'lançamentos de dízimo por mês, em média' };
     } },
-  { id: 'saldo-aplicacoes', label: 'Saldo em Aplicações', build: () => {
+  { id: 'saldo-aplicacoes', label: 'Saldo em Aplicações', compute: () => {
       const [, ateIdx] = currentRangeIdx();
       const acumMeses = allMeses.slice(0, ateIdx+1);
       const saldo = APLICACOES_CATS.reduce((s,c) => s + sumRange(DATA.despesas[c]||{}, acumMeses), 0);
-      return kpiCard('Saldo em Aplicações', brl(saldo), ICON_BANK, 'accent', `<span class="kpi-delta flat">até ${mesLabelCurto(allMeses[ateIdx])}</span>`);
+      return { value: brl(saldo), color: 'accent', sub: 'até '+mesLabelCurto(allMeses[ateIdx]) };
     } },
 ];
 
-const MP_WIDGETS = [
-  { id: 'chart-receitas', group: 'graficos', label: 'Evolução das Receitas', renderInto: (body, meses) => {
-      body.innerHTML = '<div class="chart-scroll"><div class="chart-wrap"></div></div>';
-      const vals = meses.map(m => DATA.totalReceitas[m]||0);
-      buildTrendChart(body.querySelector('.chart-wrap'), meses, vals, cssVar('--good','#1E8E5A'), cssVar('--critical','#C0453B'));
-    } },
-  { id: 'chart-despesas', group: 'graficos', label: 'Evolução das Despesas', renderInto: (body, meses) => {
-      body.innerHTML = '<div class="chart-scroll"><div class="chart-wrap"></div></div>';
-      const vals = meses.map(m => DATA.totalDespesas[m]||0);
-      buildTrendChart(body.querySelector('.chart-wrap'), meses, vals, cssVar('--critical','#C0453B'), cssVar('--good','#1E8E5A'));
-    } },
-  { id: 'chart-combo', group: 'graficos', label: 'Receitas × Despesas × Saldo', renderInto: (body, meses) => {
-      body.innerHTML = '<div class="chart-scroll"><div class="chart-wrap"></div></div>';
-      const receitaVals = meses.map(m => DATA.totalReceitas[m]||0);
-      const despesaVals = meses.map(m => DATA.totalDespesas[m]||0);
-      buildComboChart(body.querySelector('.chart-wrap'), meses, receitaVals, despesaVals);
-    } },
-  { id: 'donut-despesas', group: 'graficos', label: 'Distribuição das Despesas', renderInto: (body, meses) => {
-      body.innerHTML = '<div class="donut-row"><div class="donut-wrap"></div><div class="mini-legend"></div></div>';
-      const dark = isDarkMode();
-      const cats = sortedCats(DATA.despesas, meses);
-      const totals = cats.map(c => sumRange(DATA.despesas[c], meses));
-      const colors = cats.map((c,i) => c==='A revisar' ? cssVar('--ink-mute','#8A90A6') : categoryColor(i,dark));
-      buildDonut(body.querySelector('.donut-wrap'), body.querySelector('.mini-legend'), cats, totals, colors, totals.reduce((a,b)=>a+b,0));
-    } },
-  { id: 'donut-receitas', group: 'graficos', label: 'Distribuição das Receitas', renderInto: (body, meses) => {
-      body.innerHTML = '<div class="donut-row"><div class="donut-wrap"></div><div class="mini-legend"></div></div>';
-      const dark = isDarkMode();
-      const cats = sortedCats(DATA.receitas, meses);
-      const totals = cats.map(c => sumRange(DATA.receitas[c], meses));
-      const colors = cats.map((c,i) => c==='A revisar' ? cssVar('--ink-mute','#8A90A6') : categoryColor(i,dark));
-      buildDonut(body.querySelector('.donut-wrap'), body.querySelector('.mini-legend'), cats, totals, colors, totals.reduce((a,b)=>a+b,0));
-    } },
-  { id: 'chart-dizimistas', group: 'graficos', label: 'Dizimistas por Mês', renderInto: (body, meses) => {
-      body.innerHTML = '<div class="chart-scroll"><div class="chart-wrap"></div></div>';
-      const counts = meses.map(m => DATA.transacoes.filter(t => t.mesAno===m && t.categoria==='Dízimo' && (t.entrada||0)>0).length);
-      buildTrendChart(body.querySelector('.chart-wrap'), meses, counts, cssVar('--good','#1E8E5A'), cssVar('--critical','#C0453B'), v => Math.round(v).toString());
-    } },
-  { id: 'tabela-saldo', group: 'tabelas', label: 'Evolução do Saldo', renderInto: (body, meses) => {
-      body.innerHTML = '<div class="table-scroll"><table class="simple"></table></div>';
-      buildSaldoTable(body.querySelector('table'), meses);
-    } },
-  { id: 'tabela-mov', group: 'tabelas', label: 'Movimentações Recentes', renderInto: (body, meses) => {
-      body.innerHTML = '<div class="table-scroll"><table class="simple"></table></div>';
-      const movs = DATA.transacoes.filter(t => meses.includes(t.mesAno)).sort((a,b)=>parseDataBR(b.data)-parseDataBR(a.data)).slice(0,8);
-      body.querySelector('table').innerHTML = movTableHtml(movs);
-    } },
-  { id: 'tabela-essencial', group: 'tabelas', label: 'Custo Essencial Mensal', renderInto: (body) => {
-      body.innerHTML = buildCustoEssencial();
-    } },
+const MP_CHARTS = [
+  { id: 'donut-despesas', label: 'Distribuição das Despesas', matriz: 'despesas' },
+  { id: 'donut-receitas', label: 'Distribuição das Receitas', matriz: 'receitas' },
 ];
+
+function mpChartCatsTotals(chartId, meses) {
+  if (chartId === 'donut-despesas') {
+    const allCats = sortedCats(DATA.despesas, meses).filter(c => c !== 'A revisar');
+    const arevisarTotal = sumRange(DATA.despesas['A revisar']||{}, meses);
+    const top = allCats.slice(0, 5);
+    const outrosVal = allCats.slice(5).reduce((s,c)=>s+sumRange(DATA.despesas[c],meses), 0) + arevisarTotal;
+    const cats = top.slice(), totals = top.map(c => sumRange(DATA.despesas[c], meses));
+    if (outrosVal > 0) { cats.push('Outras'); totals.push(outrosVal); }
+    return { cats, totals };
+  }
+  const cats = sortedCats(DATA.receitas, meses);
+  const totals = cats.map(c => sumRange(DATA.receitas[c], meses));
+  return { cats, totals };
+}
 
 function mpGetSelected() {
   try {
@@ -2147,9 +2136,8 @@ function renderMeuPainelOpcoes(selected) {
     return `<div><div class="mp-group-title">${titulo}</div><div class="mp-group-items">${itensHtml}</div></div>`;
   };
   document.getElementById('mp-opcoes').innerHTML = `<div class="mp-groups">
-    ${grupoHtml('Indicadores', MP_KPIS)}
-    ${grupoHtml('Gráficos', MP_WIDGETS.filter(w => w.group==='graficos'))}
-    ${grupoHtml('Tabelas', MP_WIDGETS.filter(w => w.group==='tabelas'))}
+    ${grupoHtml('Indicadores', MP_METRICAS)}
+    ${grupoHtml('Gráficos', MP_CHARTS)}
   </div>`;
   document.getElementById('mp-opcoes').querySelectorAll('input[data-mp-id]').forEach(inp => {
     inp.addEventListener('change', () => {
@@ -2159,38 +2147,60 @@ function renderMeuPainelOpcoes(selected) {
       if (inp.checked && idx===-1) sel.push(id);
       if (!inp.checked && idx!==-1) sel.splice(idx,1);
       mpSetSelected(sel);
-      renderMeuPainelWidgets(sel);
+      renderMeuPainelSlides(sel);
     });
   });
 }
 
-function renderMeuPainelWidgets(selected) {
-  const meses = mesesInRange();
-  const kpisSelected = MP_KPIS.filter(k => selected.includes(k.id));
-  const widgetsSelected = MP_WIDGETS.filter(w => selected.includes(w.id));
+let mpData = null;
 
-  if (!kpisSelected.length && !widgetsSelected.length) {
-    document.getElementById('mp-widgets').innerHTML = '<div class="card"><div class="mp-empty">Nenhum item selecionado. Marque acima o que você quer ver aqui.</div></div>';
+function renderMeuPainelSlides(selected) {
+  const meses = mesesInRange();
+  const metricasSelected = MP_METRICAS.filter(m => selected.includes(m.id));
+  const chartsSelected = MP_CHARTS.filter(c => selected.includes(c.id));
+
+  if (!metricasSelected.length && !chartsSelected.length) {
+    document.getElementById('mp-content').innerHTML = '<div class="mp-empty">Nenhum item selecionado. Marque acima o que você quer na sua apresentação.</div>';
+    mpData = null;
     return;
   }
 
-  let html = '';
-  if (kpisSelected.length) html += `<div class="kpis" style="margin-bottom:20px;">${kpisSelected.map(k => k.build(meses)).join('')}</div>`;
-  widgetsSelected.forEach(w => {
-    html += `<div class="card mp-widget-card"><div class="card-head"><span class="card-title">${w.label}</span></div><div class="mp-widget-body" data-mp-body="${w.id}"></div></div>`;
-  });
-  document.getElementById('mp-widgets').innerHTML = html;
+  const periodoLabel = mpPeriodoLabel(meses);
+  let slidesHtml = apresSlideHtml('dark', `
+    <div class="apres-capa-igreja">Igreja Evangélica Nazareno Guarapuava</div>
+    <div class="apres-capa-sub">Minha Apresentação</div>
+    <div class="apres-capa-periodo">${periodoLabel}</div>`);
 
-  widgetsSelected.forEach(w => {
-    const body = document.querySelector(`[data-mp-body="${w.id}"]`);
-    if (body) w.renderInto(body, meses);
+  const metricasData = metricasSelected.map(m => ({ label: m.label, ...m.compute(meses) }));
+  metricasData.forEach(m => {
+    slidesHtml += apresSlideHtml('light', `
+      <div class="apres-eyebrow">${m.label}</div>
+      <div class="apres-big ${m.color}">${m.value}</div>
+      <div class="apres-sub">${m.sub}</div>`);
   });
+
+  const chartsData = chartsSelected.map(c => ({ id: c.id, label: c.label, ...mpChartCatsTotals(c.id, meses) }));
+  chartsData.forEach(c => {
+    slidesHtml += apresSlideHtml('light', `
+      <div class="apres-eyebrow">${c.label}</div>
+      <div class="apres-donut-body"><div class="donut-wrap" id="mp-donut-${c.id}"></div><div class="mini-legend" id="mp-legend-${c.id}"></div></div>`);
+  });
+
+  document.getElementById('mp-content').innerHTML = `<div id="mp-print-area">${slidesHtml}</div>`;
+
+  const dark = isDarkMode();
+  chartsData.forEach(c => {
+    const colors = c.cats.map((cat,i) => (cat==='A revisar'||cat==='Outras') ? cssVar('--ink-mute','#8A90A6') : categoryColor(i,dark));
+    buildDonut(document.getElementById('mp-donut-'+c.id), document.getElementById('mp-legend-'+c.id), c.cats, c.totals, colors, c.totals.reduce((a,b)=>a+b,0));
+  });
+
+  mpData = { periodoLabel, metricas: metricasData, charts: chartsData };
 }
 
 function renderMeuPainel() {
   const selected = mpGetSelected();
   renderMeuPainelOpcoes(selected);
-  renderMeuPainelWidgets(selected);
+  renderMeuPainelSlides(selected);
 }
 
 document.getElementById('mp-toggle-personalizar').addEventListener('click', function () {
@@ -2198,6 +2208,45 @@ document.getElementById('mp-toggle-personalizar').addEventListener('click', func
   const hidden = opcoesEl.style.display === 'none';
   opcoesEl.style.display = hidden ? '' : 'none';
   this.textContent = hidden ? 'Ocultar opções' : 'Mostrar opções';
+});
+
+document.getElementById('mp-export-pdf').addEventListener('click', () => {
+  document.body.setAttribute('data-print-alvo', 'meupainel');
+  window.print();
+});
+
+document.getElementById('mp-export-pptx').addEventListener('click', () => {
+  if (!mpData || typeof PptxGenJS === 'undefined') return;
+  const d = mpData;
+  const pptx = new PptxGenJS();
+  pptx.defineLayout({ name: 'CHURCH', width: 13.33, height: 7.5 });
+  pptx.layout = 'CHURCH';
+  const NAVY = '17213D', GREEN = '1E8E5A', RED = 'C0453B', GOLD = 'B9852A', MUTE = '8A90A6', WHITE = 'FFFFFF';
+  const colorMap = { good: GREEN, critical: RED, accent: GOLD };
+
+  let s = pptx.addSlide();
+  s.background = { color: NAVY };
+  s.addText('Igreja Evangélica Nazareno Guarapuava', { x:0.5, y:2.9, w:12.33, h:1, align:'center', fontSize:32, bold:true, color:WHITE });
+  s.addText('Minha Apresentação', { x:0.5, y:3.9, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:GOLD });
+  s.addText(d.periodoLabel, { x:0.5, y:4.6, w:12.33, h:0.6, align:'center', fontSize:16, color:'CBD5E1' });
+
+  d.metricas.forEach(m => {
+    s = pptx.addSlide();
+    s.background = { color: WHITE };
+    s.addText(m.label.toUpperCase(), { x:0.5, y:1.4, w:12.33, h:0.8, align:'center', fontSize:24, bold:true, color:MUTE });
+    s.addText(m.value, { x:0.5, y:2.4, w:12.33, h:2, align:'center', fontSize:76, bold:true, color: colorMap[m.color]||MUTE });
+    s.addText(m.sub||'', { x:0.5, y:4.7, w:12.33, h:0.6, align:'center', fontSize:18, color:MUTE });
+  });
+
+  d.charts.forEach(c => {
+    s = pptx.addSlide();
+    s.background = { color: WHITE };
+    s.addText(c.label.toUpperCase(), { x:0.5, y:0.4, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:MUTE });
+    const chartData = [{ name: c.label, labels: c.cats, values: c.totals }];
+    s.addChart(pptx.ChartType.pie, chartData, { x:2.5, y:1.2, w:8.33, h:5.8, showLegend:true, legendPos:'r', showPercent:true, dataLabelFontSize:12 });
+  });
+
+  pptx.writeFile({ fileName: 'MeuPainel_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.pptx' });
 });
 
 /* ============ Carregamento de dados (JSONP) ============ */
