@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tesouraria — Igreja Evangélica Nazareno Guarapuava</title>
+<title>NazaControl — Tesouraria Nazareno Guarapuava</title>
 <style>
   :root {
     color-scheme: light;
@@ -625,13 +625,300 @@
   .login-footer .lf-items { font-size: 10.5px; color: #64748B; margin-top: 3px; }
   .login-copy { text-align: center; font-size: 11px; color: #64748B; margin-top: 18px; }
 </style>
+<style id="nazacontrol-v2-style">
+/* NazaControl v2 — camada visual. A lógica original permanece integral. */
+:root, :root[data-theme="light"] {
+  --sidebar-bg: #10283f;
+  --sidebar-bg-hover: #1a364e;
+  --sidebar-bg-active: #164d4b;
+  --sidebar-text: #b8cbd9;
+  --sidebar-text-active: #ffffff;
+  --sidebar-border: #294155;
+  --accent: #087f66;
+  --accent-soft: #e5f5ef;
+  --page-bg: #f3f6f9;
+  --card-bg: #ffffff;
+  --card-border: #dce5eb;
+  --ink: #132f46;
+  --ink-soft: #506578;
+  --ink-mute: #637689;
+  --line: #e3ebf0;
+  --good: #087b5d;
+  --good-soft: #e5f5ed;
+  --critical: #b8454e;
+  --critical-soft: #fcedef;
+  --info: #3267a5;
+  --info-soft: #edf3fb;
+  --shadow: 0 2px 3px #122e4603, 0 8px 28px #122e4606;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --sidebar-bg: #0b1d2c; --sidebar-bg-hover: #142f42;
+    --sidebar-bg-active: #13483f; --sidebar-text: #b3c6d3;
+    --sidebar-border: #233e50; --accent: #5ddbb4; --accent-soft: #163b34;
+    --page-bg: #0e1c29; --card-bg: #152938; --card-border: #2b4354;
+    --ink: #e9f1f6; --ink-soft: #b2c4d2; --ink-mute: #96adbe;
+    --line: #2b4354; --good: #67d6ae; --good-soft: #173d33;
+    --critical: #f39ca5; --critical-soft: #442c35;
+    --info: #98bff0; --info-soft: #20374e;
+    --shadow: 0 5px 22px #00000018;
+  }
+}
+:root[data-theme="dark"] {
+  --sidebar-bg: #0b1d2c; --sidebar-bg-hover: #142f42;
+  --sidebar-bg-active: #13483f; --sidebar-text: #b3c6d3;
+  --sidebar-border: #233e50; --accent: #5ddbb4; --accent-soft: #163b34;
+  --page-bg: #0e1c29; --card-bg: #152938; --card-border: #2b4354;
+  --ink: #e9f1f6; --ink-soft: #b2c4d2; --ink-mute: #96adbe;
+  --line: #2b4354; --good: #67d6ae; --good-soft: #173d33;
+  --critical: #f39ca5; --critical-soft: #442c35;
+  --info: #98bff0; --info-soft: #20374e;
+  --shadow: 0 5px 22px #00000018;
+}
+@media screen {
+  html { font-size: 16px; }
+  body { font-size: 1rem; line-height: 1.5; }
+  button, input, select { font: inherit; }
+  button { touch-action: manipulation; }
+  button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 3px;
+  }
+  ::selection { background: #a6e8d5; color: #10283f; }
+  .sidebar { width: 258px; padding: 28px 18px 22px; gap: 6px; }
+  .brand { gap: 12px; padding: 0 2px 24px; margin-bottom: 8px; }
+  .brand-mark { width: 42px; height: 42px; border-radius: 13px; background: #1b4b4c; color: #6ee7bf; }
+  .brand-title { font-size: 1.2rem; letter-spacing: -.04em; }
+  .brand-sub { font-size: .75rem; letter-spacing: 0; }
+  #nav-list { display: flex; flex-direction: column; gap: 5px; }
+  #nav-list::before { content: 'PRINCIPAL'; color: #9db6c7; font-size: .75rem; font-weight: 700; letter-spacing: .12em; padding: 8px 12px 6px; }
+  .nav-item { min-height: 44px; padding: 11px 13px; gap: 12px; border-radius: 9px; font-size: .875rem; }
+  .nav-item.active { box-shadow: inset 3px 0 #58d5ac; }
+  .nav-item.active::before { display: none; }
+  .nav-item.active .icon { color: #6ee7bf; }
+  .nav-item:nth-child(5), .nav-item:nth-child(8) { margin-top: 38px; }
+  .nav-item:nth-child(5)::after, .nav-item:nth-child(8)::after {
+    position: absolute; top: -28px; left: 13px; color: #9db6c7; font-size: .75rem; font-weight: 700; letter-spacing: .1em; pointer-events: none;
+  }
+  .nav-item:nth-child(5)::after { content: 'ANÁLISES E RELATÓRIOS'; }
+  .nav-item:nth-child(8)::after { content: 'PRESTAÇÃO DE CONTAS'; }
+  .sidebar-footer { padding-top: 20px; margin-top: 28px; gap: 12px; }
+  .theme-toggle { min-height: 42px; font-size: .875rem; border-radius: 9px; }
+  .verse { font-size: .8125rem; line-height: 1.65; }
+  .verse b, .sync-note { font-size: .75rem; opacity: 1; }
+  .sync-note { border-top: 1px solid var(--sidebar-border); padding-top: 12px; }
+  .topbar { position: sticky; top: 0; z-index: 20; align-items: center; padding: 25px 36px 23px; margin-bottom: 26px; background: var(--card-bg); border-bottom: 1px solid var(--card-border); }
+  .topbar-left { min-width: 0; }
+  .page-eyebrow { color: var(--accent); font-size: .75rem; font-weight: 750; letter-spacing: .12em; margin-bottom: 6px; }
+  .topbar-title { font-size: 1.875rem; font-weight: 750; line-height: 1.2; letter-spacing: -.04em; }
+  .topbar-sub { color: var(--ink-soft); font-size: .875rem; margin-top: 6px; }
+  .range-picker { border-radius: 10px; padding: 6px 12px; gap: 9px; box-shadow: none; min-height: 48px; background: var(--page-bg); }
+  .range-picker select { min-height: 36px; font-size: .875rem; padding: 3px 22px 3px 3px; }
+  .range-icon { color: var(--accent); }
+  .range-caption { color: var(--ink-soft); font-size: .8125rem; margin-right: 3px; }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m2 2 4 4 4-4' fill='none' stroke='%23768b9a' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") !important; background-repeat: no-repeat !important; background-position: right 10px center !important; }
+  .content { padding: 0 36px 48px; }
+  .section { gap: 22px; }
+  .kpis, #vg-kpis { gap: 16px; }
+  .kpi-card { padding: 21px 22px; border-radius: 14px; gap: 14px; min-width: 0; position: relative; overflow: hidden; }
+  .kpi-top { align-items: center; gap: 11px; }
+  .kpi-icon { width: 38px; height: 38px; border-radius: 11px; }
+  .kpi-label { font-size: .875rem; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--ink-soft); }
+  .kpi-value { font-size: clamp(1.4rem, 1.85vw, 2rem); font-weight: 750; letter-spacing: -.04em; line-height: 1.2; overflow-wrap: anywhere; }
+  .kpi-delta { font-size: .8125rem; flex-wrap: wrap; }
+  #vg-kpis .kpi-card:nth-child(1) { border-top: 3px solid var(--good); padding-top: 19px; }
+  #vg-kpis .kpi-card:nth-child(2) { border-top: 3px solid var(--critical); padding-top: 19px; }
+  #vg-kpis .kpi-card:nth-child(3) { background: #12374c; border-color: #12374c; color: #ffffff; }
+  #vg-kpis .kpi-card:nth-child(3) .kpi-label, #vg-kpis .kpi-card:nth-child(3) .kpi-delta.flat,
+  #vg-kpis .kpi-card:nth-child(3) .kpi-delta-note { color: #c6d9e4; }
+  #vg-kpis .kpi-card:nth-child(3) .kpi-icon { background: #285164; color: #7ee4c2; }
+  #vg-kpis .kpi-card:nth-child(3) .kpi-delta.up { color: #82e8bc; }
+  #vg-kpis .kpi-card:nth-child(3) .kpi-delta.down { color: #ffb6bf; }
+  .card { padding: 24px; border-radius: 14px; gap: 18px; }
+  .card-title { font-size: 1rem; text-transform: none; letter-spacing: -.02em; font-weight: 700; }
+  .card-head { gap: 14px; }
+  .card-link { min-height: 36px; font-size: .875rem; color: var(--accent); }
+  .grid-2 { grid-template-columns: minmax(0,1.35fr) minmax(0,1fr); gap: 22px; }
+  .alerta-card { border-radius: 12px; padding: 16px 18px; font-size: .875rem; margin-bottom: 0; border-width: 0 0 0 3px !important; }
+  .legend-row { font-size: .8125rem; gap: 18px; }
+  .legend-swatch { border-radius: 3px; }
+  .chart-scroll, .table-scroll, .dre-mensal-row { scrollbar-width: thin; scrollbar-color: var(--ink-mute) var(--page-bg); }
+  .chart-wrap > svg { display: block; }
+  .chart-wrap > .tooltip { display: none; }
+  .chart-wrap > .tooltip.show { display: block; }
+  .donut-row { justify-content: center; gap: 22px; }
+  .donut-center .v { font-size: .9375rem; }
+  .donut-center .l { font-size: .75rem; letter-spacing: 0; }
+  .mini-legend { min-width: 180px; gap: 11px; }
+  .mini-legend-item, .outras-detalhe-row { font-size: .875rem; gap: 8px; }
+  .mini-legend-item .lbl { min-width: 0; overflow-wrap: anywhere; }
+  .mini-legend-item .pct, .outras-detalhe-pct { font-size: .75rem; width: 42px; }
+  .mini-legend-item .val { font-size: .8125rem; }
+  .outras-detalhe-title, .essencial-title, .trend-stat-label, .mp-group-title { font-size: .8125rem; letter-spacing: .03em; }
+  .hbar-row { grid-template-columns: minmax(100px, .9fr) minmax(50px, 1fr) minmax(100px, auto); font-size: .875rem; }
+  .hbar-track { height: 10px; border: none; border-radius: 20px; }
+  .hbar-fill { border-radius: 20px; }
+  .hbar-legend { font-size: .8125rem; }
+  .trend-stat-note, .essencial-note, .apres-actions-note { font-size: .8125rem; line-height: 1.65; }
+  .essencial-row, .mp-check-item { font-size: .875rem; }
+  .trend-stat-value { font-size: 1.5rem; }
+  table.simple { font-size: .875rem; }
+  table.simple th, table.simple td { padding: 13px 14px; }
+  table.simple thead th { background: var(--page-bg); font-size: .75rem; letter-spacing: .035em; border-bottom: 1px solid var(--card-border); color: var(--ink-soft); }
+  table.simple th.cat-col { background: var(--page-bg); }
+  table.simple tbody tr:last-child td { border-bottom: none; }
+  tr.subtotal td { background: var(--accent-soft); color: var(--ink); }
+  .pill { padding: 4px 10px; font-size: .8125rem; font-weight: 650; }
+  .filters-row { gap: 12px; }
+  .filters-row input[type="text"], .filters-row select { min-height: 46px; font-size: .875rem; border-radius: 9px; background-color: var(--page-bg); padding: 10px 32px 10px 12px; max-width: 100%; }
+  .filters-row input[type="text"] { flex: 1 1 250px; padding-right: 12px; }
+  .results-count { font-size: .8125rem; }
+  .pagination { border-top: 1px solid var(--line); padding-top: 16px; flex-wrap: wrap; gap: 12px; }
+  .pagination button, .btn-dre-export { font-size: .875rem; min-height: 42px; border-radius: 8px; padding: 8px 14px; }
+  .page-info { font-size: .8125rem; }
+  .toggle-group { border-radius: 9px; padding: 4px; background: var(--page-bg); flex-wrap: wrap; }
+  .toggle-group button { font-size: .875rem; min-height: 36px; padding: 6px 14px; border-radius: 6px; }
+  .toggle-group button.active { background: var(--accent); color: var(--card-bg); }
+  .dre-table { font-size: .9375rem; }
+  .dre-table td { padding-top: 9px; padding-bottom: 9px; }
+  .dre-header .dre-periodo, .dre-mensal-title { font-size: .875rem; }
+  .dre-section-title td, .dre-table-compact .dre-section-title td { font-size: .8125rem; }
+  .dre-mes-col { border-radius: 12px; padding: 18px; }
+  .dre-table-compact { font-size: .8125rem; }
+  .dre-table-compact td { padding-top: 5px; padding-bottom: 5px; }
+  .mp-check-item { min-height: 42px; padding: 8px 12px; border: 1px solid var(--card-border); border-radius: 8px; }
+  .mp-check-item:has(input:checked) { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+  .apres-slide.dark { background: linear-gradient(125deg,#10283f,#174b52); }
+  .apres-slide.dark .apres-capa-sub { color: #70e0b9; }
+  .apres-slide.dark .apres-big.good, .apres-slide.dark .apres-big.accent { color: #70e0b9; }
+  .apres-slide.dark .apres-big.critical { color: #ffb6bf; }
+  .apres-slide { box-shadow: var(--shadow); }
+
+  /* Identidade de acesso consistente com o painel. */
+  #login-overlay { background: #10283f; padding: 48px; gap: clamp(44px, 7vw, 120px); overflow-y: auto; color-scheme: dark; }
+  #login-overlay::before { content: ''; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 15% 90%,#0b735a44,transparent 55%); }
+  .login-intro { position: relative; max-width: 510px; color: #ffffff; }
+  .login-kicker { display: inline-flex; align-items: center; gap: 10px; color: #8be4c6; font-size: .8125rem; letter-spacing: .12em; font-weight: 700; }
+  .login-kicker svg { width: 24px; height: 24px; }
+  .login-intro h2 { font-size: clamp(2.5rem, 4.5vw, 4.1rem); font-weight: 650; line-height: 1.08; letter-spacing: -.055em; margin: 28px 0 24px; }
+  .login-intro h2 span { color: #79ddba; }
+  .login-intro p { max-width: 420px; font-size: 1rem; line-height: 1.8; color: #c0d1dd; margin: 0; }
+  .login-features { margin-top: 40px; padding-top: 24px; border-top: 1px solid #3b5265; display: flex; gap: 28px; flex-wrap: wrap; color: #cfdee8; font-size: .8125rem; }
+  .login-features span { display: flex; align-items: center; gap: 8px; }
+  .login-features svg { width: 18px; height: 18px; color: #7ce1bb; }
+  .login-wrap { max-width: 430px; position: relative; flex-shrink: 0; }
+  .login-card { background: #17334b; border-color: #365268; padding: 32px; border-radius: 20px; gap: 20px; box-shadow: 0 24px 80px #07182544; }
+  .login-logo-wrap { width: 64px; height: 64px; border-radius: 16px; background: #f5faf8; margin-bottom: 0; padding: 10px; }
+  .login-logo-wrap object, .login-logo-wrap svg { width: 100%; height: 100%; color: #176e5b; }
+  .login-title h1 { font-size: 1.875rem; letter-spacing: -.05em; }
+  .login-title h1 span { color: #79ddba; }
+  .login-title .lt-sub1 { font-size: .875rem; color: #c5d5df; line-height: 1.5; }
+  .login-title .lt-sub2 { font-size: .75rem; color: #a4becd; margin-top: 6px; }
+  .login-field label { font-size: .875rem; color: #e3edf3; }
+  .login-forgot { font-size: .8125rem; color: #94e9cc; padding: 3px 0; }
+  .login-input-wrap input { min-height: 50px; background: #10283f; border-color: #4b667c; border-radius: 10px; font-size: 1rem; padding: 12px 44px; }
+  .login-input-wrap input::placeholder { color: #a4b9c9; }
+  .login-input-wrap .li-icon { width: 18px; height: 18px; left: 15px; color: #a4b9c9; }
+  .login-input-wrap .li-eye { right: 6px; padding: 10px; color: #b8d0df; }
+  .login-input-wrap .li-eye svg { width: 20px; height: 20px; }
+  .login-remember, .login-msg-info { font-size: .8125rem; color: #c3d3df; line-height: 1.6; }
+  .login-remember input { width: 18px; height: 18px; flex-shrink: 0; }
+  .login-submit { min-height: 50px; font-size: .9375rem; background: #76dfb8; color: #102c27; border-radius: 10px; }
+  .login-error { font-size: .875rem; margin: 0; }
+  .login-footer { border-color: #3b5265; padding-top: 20px; }
+  .login-footer .lf-mod { font-size: .8125rem; color: #c5d5df; }
+  .login-footer .lf-items, .login-copy { font-size: .75rem; color: #aec4d3; }
+  .login-copy { margin: 20px 0 0; }
+  @media (min-width: 861px) and (max-width: 1180px) {
+    .sidebar { width: 230px; padding-left: 14px; padding-right: 14px; }
+    .topbar { padding: 22px 24px; }
+    .content { padding: 0 24px 40px; }
+    .grid-2 { grid-template-columns: minmax(0,1fr); }
+    .kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    #vg-kpis { grid-template-columns: repeat(3,minmax(0,1fr)); }
+    .kpi-card { padding: 18px; }
+    .range-caption { display: none; }
+  }
+  @media (max-width: 980px) { .grid-2 { grid-template-columns: minmax(0,1fr); } }
+  @media (max-width: 860px) {
+    .sidebar { width: min(300px, 86vw); height: 100dvh; }
+    .topbar { padding: 18px 20px; gap: 18px; margin-bottom: 20px; }
+    .topbar-title { font-size: 1.5rem; }
+    .topbar-left { align-items: center; gap: 12px; }
+    .menu-toggle { width: 44px; height: 44px; border-radius: 10px; }
+    .content { padding: 0 20px 32px; }
+    .kpis, #vg-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+    .kpi-value { font-size: 1.6rem; }
+    .kpi-card { padding: 18px; }
+    .card { padding: 20px; }
+    #login-overlay { padding: 28px; }
+    .login-intro { display: none; }
+    .apres-slide { padding: 24px; }
+    .apres-cols { gap: 20px; }
+    .apres-slide .apres-donut-body { gap: 14px; }
+    .apres-slide .apres-donut-body .donut-wrap { transform: none; margin: 0; }
+  }
+  @media (max-width: 540px) {
+    .topbar { padding: 16px; position: relative; }
+    .page-eyebrow { font-size: .6875rem; }
+    .topbar-sub { font-size: .8125rem; }
+    .content { padding: 0 14px 28px; }
+    .range-picker { width: 100%; justify-content: space-between; gap: 4px; }
+    .range-caption { display: none; }
+    .range-picker select { min-width: 0; font-size: .875rem; }
+    .kpis, #vg-kpis { grid-template-columns: minmax(0,1fr); }
+    .kpi-card { padding: 20px; gap: 12px; }
+    .kpi-value { font-size: 1.875rem; }
+    .card { padding: 18px 14px; }
+    .card-title { font-size: .9375rem; }
+    .donut-row { flex-direction: column; }
+    .mini-legend { width: 100%; min-width: 0; }
+    .mini-legend-item .lbl { font-size: .8125rem; }
+    .hbar-row { grid-template-columns: minmax(74px,.8fr) minmax(30px,.6fr) minmax(90px,auto); gap: 8px; }
+    .hbar-label, .hbar-value { font-size: .8125rem; }
+    .filters-row input[type="text"], .filters-row select { width: 100%; min-width: 0; }
+    .results-count { margin-left: 0; }
+    .cat-col { min-width: 150px; }
+    .dre-export-actions { gap: 8px; }
+    .btn-dre-export { font-size: .8125rem; padding: 8px 10px; }
+    .apres-slide { padding: 26px 16px; min-height: 230px; aspect-ratio: auto; }
+    .apres-cols { flex-direction: column; gap: 24px; }
+    .apres-divider { display: none; }
+    .apres-big { font-size: clamp(1.8rem, 9vw, 3rem); overflow-wrap: anywhere; }
+    .apres-slide .apres-donut-body .mini-legend { min-width: 0; }
+    .mp-group-items { grid-template-columns: minmax(0,1fr); }
+    #login-overlay { padding: 20px 14px; align-items: safe center; }
+    .login-card { padding: 26px 22px; gap: 18px; }
+    .login-title h1 { font-size: 1.75rem; }
+    .login-title .lt-sub1 { font-size: .8125rem; }
+  }
+  @media (max-height: 760px) {
+    #login-overlay { align-items: flex-start; }
+    .sidebar { padding-top: 18px; }
+    .brand { padding-bottom: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+  }
+}
+@media print { .page-eyebrow, .range-caption, .login-intro { display: none !important; } }
+
+</style>
 </head>
 <body>
 
 <div id="login-overlay">
+  <div class="login-intro">
+    <div class="login-kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v7m-3-4h6M4 21V12l8-5 8 5v9H4Zm6 0v-7h4v7"/></svg> NAZACONTROL · TESOURARIA</div>
+    <h2>Clareza nas contas.<br><span>Cuidado com<br>cada recurso.</span></h2>
+    <p>Uma visão completa da gestão financeira da igreja, para acompanhar o presente e planejar os próximos passos.</p>
+    <div class="login-features">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 20V10m8 10V4m8 16v-8"/></svg>Indicadores e análises</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6m-6 4h6m-6 4h4"/></svg>Prestação de contas</span>
+    </div>
+  </div>
   <div class="login-wrap">
     <form id="login-form" class="login-card">
-      <div class="login-logo-wrap"><img src="LOGO.png" alt="Logo Igreja Evangélica Nazareno"></div>
+      <div class="login-logo-wrap"><object data="LOGO.png" type="image/png" aria-label="Igreja Evangélica Nazareno"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v7m-3-4h6M4 21V12l8-5 8 5v9H4Zm6 0v-7h4v7"/></svg></object></div>
       <div class="login-title">
         <h1>Naza<span>Control</span></h1>
         <p class="lt-sub1">Igreja Evangélica Nazareno de Guarapuava</p>
@@ -657,11 +944,11 @@
           <button type="button" class="li-eye" id="login-eye" aria-label="Mostrar senha"><svg id="login-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
         </div>
       </div>
-      <div class="login-msg-info" id="login-forgot-msg">Fale com o tesoureiro responsável para redefinir sua senha.</div>
+      <div class="login-msg-info" id="login-forgot-msg" role="status">Fale com o tesoureiro responsável para redefinir sua senha.</div>
 
       <label class="login-remember"><input type="checkbox" id="login-remember"> Lembrar meu acesso neste dispositivo</label>
 
-      <div id="login-error" class="login-error"></div>
+      <div id="login-error" role="alert" class="login-error"></div>
 
       <button id="login-submit" type="submit" class="login-submit">Acessar Sistema</button>
 
@@ -684,12 +971,12 @@
         <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M6 8l6-5 6 5M4 21h16M6 21v-8M10 21v-8M14 21v-8M18 21v-8"/></svg>
       </div>
       <div class="brand-text">
-        <span class="brand-title">TESOURARIA</span>
+        <span class="brand-title">NazaControl</span>
         <span class="brand-sub">Igreja Nazareno Guarapuava</span>
       </div>
     </div>
 
-    <nav id="nav-list"></nav>
+    <nav id="nav-list" aria-label="Navegação principal"></nav>
 
     <div class="sidebar-footer">
       <button class="theme-toggle" id="fullscreen-toggle" type="button"><svg class="icon" id="fullscreen-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3"/><path d="M21 8V5a2 2 0 00-2-2h-3"/><path d="M3 16v3a2 2 0 002 2h3"/><path d="M16 21h3a2 2 0 002-2v-3"/></svg><span id="fullscreen-toggle-label">Tela cheia</span></button>
@@ -706,11 +993,13 @@
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
         </button>
         <div>
+          <div class="page-eyebrow">GESTÃO FINANCEIRA · TESOURARIA</div>
           <h1 class="topbar-title" id="page-title">Visão Geral</h1>
           <div class="topbar-sub" id="page-sub">Resumo financeiro do período selecionado</div>
         </div>
       </div>
-      <div class="range-picker">
+      <div class="range-picker" role="group" aria-label="Período de análise">
+        <span class="range-caption">Período</span>
         <svg class="range-icon icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
         <select id="sel-de" aria-label="Mês inicial"></select>
         <span class="range-sep">–</span>
@@ -752,7 +1041,7 @@
         <div class="card">
           <div class="card-head">
             <span class="card-title">Movimentações recentes</span>
-            <button class="card-link" id="vg-ver-todas">Ver todas →</button>
+            <button class="card-link" id="vg-ver-todas">Ver todas</button>
           </div>
           <div class="table-scroll"><table class="simple" id="vg-mov-table"></table></div>
         </div>
@@ -807,14 +1096,14 @@
       <section class="section" id="sec-mov">
         <div class="card">
           <div class="filters-row">
-            <input type="text" id="mov-search" placeholder="Buscar por descrição…">
-            <select id="mov-categoria"><option value="">Todas as categorias</option></select>
-            <select id="mov-conta">
+            <input type="text" id="mov-search" aria-label="Buscar movimentações por descrição" placeholder="Buscar por descrição…">
+            <select id="mov-categoria" aria-label="Filtrar por categoria"><option value="">Todas as categorias</option></select>
+            <select id="mov-conta" aria-label="Filtrar por conta">
               <option value="">Banco e Dinheiro</option>
               <option value="Banco">Só Banco</option>
               <option value="Dinheiro">Só Dinheiro</option>
             </select>
-            <select id="mov-tipo">
+            <select id="mov-tipo" aria-label="Filtrar por tipo">
               <option value="">Receitas e Despesas</option>
               <option value="receita">Só Receitas</option>
               <option value="despesa">Só Despesas</option>
@@ -825,9 +1114,9 @@
         <div class="card">
           <div class="table-scroll"><table class="simple" id="mov-table"></table></div>
           <div class="pagination">
-            <button id="mov-prev">← Anterior</button>
+            <button id="mov-prev">Anterior</button>
             <span class="page-info" id="mov-page-info"></span>
-            <button id="mov-next">Próxima →</button>
+            <button id="mov-next">Próxima</button>
           </div>
         </div>
       </section>

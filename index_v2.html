@@ -1,0 +1,2638 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NazaControl — Tesouraria Nazareno Guarapuava</title>
+<style>
+  :root {
+    color-scheme: light;
+    --sidebar-bg: #17213D;
+    --sidebar-bg-hover: rgba(255,255,255,0.06);
+    --sidebar-bg-active: rgba(201,147,46,0.16);
+    --sidebar-text: #A9B3CC;
+    --sidebar-text-active: #FFFFFF;
+    --sidebar-border: rgba(255,255,255,0.08);
+    --accent: #B9852A;
+    --accent-soft: #F8EEDC;
+    --page-bg: #F1F3F8;
+    --card-bg: #FFFFFF;
+    --card-border: #E4E7F0;
+    --ink: #1B2440;
+    --ink-soft: #5B6478;
+    --ink-mute: #8A90A6;
+    --line: #E7E9F1;
+    --good: #1E8E5A;
+    --good-soft: #E4F5EC;
+    --critical: #C0453B;
+    --critical-soft: #FBEAE8;
+    --info: #2F6FE0;
+    --info-soft: #E8EFFD;
+    --shadow: 0 1px 2px rgba(20,24,50,0.04), 0 8px 24px -12px rgba(20,24,50,0.14);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --sidebar-bg: #0E1526;
+      --sidebar-bg-hover: rgba(255,255,255,0.05);
+      --sidebar-bg-active: rgba(224,171,84,0.14);
+      --sidebar-text: #8D96B3;
+      --sidebar-text-active: #FFFFFF;
+      --sidebar-border: rgba(255,255,255,0.08);
+      --accent: #E0AB54;
+      --accent-soft: #332711;
+      --page-bg: #0F1220;
+      --card-bg: #171B2C;
+      --card-border: #262C42;
+      --ink: #E9EBF5;
+      --ink-soft: #A6ACC4;
+      --ink-mute: #767C97;
+      --line: #262C42;
+      --good: #4BBE8A;
+      --good-soft: #142A22;
+      --critical: #E58076;
+      --critical-soft: #301C1A;
+      --info: #6F9CF2;
+      --info-soft: #17223E;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --sidebar-bg: #0E1526;
+    --sidebar-bg-hover: rgba(255,255,255,0.05);
+    --sidebar-bg-active: rgba(224,171,84,0.14);
+    --sidebar-text: #8D96B3;
+    --sidebar-text-active: #FFFFFF;
+    --sidebar-border: rgba(255,255,255,0.08);
+    --accent: #E0AB54;
+    --accent-soft: #332711;
+    --page-bg: #0F1220;
+    --card-bg: #171B2C;
+    --card-border: #262C42;
+    --ink: #E9EBF5;
+    --ink-soft: #A6ACC4;
+    --ink-mute: #767C97;
+    --line: #262C42;
+    --good: #4BBE8A;
+    --good-soft: #142A22;
+    --critical: #E58076;
+    --critical-soft: #301C1A;
+    --info: #6F9CF2;
+    --info-soft: #17223E;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.55);
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --sidebar-bg: #17213D;
+    --sidebar-bg-hover: rgba(255,255,255,0.06);
+    --sidebar-bg-active: rgba(201,147,46,0.16);
+    --sidebar-text: #A9B3CC;
+    --sidebar-text-active: #FFFFFF;
+    --sidebar-border: rgba(255,255,255,0.08);
+    --accent: #B9852A;
+    --accent-soft: #F8EEDC;
+    --page-bg: #F1F3F8;
+    --card-bg: #FFFFFF;
+    --card-border: #E4E7F0;
+    --ink: #1B2440;
+    --ink-soft: #5B6478;
+    --ink-mute: #8A90A6;
+    --line: #E7E9F1;
+    --good: #1E8E5A;
+    --good-soft: #E4F5EC;
+    --critical: #C0453B;
+    --critical-soft: #FBEAE8;
+    --info: #2F6FE0;
+    --info-soft: #E8EFFD;
+    --shadow: 0 1px 2px rgba(20,24,50,0.04), 0 8px 24px -12px rgba(20,24,50,0.14);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--page-bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    height: 100%;
+  }
+  .icon { width: 18px; height: 18px; flex-shrink: 0; }
+  .icon-lg { width: 22px; height: 22px; }
+
+  /* ---------- Shell ---------- */
+  .shell { display: flex; min-height: 100vh; }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    width: 234px;
+    flex-shrink: 0;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    padding: 22px 14px;
+    gap: 4px;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 8px 20px;
+    border-bottom: 1px solid var(--sidebar-border);
+    margin-bottom: 14px;
+  }
+  .brand-mark {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: var(--accent-soft);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .brand-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .brand-title { font-size: 14.5px; font-weight: 700; color: var(--sidebar-text-active); letter-spacing: 0.02em; }
+  .brand-sub { font-size: 10.5px; color: var(--sidebar-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--sidebar-text);
+    border: none;
+    background: none;
+    text-align: left;
+    width: 100%;
+    position: relative;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .nav-item:hover { background: var(--sidebar-bg-hover); color: var(--sidebar-text-active); }
+  .nav-item.active { background: var(--sidebar-bg-active); color: var(--sidebar-text-active); }
+  .nav-item.active::before {
+    content: "";
+    position: absolute; left: -14px; top: 8px; bottom: 8px; width: 3px;
+    background: var(--accent); border-radius: 0 3px 3px 0;
+  }
+  .nav-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--sidebar-border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .verse {
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--sidebar-text);
+    font-style: italic;
+  }
+  .verse b { color: var(--sidebar-text-active); font-style: normal; font-size: 10.5px; }
+  .sync-note { font-size: 10.5px; color: var(--sidebar-text); opacity: 0.8; }
+  .theme-toggle { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--sidebar-bg-hover); color: var(--sidebar-text); font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .theme-toggle:hover { background: var(--sidebar-bg-active); color: var(--sidebar-text-active); }
+
+  /* ---------- Main ---------- */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 26px 32px 18px;
+    flex-wrap: wrap;
+  }
+  .topbar-title { font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+  .topbar-sub { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+
+  .range-picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-shadow: var(--shadow);
+    font-size: 12.5px;
+  }
+  .range-picker select {
+    border: none;
+    background: none;
+    color: var(--ink);
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .range-picker select:focus-visible { outline: 2px solid var(--accent); border-radius: 4px; }
+  .range-sep { color: var(--ink-mute); }
+  .range-icon { color: var(--ink-mute); }
+
+  .content { padding: 0 32px 40px; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+  .section { display: none; flex-direction: column; gap: 20px; }
+  .section.active { display: flex; }
+
+  /* ---------- KPI cards ---------- */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (min-width: 861px) { #vg-kpis { grid-template-columns: repeat(3, 1fr); } }
+  .kpi-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .kpi-top { display: flex; align-items: center; gap: 10px; }
+  .kpi-icon {
+    width: 34px; height: 34px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .kpi-icon.good { background: var(--good-soft); color: var(--good); }
+  .kpi-icon.critical { background: var(--critical-soft); color: var(--critical); }
+  .kpi-icon.info { background: var(--info-soft); color: var(--info); }
+  .kpi-icon.accent { background: var(--accent-soft); color: var(--accent); }
+  .kpi-label { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-mute); }
+  .kpi-value { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .kpi-delta { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; }
+  .kpi-delta.up { color: var(--good); }
+  .kpi-delta.down { color: var(--critical); }
+  .kpi-delta.flat { color: var(--ink-mute); font-weight: 500; }
+  .kpi-delta-note { color: var(--ink-mute); font-weight: 400; }
+
+  /* ---------- Card / section blocks ---------- */
+  .grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+  @media (max-width: 980px) { .grid-2 { grid-template-columns: 1fr; } .kpis { grid-template-columns: repeat(2,1fr); } }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .card-title { font-size: 13.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink); }
+  .card-link { font-size: 12px; color: var(--info); cursor: pointer; font-weight: 600; background: none; border: none; padding: 0; }
+  .card-link:hover { text-decoration: underline; }
+
+  /* ---------- DRE ---------- */
+  .dre-export-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-dre-export { font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 7px; border: 1px solid var(--card-border); background: var(--page-bg); color: var(--ink); cursor: pointer; }
+  .btn-dre-export:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .dre-header { text-align: center; margin: 4px 0 22px; }
+  .dre-header .dre-igreja { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .dre-header .dre-periodo { font-size: 12.5px; color: var(--ink-mute); margin-top: 3px; }
+  .dre-table { width: 100%; max-width: 620px; margin: 0 auto; border-collapse: collapse; font-size: 13.5px; }
+  .dre-table td { padding: 6px 4px; }
+  .dre-section-title td { font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; color: var(--ink-mute); padding-top: 18px; }
+  .dre-cat-label { padding-left: 18px !important; color: var(--ink-soft); }
+  .dre-value { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .dre-subtotal td { border-top: 1px solid var(--card-border); font-weight: 700; padding-top: 9px; }
+  .dre-result td { border-top: 2px solid var(--ink); font-weight: 800; font-size: 15px; padding-top: 12px; }
+  .dre-result.positive .dre-value { color: var(--good); }
+  .dre-result.negative .dre-value { color: var(--critical); }
+  .dre-value.dre-pos { color: var(--good); }
+  .dre-value.dre-neg { color: var(--critical); }
+
+  /* ---------- DRE Mensal (horizontal, compacto) ---------- */
+  .dre-mensal-row { display: flex; gap: 18px; overflow-x: auto; padding-bottom: 10px; align-items: flex-start; }
+  .dre-mes-col { flex-shrink: 0; min-width: 250px; border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 16px; }
+  .dre-mensal-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-mute); margin: 0 0 10px; text-align: center; }
+  .dre-table-compact { width: auto; max-width: none; margin: 0; border-collapse: collapse; font-size: 12px; }
+  .dre-table-compact td { padding: 3px 0; }
+  .dre-table-compact .dre-section-title td { padding-top: 12px; font-size: 10px; }
+  .dre-table-compact .dre-cat-label { padding-left: 10px !important; white-space: nowrap; }
+  .dre-table-compact .dre-value { padding-left: 16px; white-space: nowrap; }
+  .dre-table-compact .dre-subtotal td { padding-top: 6px; }
+  .dre-table-compact .dre-result td { padding-top: 8px; font-size: 12.5px; }
+
+  @media print {
+    body:not([data-print-alvo]) * { visibility: hidden; }
+    body[data-print-alvo="geral"] * { visibility: hidden; }
+    body[data-print-alvo="geral"] #dre-print-geral, body[data-print-alvo="geral"] #dre-print-geral * { visibility: visible; }
+    body[data-print-alvo="mensal"] * { visibility: hidden; }
+    body[data-print-alvo="mensal"] #dre-print-mensal, body[data-print-alvo="mensal"] #dre-print-mensal * { visibility: visible; }
+    #dre-print-geral, #dre-print-mensal { position: absolute; left: 0; top: 0; width: 100%; padding: 24px; }
+    .dre-mensal-row { overflow: visible; flex-wrap: wrap; }
+    body[data-print-alvo="apresentacao"] * { visibility: hidden; }
+    body[data-print-alvo="apresentacao"] #apres-print-area, body[data-print-alvo="apresentacao"] #apres-print-area * { visibility: visible; }
+    body[data-print-alvo="meupainel"] * { visibility: hidden; }
+    body[data-print-alvo="meupainel"] #mp-print-area, body[data-print-alvo="meupainel"] #mp-print-area * { visibility: visible; }
+    #apres-print-area, #mp-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+    .apres-slide { page-break-after: always; break-after: page; box-shadow: none !important; border-radius: 0 !important; width: 100% !important; max-width: none !important; height: 100vh !important; }
+  }
+
+  /* ---------- Apresentação ---------- */
+  .apres-actions-note { font-size: 11.5px; color: var(--ink-mute); margin-top: 8px; }
+  .apres-slide {
+    aspect-ratio: 16/9; width: 100%; max-width: 880px; margin: 0 auto 26px;
+    border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.12); position: relative; overflow: hidden;
+  }
+  .apres-slide.dark { background: linear-gradient(160deg, #17213D 0%, #1F2C52 100%); color: #fff; }
+  .apres-slide.light { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--ink); }
+  .apres-eyebrow { font-size: clamp(14px, 2vw, 20px); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-mute); margin-bottom: 14px; }
+  .apres-slide.dark .apres-eyebrow { color: #B9C2E0; }
+  .apres-big { font-size: clamp(40px, 7vw, 88px); font-weight: 800; line-height: 1; letter-spacing: -0.01em; text-align: center; }
+  .apres-big.good { color: var(--good); }
+  .apres-big.critical { color: var(--critical); }
+  .apres-big.accent { color: var(--accent); }
+  .apres-sub { font-size: clamp(13px, 1.6vw, 18px); color: var(--ink-mute); margin-top: 16px; text-align: center; }
+  .apres-slide.dark .apres-sub { color: #B9C2E0; }
+  .apres-cols { display: flex; gap: 48px; width: 100%; justify-content: center; align-items: center; }
+  .apres-col { display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .apres-divider { width: 1px; align-self: stretch; background: var(--card-border); }
+  .apres-slide.dark .apres-divider { background: rgba(255,255,255,0.18); }
+  .apres-capa-igreja { font-size: clamp(20px, 3vw, 34px); font-weight: 800; text-align: center; }
+  .apres-capa-sub { font-size: clamp(16px, 2.2vw, 24px); color: var(--accent); font-weight: 700; margin-top: 10px; text-align: center; }
+  .apres-capa-periodo { font-size: clamp(12px, 1.6vw, 16px); color: #B9C2E0; margin-top: 18px; text-align: center; }
+  .apres-badge { position: absolute; top: 18px; right: 22px; font-size: 11px; color: var(--ink-mute); }
+  .apres-slide.dark .apres-badge { color: #8894BE; }
+
+  /* ---------- Meu Painel ---------- */
+  .mp-groups { display: flex; flex-direction: column; gap: 18px; }
+  .mp-group-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-mute); margin-bottom: 8px; }
+  .mp-group-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+  .mp-check-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft); cursor: pointer; padding: 4px 0; }
+  .mp-check-item input { width: 15px; height: 15px; accent-color: var(--accent); flex-shrink: 0; }
+  .mp-empty { text-align: center; color: var(--ink-mute); font-size: 13px; padding: 40px 20px; }
+  .mp-widget-card { margin-bottom: 20px; }
+  .apres-slide .apres-donut-body { display: flex; align-items: center; justify-content: center; gap: 40px; width: 100%; flex-wrap: wrap; }
+  .apres-slide .apres-donut-body .donut-wrap { transform: scale(1.5); margin: 10px 30px; }
+  .apres-slide .apres-donut-body .mini-legend { font-size: 15px; min-width: 220px; }
+  .apres-slide .apres-donut-body .mini-legend-item .val { font-size: 15px; }
+
+  .legend-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); }
+  .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 2px; }
+  .legend-line { width: 14px; height: 2px; border-radius: 2px; }
+
+  .chart-scroll { overflow-x: auto; }
+  .tooltip {
+    position: absolute; pointer-events: none;
+    background: var(--ink); color: var(--card-bg);
+    font-size: 11.5px; padding: 8px 10px; border-radius: 6px; line-height: 1.5;
+    box-shadow: var(--shadow); opacity: 0; transition: opacity 0.1s ease; z-index: 5; white-space: nowrap;
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip .t-title { font-weight: 700; margin-bottom: 2px; }
+  .chart-wrap { position: relative; }
+
+  /* ---------- Donut ---------- */
+  .donut-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .donut-wrap { position: relative; flex-shrink: 0; }
+  .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; }
+  .donut-center .v { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .donut-center .l { font-size: 9.5px; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mini-legend { display: flex; flex-direction: column; gap: 7px; flex: 1; min-width: 160px; }
+  .mini-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .mini-legend-item .lbl { flex: 1; color: var(--ink-soft); }
+  .mini-legend-item .pct { color: var(--ink-mute); font-size: 10.5px; width: 36px; text-align: right; font-variant-numeric: tabular-nums; }
+  .mini-legend-item .val { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .outras-detalhe { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--card-border); width: 100%; }
+  .outras-detalhe-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-mute); margin-bottom: 8px; }
+  .outras-detalhe-list { display: flex; flex-direction: column; gap: 6px; }
+  .outras-detalhe-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .outras-detalhe-label { flex: 1; color: var(--ink-soft); }
+  .outras-detalhe-pct { color: var(--ink-mute); font-size: 10.5px; width: 36px; text-align: right; font-variant-numeric: tabular-nums; }
+  .outras-detalhe-value { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .outras-detalhe-row.outras-detalhe-mais { border-top: 1px dashed var(--card-border); padding-top: 7px; margin-top: 1px; font-style: italic; color: var(--ink-mute); }
+
+  /* ---------- Horizontal bars ---------- */
+  .hbar-list { display: flex; flex-direction: column; gap: 8px; }
+  .hbar-row { display: grid; grid-template-columns: 150px 1fr 74px; align-items: center; gap: 10px; font-size: 12px; }
+  .hbar-label { color: var(--ink-soft); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hbar-row.pending .hbar-label { font-style: italic; color: var(--ink-mute); }
+  .hbar-track { background: var(--page-bg); border: 1px solid var(--card-border); border-radius: 3px; height: 14px; overflow: hidden; }
+  .hbar-fill { display: block; height: 100%; border-radius: 2px; }
+  .hbar-value { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; white-space: nowrap; }
+  .hbar-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--card-border); font-size: 11px; color: var(--ink-mute); }
+  .hbar-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .hbar-legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  /* ---------- Alerta / insight ---------- */
+  .alerta-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 13px; line-height: 1.55; }
+  .alerta-card b { font-weight: 700; }
+  .alerta-icon { flex-shrink: 0; width: 20px; height: 20px; margin-top: 1px; }
+  .alerta-card.warn { background: var(--accent-soft); color: var(--ink); border: 1px solid var(--accent); }
+  .alerta-card.warn .alerta-icon { color: var(--accent); }
+  .alerta-card.critical { background: var(--critical-soft); color: var(--ink); border: 1px solid var(--critical); }
+  .alerta-card.critical .alerta-icon { color: var(--critical); }
+  .alerta-card.info { background: var(--info-soft); color: var(--ink); border: 1px solid var(--info); }
+  .alerta-card.info .alerta-icon { color: var(--info); }
+  .alerta-card.good { background: var(--good-soft); color: var(--ink); border: 1px solid var(--good); }
+  .alerta-card.good .alerta-icon { color: var(--good); }
+
+  .trend-stats { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--card-border); }
+  .trend-stat { display: flex; flex-direction: column; gap: 3px; min-width: 110px; }
+  .trend-stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-mute); }
+  .trend-stat-value { font-size: 19px; font-weight: 700; color: var(--ink); }
+  .trend-stat-value.critical { color: var(--critical); }
+  .trend-stat-value.good { color: var(--good); }
+  .trend-stat-note { font-size: 11.5px; color: var(--ink-soft); }
+
+  .essencial-box { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--card-border); }
+  .essencial-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-mute); margin-bottom: 10px; }
+  .essencial-list { display: flex; flex-direction: column; gap: 7px; }
+  .essencial-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }
+  .essencial-label { color: var(--ink-soft); }
+  .essencial-value { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .essencial-row.essencial-total { border-top: 1px solid var(--card-border); padding-top: 8px; margin-top: 2px; }
+  .essencial-row.essencial-total .essencial-label, .essencial-row.essencial-total .essencial-value { font-weight: 700; color: var(--ink); font-size: 14px; }
+  .essencial-note { margin-top: 10px; font-size: 11.5px; color: var(--ink-mute); line-height: 1.5; }
+
+  /* ---------- Tables ---------- */
+  .table-scroll { overflow-x: auto; }
+  table.simple { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  table.simple th, table.simple td { padding: 9px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
+  table.simple th:first-child, table.simple td:first-child,
+  table.simple th.left, table.simple td.left { text-align: left; }
+  table.simple thead th {
+    font-size: 10.5px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-mute);
+    font-weight: 700; border-bottom: 2px solid var(--line); background: var(--card-bg);
+  }
+  table.simple tbody tr:hover { background: var(--page-bg); }
+  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.critical { background: var(--critical-soft); color: var(--critical); }
+  .cat-col { text-align: left; position: sticky; left: 0; background: var(--card-bg); min-width: 190px; z-index: 2; }
+  thead .cat-col { z-index: 3; }
+  tr.group-header td { background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+  tr.cat-row.pending td { color: var(--ink-mute); font-style: italic; }
+  tr.subtotal td { font-weight: 700; border-top: 1px solid var(--ink-mute); }
+  td.zero { color: var(--ink-mute); }
+
+  /* ---------- Movimentações filters ---------- */
+  .filters-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .filters-row input[type="text"], .filters-row select {
+    border: 1px solid var(--card-border); border-radius: 7px; padding: 8px 11px;
+    font-size: 12.5px; font-family: inherit; background: var(--card-bg); color: var(--ink);
+  }
+  .filters-row input[type="text"] { min-width: 220px; }
+  .filters-row input:focus-visible, .filters-row select:focus-visible { outline: 2px solid var(--accent); }
+  .results-count { font-size: 12px; color: var(--ink-mute); margin-left: auto; }
+
+  .pagination { display: flex; align-items: center; justify-content: center; gap: 10px; padding-top: 6px; }
+  .pagination button {
+    border: 1px solid var(--card-border); background: var(--card-bg); color: var(--ink);
+    border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-weight: 600;
+  }
+  .pagination button:disabled { opacity: 0.4; cursor: default; }
+  .pagination button:not(:disabled):hover { background: var(--page-bg); }
+  .pagination .page-info { font-size: 12px; color: var(--ink-soft); }
+
+  /* ---------- Comparativo ---------- */
+  .toggle-group { display: inline-flex; border: 1px solid var(--card-border); border-radius: 8px; overflow: hidden; }
+  .toggle-group button {
+    border: none; background: var(--card-bg); color: var(--ink-soft);
+    padding: 7px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  }
+  .toggle-group button.active { background: var(--accent); color: #fff; }
+
+  /* ---------- Mobile menu ---------- */
+  .menu-toggle {
+    display: none;
+    width: 38px; height: 38px; flex-shrink: 0;
+    align-items: center; justify-content: center;
+    border-radius: 8px; border: 1px solid var(--card-border);
+    background: var(--card-bg); color: var(--ink);
+    cursor: pointer;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .sidebar-backdrop {
+    display: none;
+    position: fixed; inset: 0; z-index: 499;
+    background: rgba(0,0,0,0.45);
+  }
+  .sidebar-backdrop.show { display: block; }
+
+  @media (max-width: 860px) {
+    .menu-toggle { display: flex; }
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 500;
+      width: 258px;
+      transform: translateX(-100%);
+      transition: transform 0.22s ease;
+      box-shadow: 10px 0 28px rgba(0,0,0,0.28);
+    }
+    .sidebar.open { transform: translateX(0); }
+    .content { padding: 0 16px 32px; }
+    .topbar { padding: 16px 16px 10px; gap: 12px; }
+    .topbar-title { font-size: 20px; }
+    .kpis { grid-template-columns: repeat(2,1fr); gap: 10px; }
+  }
+  @media (max-width: 480px) {
+    .kpis { grid-template-columns: 1fr; }
+    .kpi-value { font-size: 19px; }
+    .range-picker { width: 100%; justify-content: space-between; }
+    .filters-row input[type="text"] { min-width: 100%; }
+    .card { padding: 14px 14px; }
+    .donut-row { flex-direction: column; align-items: center; }
+    .mini-legend { width: 100%; min-width: 0; }
+    .mini-legend-item .lbl { font-size: 11.5px; }
+    .cat-col { min-width: 140px; }
+    .hbar-row { grid-template-columns: 96px 1fr 60px; gap: 6px; }
+    .hbar-label { font-size: 11px; }
+    .hbar-value { font-size: 11px; }
+  }
+
+  /* ---------- Login (NazaControl) ---------- */
+  #login-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(52,211,153,0.10), transparent 42%),
+      radial-gradient(circle at 85% 78%, rgba(52,211,153,0.07), transparent 46%),
+      linear-gradient(160deg, #0a0f1a 0%, #0e1f22 55%, #12302a 100%);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .login-wrap { width: 100%; max-width: 380px; }
+  .login-card {
+    background: rgba(15,23,32,0.88);
+    border: 1px solid rgba(148,163,184,0.18);
+    border-radius: 18px;
+    padding: 34px 30px 26px;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    display: flex; flex-direction: column; gap: 16px;
+    color: #E2E8F0;
+  }
+  .login-logo-wrap {
+    width: 76px; height: 76px; border-radius: 50%;
+    background: #F1F5F9; border: 1px solid rgba(148,163,184,0.25);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 6px; padding: 12px; box-sizing: border-box;
+  }
+  .login-logo-wrap img { width: 100%; height: 100%; object-fit: contain; }
+  .login-title { text-align: center; }
+  .login-title h1 { font-size: 25px; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.01em; color: #F8FAFC; }
+  .login-title h1 span { color: #34D399; }
+  .login-title .lt-sub1 { font-size: 12px; color: #94A3B8; margin: 0; }
+  .login-title .lt-sub2 { font-size: 10.5px; color: #64748B; margin: 3px 0 0; letter-spacing: 0.02em; }
+  .login-field { display: flex; flex-direction: column; gap: 6px; }
+  .login-field-label-row { display: flex; align-items: center; justify-content: space-between; }
+  .login-field label { font-size: 12px; font-weight: 600; color: #CBD5E1; }
+  .login-forgot { font-size: 11px; color: #34D399; cursor: pointer; background: none; border: none; padding: 0; font-family: inherit; }
+  .login-forgot:hover { text-decoration: underline; }
+  .login-input-wrap { position: relative; display: flex; align-items: center; }
+  .login-input-wrap .li-icon { position: absolute; left: 12px; width: 15px; height: 15px; color: #64748B; pointer-events: none; }
+  .login-input-wrap input {
+    width: 100%; box-sizing: border-box;
+    padding: 10px 12px 10px 36px;
+    background: #0b1220; border: 1px solid rgba(148,163,184,0.25); border-radius: 9px;
+    color: #F1F5F9; font-size: 13.5px; font-family: inherit;
+  }
+  .login-input-wrap input::placeholder { color: #475569; }
+  .login-input-wrap input:focus { outline: none; border-color: #34D399; box-shadow: 0 0 0 3px rgba(52,211,153,0.15); }
+  .login-input-wrap .li-eye { position: absolute; right: 10px; background: none; border: none; color: #64748B; cursor: pointer; padding: 4px; display: flex; }
+  .login-input-wrap .li-eye:hover { color: #CBD5E1; }
+  .login-input-wrap .li-eye svg { width: 15px; height: 15px; }
+  .login-msg-info { font-size: 11px; color: #94A3B8; margin-top: -6px; display: none; line-height: 1.5; }
+  .login-remember { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #94A3B8; cursor: pointer; }
+  .login-remember input { accent-color: #10B981; width: 15px; height: 15px; }
+  .login-submit {
+    background: linear-gradient(135deg, #34D399, #10B981);
+    color: #06281C; border: none; border-radius: 9px; padding: 12px;
+    font-size: 13.5px; font-weight: 800; cursor: pointer; letter-spacing: 0.01em;
+  }
+  .login-submit:hover { filter: brightness(1.06); }
+  .login-submit:disabled { opacity: 0.7; cursor: default; }
+  .login-error { color: #FCA5A5; font-size: 12px; background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); padding: 8px 10px; border-radius: 8px; display: none; }
+  .login-footer { border-top: 1px solid rgba(148,163,184,0.15); padding-top: 14px; text-align: center; }
+  .login-footer .lf-mod { font-size: 11px; color: #94A3B8; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .login-footer .lf-mod svg { width: 13px; height: 13px; color: #34D399; flex-shrink: 0; }
+  .login-footer .lf-items { font-size: 10.5px; color: #64748B; margin-top: 3px; }
+  .login-copy { text-align: center; font-size: 11px; color: #64748B; margin-top: 18px; }
+</style>
+<style id="nazacontrol-v2-style">
+/* NazaControl v2 — camada visual. A lógica original permanece integral. */
+:root, :root[data-theme="light"] {
+  --sidebar-bg: #10283f;
+  --sidebar-bg-hover: #1a364e;
+  --sidebar-bg-active: #164d4b;
+  --sidebar-text: #b8cbd9;
+  --sidebar-text-active: #ffffff;
+  --sidebar-border: #294155;
+  --accent: #087f66;
+  --accent-soft: #e5f5ef;
+  --page-bg: #f3f6f9;
+  --card-bg: #ffffff;
+  --card-border: #dce5eb;
+  --ink: #132f46;
+  --ink-soft: #506578;
+  --ink-mute: #637689;
+  --line: #e3ebf0;
+  --good: #087b5d;
+  --good-soft: #e5f5ed;
+  --critical: #b8454e;
+  --critical-soft: #fcedef;
+  --info: #3267a5;
+  --info-soft: #edf3fb;
+  --shadow: 0 2px 3px #122e4603, 0 8px 28px #122e4606;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --sidebar-bg: #0b1d2c; --sidebar-bg-hover: #142f42;
+    --sidebar-bg-active: #13483f; --sidebar-text: #b3c6d3;
+    --sidebar-border: #233e50; --accent: #5ddbb4; --accent-soft: #163b34;
+    --page-bg: #0e1c29; --card-bg: #152938; --card-border: #2b4354;
+    --ink: #e9f1f6; --ink-soft: #b2c4d2; --ink-mute: #96adbe;
+    --line: #2b4354; --good: #67d6ae; --good-soft: #173d33;
+    --critical: #f39ca5; --critical-soft: #442c35;
+    --info: #98bff0; --info-soft: #20374e;
+    --shadow: 0 5px 22px #00000018;
+  }
+}
+:root[data-theme="dark"] {
+  --sidebar-bg: #0b1d2c; --sidebar-bg-hover: #142f42;
+  --sidebar-bg-active: #13483f; --sidebar-text: #b3c6d3;
+  --sidebar-border: #233e50; --accent: #5ddbb4; --accent-soft: #163b34;
+  --page-bg: #0e1c29; --card-bg: #152938; --card-border: #2b4354;
+  --ink: #e9f1f6; --ink-soft: #b2c4d2; --ink-mute: #96adbe;
+  --line: #2b4354; --good: #67d6ae; --good-soft: #173d33;
+  --critical: #f39ca5; --critical-soft: #442c35;
+  --info: #98bff0; --info-soft: #20374e;
+  --shadow: 0 5px 22px #00000018;
+}
+@media screen {
+  html { font-size: 16px; }
+  body { font-size: 1rem; line-height: 1.5; }
+  button, input, select { font: inherit; }
+  button { touch-action: manipulation; }
+  button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 3px;
+  }
+  ::selection { background: #a6e8d5; color: #10283f; }
+  .sidebar { width: 258px; padding: 28px 18px 22px; gap: 6px; }
+  .brand { gap: 12px; padding: 0 2px 24px; margin-bottom: 8px; }
+  .brand-mark { width: 42px; height: 42px; border-radius: 13px; background: #1b4b4c; color: #6ee7bf; }
+  .brand-title { font-size: 1.2rem; letter-spacing: -.04em; }
+  .brand-sub { font-size: .75rem; letter-spacing: 0; }
+  #nav-list { display: flex; flex-direction: column; gap: 5px; }
+  #nav-list::before { content: 'PRINCIPAL'; color: #9db6c7; font-size: .75rem; font-weight: 700; letter-spacing: .12em; padding: 8px 12px 6px; }
+  .nav-item { min-height: 44px; padding: 11px 13px; gap: 12px; border-radius: 9px; font-size: .875rem; }
+  .nav-item.active { box-shadow: inset 3px 0 #58d5ac; }
+  .nav-item.active::before { display: none; }
+  .nav-item.active .icon { color: #6ee7bf; }
+  .nav-item:nth-child(5), .nav-item:nth-child(8) { margin-top: 38px; }
+  .nav-item:nth-child(5)::after, .nav-item:nth-child(8)::after {
+    position: absolute; top: -28px; left: 13px; color: #9db6c7; font-size: .75rem; font-weight: 700; letter-spacing: .1em; pointer-events: none;
+  }
+  .nav-item:nth-child(5)::after { content: 'ANÁLISES E RELATÓRIOS'; }
+  .nav-item:nth-child(8)::after { content: 'PRESTAÇÃO DE CONTAS'; }
+  .sidebar-footer { padding-top: 20px; margin-top: 28px; gap: 12px; }
+  .theme-toggle { min-height: 42px; font-size: .875rem; border-radius: 9px; }
+  .verse { font-size: .8125rem; line-height: 1.65; }
+  .verse b, .sync-note { font-size: .75rem; opacity: 1; }
+  .sync-note { border-top: 1px solid var(--sidebar-border); padding-top: 12px; }
+  .topbar { position: sticky; top: 0; z-index: 20; align-items: center; padding: 25px 36px 23px; margin-bottom: 26px; background: var(--card-bg); border-bottom: 1px solid var(--card-border); }
+  .topbar-left { min-width: 0; }
+  .page-eyebrow { color: var(--accent); font-size: .75rem; font-weight: 750; letter-spacing: .12em; margin-bottom: 6px; }
+  .topbar-title { font-size: 1.875rem; font-weight: 750; line-height: 1.2; letter-spacing: -.04em; }
+  .topbar-sub { color: var(--ink-soft); font-size: .875rem; margin-top: 6px; }
+  .range-picker { border-radius: 10px; padding: 6px 12px; gap: 9px; box-shadow: none; min-height: 48px; background: var(--page-bg); }
+  .range-picker select { min-height: 36px; font-size: .875rem; padding: 3px 22px 3px 3px; }
+  .range-icon { color: var(--accent); }
+  .range-caption { color: var(--ink-soft); font-size: .8125rem; margin-right: 3px; }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m2 2 4 4 4-4' fill='none' stroke='%23768b9a' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") !important; background-repeat: no-repeat !important; background-position: right 10px center !important; }
+  .content { padding: 0 36px 48px; }
+  .section { gap: 22px; }
+  .kpis, #vg-kpis { gap: 16px; }
+  .kpi-card { padding: 21px 22px; border-radius: 14px; gap: 14px; min-width: 0; position: relative; overflow: hidden; }
+  .kpi-top { align-items: center; gap: 11px; }
+  .kpi-icon { width: 38px; height: 38px; border-radius: 11px; }
+  .kpi-label { font-size: .875rem; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--ink-soft); }
+  .kpi-value { font-size: clamp(1.4rem, 1.85vw, 2rem); font-weight: 750; letter-spacing: -.04em; line-height: 1.2; overflow-wrap: anywhere; }
+  .kpi-delta { font-size: .8125rem; flex-wrap: wrap; }
+  #vg-kpis .kpi-card:nth-child(1) { border-top: 3px solid var(--good); padding-top: 19px; }
+  #vg-kpis .kpi-card:nth-child(2) { border-top: 3px solid var(--critical); padding-top: 19px; }
+  #vg-kpis .kpi-card:nth-child(3) { background: #12374c; border-color: #12374c; color: #ffffff; }
+  #vg-kpis .kpi-card:nth-child(3) .kpi-label, #vg-kpis .kpi-card:nth-child(3) .kpi-delta.flat,
+  #vg-kpis .kpi-card:nth-child(3) .kpi-delta-note { color: #c6d9e4; }
+  #vg-kpis .kpi-card:nth-child(3) .kpi-icon { background: #285164; color: #7ee4c2; }
+  #vg-kpis .kpi-card:nth-child(3) .kpi-delta.up { color: #82e8bc; }
+  #vg-kpis .kpi-card:nth-child(3) .kpi-delta.down { color: #ffb6bf; }
+  .card { padding: 24px; border-radius: 14px; gap: 18px; }
+  .card-title { font-size: 1rem; text-transform: none; letter-spacing: -.02em; font-weight: 700; }
+  .card-head { gap: 14px; }
+  .card-link { min-height: 36px; font-size: .875rem; color: var(--accent); }
+  .grid-2 { grid-template-columns: minmax(0,1.35fr) minmax(0,1fr); gap: 22px; }
+  .alerta-card { border-radius: 12px; padding: 16px 18px; font-size: .875rem; margin-bottom: 0; border-width: 0 0 0 3px !important; }
+  .legend-row { font-size: .8125rem; gap: 18px; }
+  .legend-swatch { border-radius: 3px; }
+  .chart-scroll, .table-scroll, .dre-mensal-row { scrollbar-width: thin; scrollbar-color: var(--ink-mute) var(--page-bg); }
+  .chart-wrap > svg { display: block; }
+  .chart-wrap > .tooltip { display: none; }
+  .chart-wrap > .tooltip.show { display: block; }
+  .donut-row { justify-content: center; gap: 22px; }
+  .donut-center .v { font-size: .9375rem; }
+  .donut-center .l { font-size: .75rem; letter-spacing: 0; }
+  .mini-legend { min-width: 180px; gap: 11px; }
+  .mini-legend-item, .outras-detalhe-row { font-size: .875rem; gap: 8px; }
+  .mini-legend-item .lbl { min-width: 0; overflow-wrap: anywhere; }
+  .mini-legend-item .pct, .outras-detalhe-pct { font-size: .75rem; width: 42px; }
+  .mini-legend-item .val { font-size: .8125rem; }
+  .outras-detalhe-title, .essencial-title, .trend-stat-label, .mp-group-title { font-size: .8125rem; letter-spacing: .03em; }
+  .hbar-row { grid-template-columns: minmax(100px, .9fr) minmax(50px, 1fr) minmax(100px, auto); font-size: .875rem; }
+  .hbar-track { height: 10px; border: none; border-radius: 20px; }
+  .hbar-fill { border-radius: 20px; }
+  .hbar-legend { font-size: .8125rem; }
+  .trend-stat-note, .essencial-note, .apres-actions-note { font-size: .8125rem; line-height: 1.65; }
+  .essencial-row, .mp-check-item { font-size: .875rem; }
+  .trend-stat-value { font-size: 1.5rem; }
+  table.simple { font-size: .875rem; }
+  table.simple th, table.simple td { padding: 13px 14px; }
+  table.simple thead th { background: var(--page-bg); font-size: .75rem; letter-spacing: .035em; border-bottom: 1px solid var(--card-border); color: var(--ink-soft); }
+  table.simple th.cat-col { background: var(--page-bg); }
+  table.simple tbody tr:last-child td { border-bottom: none; }
+  tr.subtotal td { background: var(--accent-soft); color: var(--ink); }
+  .pill { padding: 4px 10px; font-size: .8125rem; font-weight: 650; }
+  .filters-row { gap: 12px; }
+  .filters-row input[type="text"], .filters-row select { min-height: 46px; font-size: .875rem; border-radius: 9px; background-color: var(--page-bg); padding: 10px 32px 10px 12px; max-width: 100%; }
+  .filters-row input[type="text"] { flex: 1 1 250px; padding-right: 12px; }
+  .results-count { font-size: .8125rem; }
+  .pagination { border-top: 1px solid var(--line); padding-top: 16px; flex-wrap: wrap; gap: 12px; }
+  .pagination button, .btn-dre-export { font-size: .875rem; min-height: 42px; border-radius: 8px; padding: 8px 14px; }
+  .page-info { font-size: .8125rem; }
+  .toggle-group { border-radius: 9px; padding: 4px; background: var(--page-bg); flex-wrap: wrap; }
+  .toggle-group button { font-size: .875rem; min-height: 36px; padding: 6px 14px; border-radius: 6px; }
+  .toggle-group button.active { background: var(--accent); color: var(--card-bg); }
+  .dre-table { font-size: .9375rem; }
+  .dre-table td { padding-top: 9px; padding-bottom: 9px; }
+  .dre-header .dre-periodo, .dre-mensal-title { font-size: .875rem; }
+  .dre-section-title td, .dre-table-compact .dre-section-title td { font-size: .8125rem; }
+  .dre-mes-col { border-radius: 12px; padding: 18px; }
+  .dre-table-compact { font-size: .8125rem; }
+  .dre-table-compact td { padding-top: 5px; padding-bottom: 5px; }
+  .mp-check-item { min-height: 42px; padding: 8px 12px; border: 1px solid var(--card-border); border-radius: 8px; }
+  .mp-check-item:has(input:checked) { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+  .apres-slide.dark { background: linear-gradient(125deg,#10283f,#174b52); }
+  .apres-slide.dark .apres-capa-sub { color: #70e0b9; }
+  .apres-slide.dark .apres-big.good, .apres-slide.dark .apres-big.accent { color: #70e0b9; }
+  .apres-slide.dark .apres-big.critical { color: #ffb6bf; }
+  .apres-slide { box-shadow: var(--shadow); }
+
+  /* Identidade de acesso consistente com o painel. */
+  #login-overlay { background: #10283f; padding: 48px; gap: clamp(44px, 7vw, 120px); overflow-y: auto; color-scheme: dark; }
+  #login-overlay::before { content: ''; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 15% 90%,#0b735a44,transparent 55%); }
+  .login-intro { position: relative; max-width: 510px; color: #ffffff; }
+  .login-kicker { display: inline-flex; align-items: center; gap: 10px; color: #8be4c6; font-size: .8125rem; letter-spacing: .12em; font-weight: 700; }
+  .login-kicker svg { width: 24px; height: 24px; }
+  .login-intro h2 { font-size: clamp(2.5rem, 4.5vw, 4.1rem); font-weight: 650; line-height: 1.08; letter-spacing: -.055em; margin: 28px 0 24px; }
+  .login-intro h2 span { color: #79ddba; }
+  .login-intro p { max-width: 420px; font-size: 1rem; line-height: 1.8; color: #c0d1dd; margin: 0; }
+  .login-features { margin-top: 40px; padding-top: 24px; border-top: 1px solid #3b5265; display: flex; gap: 28px; flex-wrap: wrap; color: #cfdee8; font-size: .8125rem; }
+  .login-features span { display: flex; align-items: center; gap: 8px; }
+  .login-features svg { width: 18px; height: 18px; color: #7ce1bb; }
+  .login-wrap { max-width: 430px; position: relative; flex-shrink: 0; }
+  .login-card { background: #17334b; border-color: #365268; padding: 32px; border-radius: 20px; gap: 20px; box-shadow: 0 24px 80px #07182544; }
+  .login-logo-wrap { width: 64px; height: 64px; border-radius: 16px; background: #f5faf8; margin-bottom: 0; padding: 10px; }
+  .login-logo-wrap object, .login-logo-wrap svg { width: 100%; height: 100%; color: #176e5b; }
+  .login-title h1 { font-size: 1.875rem; letter-spacing: -.05em; }
+  .login-title h1 span { color: #79ddba; }
+  .login-title .lt-sub1 { font-size: .875rem; color: #c5d5df; line-height: 1.5; }
+  .login-title .lt-sub2 { font-size: .75rem; color: #a4becd; margin-top: 6px; }
+  .login-field label { font-size: .875rem; color: #e3edf3; }
+  .login-forgot { font-size: .8125rem; color: #94e9cc; padding: 3px 0; }
+  .login-input-wrap input { min-height: 50px; background: #10283f; border-color: #4b667c; border-radius: 10px; font-size: 1rem; padding: 12px 44px; }
+  .login-input-wrap input::placeholder { color: #a4b9c9; }
+  .login-input-wrap .li-icon { width: 18px; height: 18px; left: 15px; color: #a4b9c9; }
+  .login-input-wrap .li-eye { right: 6px; padding: 10px; color: #b8d0df; }
+  .login-input-wrap .li-eye svg { width: 20px; height: 20px; }
+  .login-remember, .login-msg-info { font-size: .8125rem; color: #c3d3df; line-height: 1.6; }
+  .login-remember input { width: 18px; height: 18px; flex-shrink: 0; }
+  .login-submit { min-height: 50px; font-size: .9375rem; background: #76dfb8; color: #102c27; border-radius: 10px; }
+  .login-error { font-size: .875rem; margin: 0; }
+  .login-footer { border-color: #3b5265; padding-top: 20px; }
+  .login-footer .lf-mod { font-size: .8125rem; color: #c5d5df; }
+  .login-footer .lf-items, .login-copy { font-size: .75rem; color: #aec4d3; }
+  .login-copy { margin: 20px 0 0; }
+  @media (min-width: 861px) and (max-width: 1180px) {
+    .sidebar { width: 230px; padding-left: 14px; padding-right: 14px; }
+    .topbar { padding: 22px 24px; }
+    .content { padding: 0 24px 40px; }
+    .grid-2 { grid-template-columns: minmax(0,1fr); }
+    .kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    #vg-kpis { grid-template-columns: repeat(3,minmax(0,1fr)); }
+    .kpi-card { padding: 18px; }
+    .range-caption { display: none; }
+  }
+  @media (max-width: 980px) { .grid-2 { grid-template-columns: minmax(0,1fr); } }
+  @media (max-width: 860px) {
+    .sidebar { width: min(300px, 86vw); height: 100dvh; }
+    .topbar { padding: 18px 20px; gap: 18px; margin-bottom: 20px; }
+    .topbar-title { font-size: 1.5rem; }
+    .topbar-left { align-items: center; gap: 12px; }
+    .menu-toggle { width: 44px; height: 44px; border-radius: 10px; }
+    .content { padding: 0 20px 32px; }
+    .kpis, #vg-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+    .kpi-value { font-size: 1.6rem; }
+    .kpi-card { padding: 18px; }
+    .card { padding: 20px; }
+    #login-overlay { padding: 28px; }
+    .login-intro { display: none; }
+    .apres-slide { padding: 24px; }
+    .apres-cols { gap: 20px; }
+    .apres-slide .apres-donut-body { gap: 14px; }
+    .apres-slide .apres-donut-body .donut-wrap { transform: none; margin: 0; }
+  }
+  @media (max-width: 540px) {
+    .topbar { padding: 16px; position: relative; }
+    .page-eyebrow { font-size: .6875rem; }
+    .topbar-sub { font-size: .8125rem; }
+    .content { padding: 0 14px 28px; }
+    .range-picker { width: 100%; justify-content: space-between; gap: 4px; }
+    .range-caption { display: none; }
+    .range-picker select { min-width: 0; font-size: .875rem; }
+    .kpis, #vg-kpis { grid-template-columns: minmax(0,1fr); }
+    .kpi-card { padding: 20px; gap: 12px; }
+    .kpi-value { font-size: 1.875rem; }
+    .card { padding: 18px 14px; }
+    .card-title { font-size: .9375rem; }
+    .donut-row { flex-direction: column; }
+    .mini-legend { width: 100%; min-width: 0; }
+    .mini-legend-item .lbl { font-size: .8125rem; }
+    .hbar-row { grid-template-columns: minmax(74px,.8fr) minmax(30px,.6fr) minmax(90px,auto); gap: 8px; }
+    .hbar-label, .hbar-value { font-size: .8125rem; }
+    .filters-row input[type="text"], .filters-row select { width: 100%; min-width: 0; }
+    .results-count { margin-left: 0; }
+    .cat-col { min-width: 150px; }
+    .dre-export-actions { gap: 8px; }
+    .btn-dre-export { font-size: .8125rem; padding: 8px 10px; }
+    .apres-slide { padding: 26px 16px; min-height: 230px; aspect-ratio: auto; }
+    .apres-cols { flex-direction: column; gap: 24px; }
+    .apres-divider { display: none; }
+    .apres-big { font-size: clamp(1.8rem, 9vw, 3rem); overflow-wrap: anywhere; }
+    .apres-slide .apres-donut-body .mini-legend { min-width: 0; }
+    .mp-group-items { grid-template-columns: minmax(0,1fr); }
+    #login-overlay { padding: 20px 14px; align-items: safe center; }
+    .login-card { padding: 26px 22px; gap: 18px; }
+    .login-title h1 { font-size: 1.75rem; }
+    .login-title .lt-sub1 { font-size: .8125rem; }
+  }
+  @media (max-height: 760px) {
+    #login-overlay { align-items: flex-start; }
+    .sidebar { padding-top: 18px; }
+    .brand { padding-bottom: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+  }
+}
+@media print { .page-eyebrow, .range-caption, .login-intro { display: none !important; } }
+
+</style>
+</head>
+<body>
+
+<div id="login-overlay">
+  <div class="login-intro">
+    <div class="login-kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v7m-3-4h6M4 21V12l8-5 8 5v9H4Zm6 0v-7h4v7"/></svg> NAZACONTROL · TESOURARIA</div>
+    <h2>Clareza nas contas.<br><span>Cuidado com<br>cada recurso.</span></h2>
+    <p>Uma visão completa da gestão financeira da igreja, para acompanhar o presente e planejar os próximos passos.</p>
+    <div class="login-features">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 20V10m8 10V4m8 16v-8"/></svg>Indicadores e análises</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6m-6 4h6m-6 4h4"/></svg>Prestação de contas</span>
+    </div>
+  </div>
+  <div class="login-wrap">
+    <form id="login-form" class="login-card">
+      <div class="login-logo-wrap"><object data="LOGO.png" type="image/png" aria-label="Igreja Evangélica Nazareno"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v7m-3-4h6M4 21V12l8-5 8 5v9H4Zm6 0v-7h4v7"/></svg></object></div>
+      <div class="login-title">
+        <h1>Naza<span>Control</span></h1>
+        <p class="lt-sub1">Igreja Evangélica Nazareno de Guarapuava</p>
+        <p class="lt-sub2">Sistema de Controle Financeiro • Tesouraria</p>
+      </div>
+
+      <div class="login-field">
+        <label for="login-user">Usuário</label>
+        <div class="login-input-wrap">
+          <svg class="li-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg>
+          <input id="login-user" type="text" autocomplete="username" placeholder="Usuário" required>
+        </div>
+      </div>
+
+      <div class="login-field">
+        <div class="login-field-label-row">
+          <label for="login-senha">Senha</label>
+          <button type="button" class="login-forgot" id="login-forgot">Esqueceu a senha?</button>
+        </div>
+        <div class="login-input-wrap">
+          <svg class="li-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+          <input id="login-senha" type="password" autocomplete="current-password" placeholder="••••••••" required>
+          <button type="button" class="li-eye" id="login-eye" aria-label="Mostrar senha"><svg id="login-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+      </div>
+      <div class="login-msg-info" id="login-forgot-msg" role="status">Fale com o tesoureiro responsável para redefinir sua senha.</div>
+
+      <label class="login-remember"><input type="checkbox" id="login-remember"> Lembrar meu acesso neste dispositivo</label>
+
+      <div id="login-error" role="alert" class="login-error"></div>
+
+      <button id="login-submit" type="submit" class="login-submit">Acessar Sistema</button>
+
+      <div class="login-footer">
+        <div class="lf-mod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>Módulo Tesouraria &amp; Gestão Financeira</div>
+        <div class="lf-items">Entradas • Saídas • Saldos • DRE</div>
+      </div>
+    </form>
+    <p class="login-copy">© NazaControl — Sistema Interno</p>
+  </div>
+</div>
+
+<div class="shell">
+
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M6 8l6-5 6 5M4 21h16M6 21v-8M10 21v-8M14 21v-8M18 21v-8"/></svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">NazaControl</span>
+        <span class="brand-sub">Igreja Nazareno Guarapuava</span>
+      </div>
+    </div>
+
+    <nav id="nav-list" aria-label="Navegação principal"></nav>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="fullscreen-toggle" type="button"><svg class="icon" id="fullscreen-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3"/><path d="M21 8V5a2 2 0 00-2-2h-3"/><path d="M3 16v3a2 2 0 002 2h3"/><path d="M16 21h3a2 2 0 002-2v-3"/></svg><span id="fullscreen-toggle-label">Tela cheia</span></button>
+      <div class="verse"><b>2 Coríntios 9:7</b><br>“Cada um contribua segundo propôs no seu coração, não com tristeza ou por necessidade; porque Deus ama a quem dá com alegria.”</div>
+      <div class="sync-note" id="sync-note">Dados ao vivo da aba Base</div>
+      <button class="theme-toggle" id="theme-toggle" type="button"><svg class="icon" id="theme-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/></svg><span id="theme-toggle-label">Tema escuro</span></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Abrir menu">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+        </button>
+        <div>
+          <div class="page-eyebrow">GESTÃO FINANCEIRA · TESOURARIA</div>
+          <h1 class="topbar-title" id="page-title">Visão Geral</h1>
+          <div class="topbar-sub" id="page-sub">Resumo financeiro do período selecionado</div>
+        </div>
+      </div>
+      <div class="range-picker" role="group" aria-label="Período de análise">
+        <span class="range-caption">Período</span>
+        <svg class="range-icon icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        <select id="sel-de" aria-label="Mês inicial"></select>
+        <span class="range-sep">–</span>
+        <select id="sel-ate" aria-label="Mês final"></select>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ===== VISÃO GERAL ===== -->
+      <section class="section" id="sec-geral">
+        <div id="vg-insight"></div>
+        <div class="kpis" id="vg-kpis"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">Receitas × Despesas × Saldo</span>
+            </div>
+            <div class="legend-row">
+              <span class="legend-item"><span class="legend-swatch" style="background:var(--good)"></span>Receitas</span>
+              <span class="legend-item"><span class="legend-swatch" style="background:var(--critical)"></span>Despesas</span>
+              <span class="legend-item"><span class="legend-line" style="background:var(--info)"></span>Saldo</span>
+            </div>
+            <div class="chart-scroll"><div class="chart-wrap" id="vg-combo"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Distribuição das Despesas</span></div>
+            <div class="donut-row">
+              <div class="donut-wrap" id="vg-donut"></div>
+              <div class="mini-legend" id="vg-donut-legend"></div>
+            </div>
+            <div id="vg-outras-detalhe"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">Evolução do Saldo</span></div>
+          <div class="table-scroll"><table class="simple" id="vg-saldo-table"></table></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Movimentações recentes</span>
+            <button class="card-link" id="vg-ver-todas">Ver todas</button>
+          </div>
+          <div class="table-scroll"><table class="simple" id="vg-mov-table"></table></div>
+        </div>
+      </section>
+
+      <!-- ===== RECEITAS ===== -->
+      <section class="section" id="sec-receitas">
+        <div id="rc-alerta"></div>
+        <div class="kpis" id="rc-kpis"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><span class="card-title">Evolução das Receitas</span></div>
+            <div class="chart-scroll"><div class="chart-wrap" id="rc-trend"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Por categoria</span></div>
+            <div class="donut-row">
+              <div class="donut-wrap" id="rc-donut"></div>
+              <div class="mini-legend" id="rc-donut-legend"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">Detalhamento mensal</span></div>
+          <div class="table-scroll"><table class="simple" id="rc-table"></table></div>
+        </div>
+      </section>
+
+      <!-- ===== DESPESAS ===== -->
+      <section class="section" id="sec-despesas">
+        <div id="ds-alerta"></div>
+        <div class="kpis" id="ds-kpis"></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><span class="card-title">Evolução das Despesas</span></div>
+            <div class="chart-scroll"><div class="chart-wrap" id="ds-trend"></div></div>
+            <div id="ds-trend-stats"></div>
+            <div id="ds-essencial"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">Por categoria</span></div>
+            <div class="hbar-list" id="ds-hbars"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">Detalhamento mensal</span></div>
+          <div class="table-scroll"><table class="simple" id="ds-table"></table></div>
+        </div>
+      </section>
+
+      <!-- ===== MOVIMENTAÇÕES ===== -->
+      <section class="section" id="sec-mov">
+        <div class="card">
+          <div class="filters-row">
+            <input type="text" id="mov-search" aria-label="Buscar movimentações por descrição" placeholder="Buscar por descrição…">
+            <select id="mov-categoria" aria-label="Filtrar por categoria"><option value="">Todas as categorias</option></select>
+            <select id="mov-conta" aria-label="Filtrar por conta">
+              <option value="">Banco e Dinheiro</option>
+              <option value="Banco">Só Banco</option>
+              <option value="Dinheiro">Só Dinheiro</option>
+            </select>
+            <select id="mov-tipo" aria-label="Filtrar por tipo">
+              <option value="">Receitas e Despesas</option>
+              <option value="receita">Só Receitas</option>
+              <option value="despesa">Só Despesas</option>
+            </select>
+            <span class="results-count" id="mov-count"></span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-scroll"><table class="simple" id="mov-table"></table></div>
+          <div class="pagination">
+            <button id="mov-prev">Anterior</button>
+            <span class="page-info" id="mov-page-info"></span>
+            <button id="mov-next">Próxima</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== COMPARATIVO ===== -->
+      <section class="section" id="sec-comp">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Comparativo mensal por ano</span>
+            <div class="toggle-group" id="comp-toggle">
+              <button data-tipo="receitas" class="active">Receitas</button>
+              <button data-tipo="despesas">Despesas</button>
+            </div>
+          </div>
+          <div class="legend-row" id="comp-legend"></div>
+          <div class="chart-scroll"><div class="chart-wrap" id="comp-chart"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">Dizimistas por Mês</span></div>
+          <div class="chart-scroll"><div class="chart-wrap" id="comp-dizimistas-chart"></div></div>
+          <div id="comp-dizimistas-stats"></div>
+        </div>
+      </section>
+
+      <!-- ===== APLICAÇÕES ===== -->
+      <section class="section" id="sec-aplic">
+        <div class="kpis" id="aplic-kpis"></div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">Evolução dos Aportes</span></div>
+          <div class="chart-scroll"><div class="chart-wrap" id="aplic-chart"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">Detalhamento mensal</span></div>
+          <div class="table-scroll"><table class="simple" id="aplic-table"></table></div>
+        </div>
+        <div class="card">
+          <div class="essencial-note" style="margin:0;">Saldos sem correções — os valores refletem apenas a soma dos aportes lançados no Fluxo de Caixa, sem juros, rendimentos ou correção monetária aplicados pela cooperativa/fundo.</div>
+        </div>
+      </section>
+
+      <!-- ===== DRE ===== -->
+      <section class="section" id="sec-dre">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">DRE — Demonstração do Resultado</span>
+            <div class="dre-export-actions">
+              <button class="btn-dre-export" id="dre-export-xlsx-geral" type="button">Exportar Excel</button>
+              <button class="btn-dre-export" id="dre-export-pdf-geral" type="button">Exportar PDF</button>
+            </div>
+          </div>
+          <div id="dre-geral-content"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">DRE Mensal — Mês a Mês</span>
+            <div class="dre-export-actions">
+              <button class="btn-dre-export" id="dre-export-xlsx-mensal" type="button">Exportar Excel</button>
+              <button class="btn-dre-export" id="dre-export-pdf-mensal" type="button">Exportar PDF</button>
+            </div>
+          </div>
+          <div id="dre-mensal-content"></div>
+        </div>
+      </section>
+
+      <!-- ===== APRESENTAÇÃO ===== -->
+      <section class="section" id="sec-apresentacao">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Apresentação — Slides para Projetor</span>
+            <div class="dre-export-actions">
+              <button class="btn-dre-export" id="apres-export-pptx" type="button">Exportar PowerPoint</button>
+              <button class="btn-dre-export" id="apres-export-pdf" type="button">Exportar PDF</button>
+            </div>
+          </div>
+          <div class="apres-actions-note">Dica: no PDF, escolha orientação Paisagem na caixa de impressão para os slides ficarem cheios na tela.</div>
+          <div id="apres-content" style="margin-top:18px;"></div>
+        </div>
+      </section>
+
+      <!-- ===== MEU PAINEL ===== -->
+      <section class="section" id="sec-meupainel">
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Personalizar Apresentação</span>
+            <button class="card-link" id="mp-toggle-personalizar" type="button">Ocultar opções</button>
+          </div>
+          <div id="mp-opcoes"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Minha Apresentação</span>
+            <div class="dre-export-actions">
+              <button class="btn-dre-export" id="mp-export-pptx" type="button">Exportar PowerPoint</button>
+              <button class="btn-dre-export" id="mp-export-pdf" type="button">Exportar PDF</button>
+            </div>
+          </div>
+          <div class="apres-actions-note">Dica: no PDF, escolha orientação Paisagem na caixa de impressão para os slides ficarem cheios na tela.</div>
+          <div id="mp-content" style="margin-top:18px;"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script>
+/* ============ Config ============ */
+const API_URL = 'https://script.google.com/macros/s/AKfycbyA0q9vsOycs1Qy8T3vz7yw_ARM4eUsk1Q6V1SiV7JQ5ymTwgs9bbhCBoR8dxniT_YU/exec';
+let DATA = null;
+let allMeses = [];
+
+/* ============ Helpers ============ */
+const MESES_PT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const MESES_PT_LONGO = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function mesLabelCurto(mesAno) { const [mm,yy]=mesAno.split('/'); return MESES_PT[parseInt(mm,10)-1]+'/'+yy.slice(2); }
+function mesLabelLongo(mesAno) { const [mm,yy]=mesAno.split('/'); return MESES_PT_LONGO[parseInt(mm,10)-1]+' de '+yy; }
+function mesNum(mesAno) { const [mm,yy]=mesAno.split('/'); return parseInt(yy,10)*12+parseInt(mm,10); }
+function brl(v) { return Math.abs(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2}); }
+function brlSigned(v) { return (v<0?'-':v>0?'+':'')+brl(v); }
+function brlFull(v) { return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+function sum(obj) { return Object.values(obj).reduce((a,b)=>a+b,0); }
+function sumRange(obj, meses) { return meses.reduce((s,m)=>s+(obj[m]||0),0); }
+
+function sortedCats(matrix, meses) {
+  return Object.keys(matrix)
+    .filter(c => c !== 'A revisar')
+    .sort((a,b) => sumRange(matrix[b],meses) - sumRange(matrix[a],meses))
+    .concat(Object.keys(matrix).includes('A revisar') ? ['A revisar'] : []);
+}
+
+const CATEGORY_COLORS = {
+  light: ['#3D6B8C','#C97A2B','#5B8C5A','#8B5FA8','#2E8B84','#B0432F','#6E8C3D','#A8598C'],
+  dark:  ['#6FA8CC','#E0A05C','#8CBF8A','#B08AD1','#5CBDB5','#E2836E','#9FC96E','#CC8AB8'],
+};
+function categoryColor(i, isDark) { const set = isDark ? CATEGORY_COLORS.dark : CATEGORY_COLORS.light; return set[i % set.length]; }
+function isDarkMode() {
+  const t = document.documentElement.getAttribute('data-theme');
+  if (t === 'dark') return true;
+  if (t === 'light') return false;
+  return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+}
+function cssVar(name, fallback) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback; }
+
+/* ============ Tema (claro/escuro) ============ */
+var savedTheme = (function(){ try { return localStorage.getItem('tesouraria-theme') || 'light'; } catch(e) { return 'light'; } })();
+document.documentElement.setAttribute('data-theme', savedTheme);
+function updateThemeToggleUI(theme) { var label = document.getElementById('theme-toggle-label'); if (label) label.textContent = theme === 'dark' ? 'Tema claro' : 'Tema escuro'; }
+updateThemeToggleUI(savedTheme);
+document.getElementById('theme-toggle').addEventListener('click', function () {
+  var cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('tesouraria-theme', next); } catch (e) {}
+  updateThemeToggleUI(next);
+  if (DATA) renderSection(currentSection);
+});
+
+/* ============ Tela cheia ============ */
+const ICON_FS_ENTER = '<path d="M8 3H5a2 2 0 00-2 2v3"/><path d="M21 8V5a2 2 0 00-2-2h-3"/><path d="M3 16v3a2 2 0 002 2h3"/><path d="M16 21h3a2 2 0 002-2v-3"/>';
+const ICON_FS_EXIT = '<path d="M8 3v3a2 2 0 01-2 2H3"/><path d="M21 8h-3a2 2 0 01-2-2V3"/><path d="M3 16h3a2 2 0 012 2v3"/><path d="M16 21v-3a2 2 0 012-2h3"/>';
+function updateFullscreenToggleUI() {
+  const isFs = !!document.fullscreenElement;
+  const icon = document.getElementById('fullscreen-toggle-icon');
+  const label = document.getElementById('fullscreen-toggle-label');
+  if (icon) icon.innerHTML = isFs ? ICON_FS_EXIT : ICON_FS_ENTER;
+  if (label) label.textContent = isFs ? 'Sair da tela cheia' : 'Tela cheia';
+}
+updateFullscreenToggleUI();
+document.getElementById('fullscreen-toggle').addEventListener('click', function () {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(function () {});
+  } else {
+    document.exitFullscreen().catch(function () {});
+  }
+});
+document.addEventListener('fullscreenchange', updateFullscreenToggleUI);
+
+/* ============ Sidebar nav ============ */
+const NAV_ICONS = {
+  geral: '<path d="M4 4h7v7H4z"/><path d="M13 4h7v7h-7z"/><path d="M4 13h7v7H4z"/><path d="M13 13h7v7h-7z"/>',
+  receitas: '<path d="M3 17l6-6 4 4 8-8" fill="none"/><path d="M15 6h6v6" fill="none"/>',
+  despesas: '<path d="M3 7l6 6 4-4 8 8" fill="none"/><path d="M15 18h6v-6" fill="none"/>',
+  mov: '<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/>',
+  comp: '<rect x="4" y="10" width="4" height="10"/><rect x="10" y="4" width="4" height="16"/><rect x="16" y="7" width="4" height="13"/>',
+  dre: '<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v3h3"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="18" x2="13" y2="18"/>',
+  aplic: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v5c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 11v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>',
+  apres: '<rect x="2" y="4" width="20" height="13" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+  meupainel: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+};
+function navIcon(key, stroked) {
+  const inner = NAV_ICONS[key];
+  if (stroked) return `<svg class="icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">${inner}</svg>`;
+  return `<svg class="icon" viewBox="0 0 24 24" fill="currentColor">${inner}</svg>`;
+}
+
+const SECTIONS = [
+  { id: 'geral', label: 'Visão Geral', title: 'Visão Geral', sub: 'Resumo financeiro do período selecionado', icon: navIcon('geral', false) },
+  { id: 'receitas', label: 'Receitas', title: 'Receitas', sub: 'Entradas por categoria e evolução mensal', icon: navIcon('receitas', true) },
+  { id: 'despesas', label: 'Despesas', title: 'Despesas', sub: 'Saidas por categoria e evolução mensal', icon: navIcon('despesas', true) },
+  { id: 'mov', label: 'Movimentações', title: 'Movimentações', sub: 'Todos os lançamentos do período', icon: navIcon('mov', true) },
+  { id: 'comp', label: 'Comparativo', title: 'Comparativo Anual', sub: 'Mesmo mês, anos diferentes, lado a lado', icon: navIcon('comp', false) },
+  { id: 'aplic', label: 'Aplicações', title: 'Aplicações', sub: 'Saldo em fundos e aplicações financeiras', icon: navIcon('aplic', true) },
+  { id: 'dre', label: 'DRE', title: 'DRE', sub: 'Demonstração do Resultado do período selecionado', icon: navIcon('dre', true) },
+  { id: 'apresentacao', label: 'Apresentação', title: 'Apresentação', sub: 'Slides com os principais números para exibir no projetor', icon: navIcon('apres', true) },
+  { id: 'meupainel', label: 'Meu Painel', title: 'Meu Painel', sub: 'Escolha os indicadores, gráficos e tabelas que quer ver aqui', icon: navIcon('meupainel', false) },
+];
+
+let currentSection = 'geral';
+const navList = document.getElementById('nav-list');
+navList.innerHTML = SECTIONS.map(s => `<button class="nav-item${s.id==='geral'?' active':''}" data-section="${s.id}">${s.icon}<span>${s.label}</span></button>`).join('');
+
+function goToSection(id) {
+  currentSection = id;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.section === id));
+  document.querySelectorAll('.section').forEach(el => el.classList.toggle('active', el.id === 'sec-' + id));
+  const meta = SECTIONS.find(s => s.id === id);
+  document.getElementById('page-title').textContent = meta.title;
+  document.getElementById('page-sub').textContent = meta.sub;
+  renderSection(id);
+}
+navList.querySelectorAll('.nav-item').forEach(el => el.addEventListener('click', () => goToSection(el.dataset.section)));
+document.getElementById('vg-ver-todas').addEventListener('click', () => goToSection('mov'));
+
+/* ============ Menu mobile ============ */
+const sidebarEl = document.querySelector('.sidebar');
+const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+const menuToggle = document.getElementById('menu-toggle');
+function fecharMenuMobile() { sidebarEl.classList.remove('open'); sidebarBackdrop.classList.remove('show'); }
+function abrirMenuMobile() { sidebarEl.classList.add('open'); sidebarBackdrop.classList.add('show'); }
+menuToggle.addEventListener('click', () => {
+  if (sidebarEl.classList.contains('open')) fecharMenuMobile(); else abrirMenuMobile();
+});
+sidebarBackdrop.addEventListener('click', fecharMenuMobile);
+navList.querySelectorAll('.nav-item').forEach(el => el.addEventListener('click', fecharMenuMobile));
+
+/* ============ Date range picker ============ */
+const selDe = document.getElementById('sel-de');
+const selAte = document.getElementById('sel-ate');
+
+function currentRangeIdx() { return [parseInt(selDe.value,10), parseInt(selAte.value,10)]; }
+function mesesInRange() { const [de,ate] = currentRangeIdx(); return allMeses.slice(de, ate+1); }
+
+selDe.addEventListener('change', () => { if (+selDe.value > +selAte.value) selAte.value = selDe.value; renderSection(currentSection); });
+selAte.addEventListener('change', () => { if (+selAte.value < +selDe.value) selDe.value = selAte.value; renderSection(currentSection); });
+
+/* ============ Render dispatcher ============ */
+function renderSection(id) {
+  if (id === 'geral') renderVisaoGeral();
+  else if (id === 'receitas') renderReceitas();
+  else if (id === 'despesas') renderDespesas();
+  else if (id === 'mov') renderMovimentacoes();
+  else if (id === 'comp') renderComparativo();
+  else if (id === 'aplic') renderAplicacoes();
+  else if (id === 'dre') renderDRE();
+  else if (id === 'apresentacao') renderApresentacao();
+  else if (id === 'meupainel') renderMeuPainel();
+}
+
+/* ============ KPI helpers ============ */
+function kpiCard(label, value, iconSvg, iconClass, deltaHtml) {
+  return `<div class="kpi-card">
+    <div class="kpi-top">
+      <div class="kpi-icon ${iconClass}">${iconSvg}</div>
+      <span class="kpi-label">${label}</span>
+    </div>
+    <span class="kpi-value">${value}</span>
+    ${deltaHtml || ''}
+  </div>`;
+}
+function deltaHtml(curr, prev, hasPrev) {
+  if (!hasPrev) return `<span class="kpi-delta flat">— sem período anterior</span>`;
+  if (prev === 0) return `<span class="kpi-delta flat">período anterior sem movimento</span>`;
+  const pct = ((curr - prev) / Math.abs(prev)) * 100;
+  const dir = pct > 0.5 ? 'up' : pct < -0.5 ? 'down' : 'flat';
+  const arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '•';
+  return `<span class="kpi-delta ${dir}">${arrow} ${Math.abs(pct).toFixed(1)}% <span class="kpi-delta-note">vs período anterior</span></span>`;
+}
+const ICON_UP = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 6h6v6"/></svg>';
+const ICON_DOWN = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6 4-4 8 8"/><path d="M15 18h6v-6"/></svg>';
+const ICON_WALLET = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12.5h3.5v3H16a1.5 1.5 0 010-3z"/></svg>';
+const ICON_BANK = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l8-6 8 6"/><path d="M5 10v8M10 10v8M14 10v8M19 10v8"/><path d="M3 19h18"/></svg>';
+const ICON_ALERT = '<svg class="alerta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+const ICON_CHECK = '<svg class="alerta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9"/></svg>';
+
+function previousRangeMeses() {
+  const [de, ate] = currentRangeIdx();
+  const len = ate - de + 1;
+  const prevAte = de - 1;
+  const prevDe = de - len;
+  if (prevDe < 0) return null;
+  return allMeses.slice(prevDe, prevAte + 1);
+}
+
+/* ============ Combo chart (Receitas x Despesas x Saldo) ============ */
+function buildComboChart(container, meses, receitaVals, despesaVals, tituloResultado) {
+  const W = Math.max(700, meses.length * 150);
+  const H = 280;
+  const M = { top: 28, right: 16, bottom: 26, left: 62 };
+  const plotW = W - M.left - M.right, plotH = H - M.top - M.bottom;
+  const groupW = plotW / meses.length;
+  const barW = Math.min(40, groupW * 0.26);
+  const resultadoVals = meses.map((m,i) => receitaVals[i] - despesaVals[i]);
+  const maxVal = Math.max(...receitaVals, ...despesaVals, 1);
+  const minRes = Math.min(...resultadoVals, 0);
+  const yMax = maxVal * 1.2, yMin = Math.min(minRes * 1.3, 0);
+  const yScale = v => plotH - ((v - yMin) / (yMax - yMin)) * plotH;
+
+  const cGood = cssVar('--good','#1E8E5A'), cCrit = cssVar('--critical','#C0453B'),
+        cInfo = cssVar('--info','#2F6FE0'), cLine = cssVar('--line','#E7E9F1'), cMute = cssVar('--ink-mute','#8A90A6'),
+        cCard = cssVar('--card-bg','#fff');
+
+  let gridlines = '', steps = 4;
+  for (let i=0;i<=steps;i++){ const v = yMin+(yMax-yMin)*(i/steps); const y = yScale(v);
+    gridlines += `<line x1="0" y1="${y}" x2="${plotW}" y2="${y}" stroke="${cLine}" stroke-width="1"/><text x="-8" y="${y+4}" text-anchor="end" font-size="10" fill="${cMute}">${brl(v)}</text>`; }
+  const zeroY = yScale(0);
+  gridlines += `<line x1="0" y1="${zeroY}" x2="${plotW}" y2="${zeroY}" stroke="${cMute}" stroke-width="1.1"/>`;
+
+  let bars='', dots='', linePath='', hitAreas='', xLabels='', valLabels='', saldoLabels='';
+  meses.forEach((m,i)=>{
+    const gx=i*groupW, cx=gx+groupW/2;
+    const rY=yScale(receitaVals[i]), dY=yScale(despesaVals[i]);
+    const rH=plotH-rY, dH=plotH-dY;
+    const rx=cx-barW-7, dx=cx+7;
+    bars += `<rect x="${rx}" y="${rY}" width="${barW}" height="${Math.max(rH,0.5)}" rx="2" fill="${cGood}"/>`;
+    bars += `<rect x="${dx}" y="${dY}" width="${barW}" height="${Math.max(dH,0.5)}" rx="2" fill="${cCrit}"/>`;
+    valLabels += `<text x="${rx+barW/2}" y="${rY-6}" text-anchor="middle" font-size="10" font-weight="700" fill="${cGood}">${brl(receitaVals[i])}</text>`;
+    valLabels += `<text x="${dx+barW/2}" y="${dY-6}" text-anchor="middle" font-size="10" font-weight="700" fill="${cCrit}">${brl(despesaVals[i])}</text>`;
+    const py=yScale(resultadoVals[i]);
+    linePath += (i===0?'M':'L')+cx+','+py+' ';
+    const saldoLabel = brlSigned(resultadoVals[i]);
+    const lw = saldoLabel.length*5.4+6;
+    saldoLabels += `<rect x="${cx-lw/2}" y="${py-22}" width="${lw}" height="13" rx="3" fill="${cCard}" opacity="0.9"/><text x="${cx}" y="${py-12}" text-anchor="middle" font-size="9" font-weight="700" fill="${cInfo}">${saldoLabel}</text>`;
+    dots += `<circle cx="${cx}" cy="${py}" r="3.4" fill="${cInfo}" stroke="${cCard}" stroke-width="1.5"/>`;
+    xLabels += `<text x="${cx}" y="${plotH+20}" text-anchor="middle" font-size="10.5" fill="${cMute}">${mesLabelCurto(m)}</text>`;
+    hitAreas += `<rect data-i="${i}" x="${gx}" y="0" width="${groupW}" height="${plotH}" fill="transparent" style="cursor:pointer"/>`;
+  });
+
+  container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><g transform="translate(${M.left},${M.top})">
+      ${gridlines}${bars}${valLabels}<path d="${linePath}" fill="none" stroke="${cInfo}" stroke-width="2"/>${saldoLabels}${dots}${xLabels}${hitAreas}
+    </g></svg><div class="tooltip" id="${container.id}-tt"></div>`;
+  const tt = document.getElementById(container.id+'-tt');
+  container.querySelectorAll('rect[data-i]').forEach(el=>{
+    el.addEventListener('mousemove', e=>{
+      const i=+el.getAttribute('data-i'); const rect=container.getBoundingClientRect();
+      tt.innerHTML = `<div class="t-title">${mesLabelLongo(meses[i])}</div>Receitas: ${brl(receitaVals[i])}<br>Despesas: ${brl(despesaVals[i])}<br>${tituloResultado||'Saldo'}: ${brlSigned(resultadoVals[i])}`;
+      tt.style.left=(e.clientX-rect.left+14)+'px'; tt.style.top=(e.clientY-rect.top-10)+'px'; tt.classList.add('show');
+    });
+    el.addEventListener('mouseleave', ()=>tt.classList.remove('show'));
+  });
+}
+
+/* ============ Single-series trend bar chart ============ */
+function buildTrendChart(container, meses, vals, colorAcima, colorAbaixo, fmt) {
+  fmt = fmt || brl;
+  const W = Math.max(700, meses.length * 76), H = 220;
+  const M = { top: 22, right: 12, bottom: 24, left: 96 };
+  const plotW = W-M.left-M.right, plotH = H-M.top-M.bottom;
+  const groupW = plotW/meses.length, barW = Math.min(40, groupW*0.72);
+  const maxVal = Math.max(...vals, 1), yMax = maxVal*1.22;
+  const yScale = v => plotH - (v/yMax)*plotH;
+  const cLine = cssVar('--line','#E7E9F1'), cMute = cssVar('--ink-mute','#8A90A6'), cInk = cssVar('--ink','#1B1F33');
+  const media = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+  const corUnica = !colorAbaixo;
+
+  let gridlines='', steps=4;
+  for (let i=0;i<=steps;i++){ const v=yMax*(i/steps); const y=yScale(v);
+    gridlines += `<line x1="0" y1="${y}" x2="${plotW}" y2="${y}" stroke="${cLine}" stroke-width="1"/>`; }
+
+  let bars='', xLabels='', hitAreas='', valLabels='';
+  meses.forEach((m,i)=>{
+    const gx=i*groupW, cx=gx+groupW/2, y=yScale(vals[i]), h=plotH-y;
+    const fill = corUnica ? colorAcima : (vals[i] >= media ? colorAcima : colorAbaixo);
+    bars += `<rect x="${cx-barW/2}" y="${y}" width="${barW}" height="${Math.max(h,0.5)}" rx="3" fill="${fill}"/>`;
+    valLabels += `<text x="${cx}" y="${y-7}" text-anchor="middle" font-size="10" font-weight="700" fill="${cInk}">${fmt(vals[i])}</text>`;
+    xLabels += `<text x="${cx}" y="${plotH+18}" text-anchor="middle" font-size="10.5" fill="${cMute}">${mesLabelCurto(m)}</text>`;
+    hitAreas += `<rect data-i="${i}" x="${gx}" y="0" width="${groupW}" height="${plotH}" fill="transparent" style="cursor:pointer"/>`;
+  });
+  let linhaMedia = '';
+  if (!corUnica && vals.length > 1) {
+    const yMedia = yScale(media);
+    const mediaLabel = fmt(media), labelW = mediaLabel.length*6.5 + 8;
+    const cBg = cssVar('--card-bg','#FFFFFF');
+    linhaMedia = `<line x1="0" y1="${yMedia}" x2="${plotW}" y2="${yMedia}" stroke="${cMute}" stroke-width="1.3" stroke-dasharray="5 4"/><rect x="${-10-labelW}" y="${yMedia-8}" width="${labelW}" height="15" fill="${cBg}"/><text x="-8" y="${yMedia+4}" text-anchor="end" font-size="10" font-weight="700" fill="${cMute}">${mediaLabel}</text>`;
+  }
+  container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><g transform="translate(${M.left},${M.top})">${gridlines}${bars}${linhaMedia}${valLabels}${xLabels}${hitAreas}</g></svg><div class="tooltip" id="${container.id}-tt"></div>`;
+  const tt = document.getElementById(container.id+'-tt');
+  container.querySelectorAll('rect[data-i]').forEach(el=>{
+    el.addEventListener('mousemove', e=>{
+      const i=+el.getAttribute('data-i'); const rect=container.getBoundingClientRect();
+      const diff = vals[i]-media;
+      const vsMedia = !corUnica && vals.length>1 ? `<br>${diff>=0?'▲':'▼'} ${diff>=0?'+':'-'}${fmt(Math.abs(diff))} vs média` : '';
+      tt.innerHTML = `<div class="t-title">${mesLabelLongo(meses[i])}</div>${fmt(vals[i])}${vsMedia}`;
+      tt.style.left=(e.clientX-rect.left+14)+'px'; tt.style.top=(e.clientY-rect.top-10)+'px'; tt.classList.add('show');
+    });
+    el.addEventListener('mouseleave', ()=>tt.classList.remove('show'));
+  });
+}
+
+/* ============ Donut chart ============ */
+function buildDonut(wrapEl, legendEl, cats, totals, colors, grandTotal) {
+  const donutSize = 150, r = donutSize/2, strokeW = 24, innerR = r - strokeW/2;
+  let angleStart = -90, arcs = '', tips = [];
+  cats.forEach((cat,i) => {
+    const val = totals[i];
+    const frac = grandTotal>0 ? val/grandTotal : 0;
+    const angleSpan = frac*360, angleEnd = angleStart+angleSpan, largeArc = angleSpan>180?1:0;
+    const toXY = deg => { const rad=(deg*Math.PI)/180; return [r+innerR*Math.cos(rad), r+innerR*Math.sin(rad)]; };
+    const [x1,y1]=toXY(angleStart), [x2,y2]=toXY(angleEnd);
+    if (frac>0) arcs += `<path data-idx="${i}" d="M ${x1} ${y1} A ${innerR} ${innerR} 0 ${largeArc} 1 ${x2} ${y2}" fill="none" stroke="${colors[i]}" stroke-width="${strokeW}" style="cursor:pointer"/>`;
+    tips.push({cat,val,pct:frac*100});
+    angleStart = angleEnd;
+  });
+  wrapEl.innerHTML = `<svg width="${donutSize}" height="${donutSize}" viewBox="0 0 ${donutSize} ${donutSize}">${arcs}</svg>
+    <div class="donut-center"><span class="v">${brl(grandTotal)}</span><span class="l">Total</span></div>
+    <div class="tooltip" id="${wrapEl.id}-tt"></div>`;
+  const tt = document.getElementById(wrapEl.id+'-tt');
+  wrapEl.querySelectorAll('path[data-idx]').forEach(el=>{
+    el.addEventListener('mousemove', e=>{
+      const i=+el.getAttribute('data-idx'), d=tips[i]; const rect=wrapEl.getBoundingClientRect();
+      tt.innerHTML = `<div class="t-title">${d.cat}</div>${brl(d.val)} · ${d.pct.toFixed(1)}%`;
+      tt.style.left=(e.clientX-rect.left+14)+'px'; tt.style.top=(e.clientY-rect.top-10)+'px'; tt.classList.add('show');
+    });
+    el.addEventListener('mouseleave', ()=>tt.classList.remove('show'));
+  });
+  legendEl.innerHTML = cats.map((cat,i) => `<div class="mini-legend-item">
+    <span class="legend-swatch" style="background:${colors[i]}"></span>
+    <span class="lbl">${cat}${cat==='A revisar'?' *':''}</span>
+    <span class="pct">${tips[i].pct.toFixed(1)}%</span>
+    <span class="val">${brl(totals[i])}</span>
+  </div>`).join('');
+}
+
+function buildOutrasDetalhe(despesaCats, meses, arevisarTotal) {
+  const MAX_ITENS = 8;
+  const resto = despesaCats.slice(5).map(c => ({ cat: c, val: sumRange(DATA.despesas[c], meses) }));
+  if (arevisarTotal > 0) resto.push({ cat: 'A revisar', val: arevisarTotal });
+  if (!resto.length) return '';
+  resto.sort((a,b) => b.val - a.val);
+  const totalResto = resto.reduce((s,r) => s + r.val, 0);
+  const visiveis = resto.slice(0, MAX_ITENS);
+  const restantes = resto.slice(MAX_ITENS);
+  let html = '<div class="outras-detalhe"><div class="outras-detalhe-title">O que compõe "Outras"</div><div class="outras-detalhe-list">';
+  visiveis.forEach(r => {
+    const pct = totalResto > 0 ? (r.val/totalResto)*100 : 0;
+    html += `<div class="outras-detalhe-row"><span class="outras-detalhe-label">${r.cat}${r.cat==='A revisar'?' *':''}</span><span class="outras-detalhe-pct">${pct.toFixed(1)}%</span><span class="outras-detalhe-value">${brl(r.val)}</span></div>`;
+  });
+  if (restantes.length) {
+    const valRestantes = restantes.reduce((s,r) => s + r.val, 0);
+    const pctRestantes = totalResto > 0 ? (valRestantes/totalResto)*100 : 0;
+    html += `<div class="outras-detalhe-row outras-detalhe-mais"><span class="outras-detalhe-label">+ ${restantes.length} categoria${restantes.length>1?'s':''} menor${restantes.length>1?'es':''}</span><span class="outras-detalhe-pct">${pctRestantes.toFixed(1)}%</span><span class="outras-detalhe-value">${brl(valRestantes)}</span></div>`;
+  }
+  html += '</div></div>';
+  return html;
+}
+
+/* ============ Category × month table ============ */
+function buildCatTable(tableEl, cats, matrix, meses, colorClass) {
+  let thead = '<thead><tr><th class="cat-col">Categoria</th>' + meses.map(m=>`<th>${mesLabelCurto(m)}</th>`).join('') + '<th>Total</th></tr></thead>';
+  let tbody = '<tbody>';
+  cats.forEach(cat => {
+    const pending = cat === 'A revisar';
+    let total = 0;
+    let row = `<tr class="cat-row${pending?' pending':''}"><td class="cat-col">${cat}${pending?' *':''}</td>`;
+    meses.forEach(m => { const v = matrix[cat][m]||0; total += v; row += `<td class="${v===0?'zero':''}">${v===0?'—':brl(v)}</td>`; });
+    row += `<td><b>${brl(total)}</b></td></tr>`;
+    tbody += row;
+  });
+  let totalsRow = `<tr class="subtotal"><td class="cat-col">Total</td>`;
+  let grand = 0;
+  meses.forEach(m => { const v = cats.reduce((s,c)=>s+(matrix[c][m]||0),0); grand += v; totalsRow += `<td>${brl(v)}</td>`; });
+  totalsRow += `<td>${brl(grand)}</td></tr>`;
+  tbody += totalsRow + '</tbody>';
+  tableEl.innerHTML = thead + tbody;
+}
+
+/* ============ VISÃO GERAL ============ */
+function buildInsightGeral(meses, receitaVals, despesaVals, saldoAcumulado) {
+  if (meses.length < 4) return '';
+  const metade = Math.floor(meses.length/2);
+  const tendencia = vals => {
+    const p1 = vals.slice(0, metade).reduce((a,b)=>a+b, 0) / (metade||1);
+    const p2 = vals.slice(vals.length-metade).reduce((a,b)=>a+b, 0) / (metade||1);
+    return p1 > 0 ? ((p2-p1)/p1)*100 : 0;
+  };
+  const tendRec = tendencia(receitaVals);
+  const tendDes = tendencia(despesaVals);
+  const recDown = tendRec < -3, recUp = tendRec > 3;
+  const desUp = tendDes > 3;
+
+  let tier = null, texto = '';
+  if (recDown && desUp) {
+    tier = 'critical';
+    texto = `Nos últimos meses a arrecadação caiu <b>${Math.abs(tendRec).toFixed(1)}%</b> enquanto as despesas subiram <b>${tendDes.toFixed(1)}%</b> — as duas pontas andando na direção errada ao mesmo tempo, o jeito mais rápido de consumir o saldo acumulado (hoje ${brl(saldoAcumulado)}).`;
+  } else if (recDown) {
+    tier = 'warn';
+    texto = `A arrecadação está em queda: <b>${Math.abs(tendRec).toFixed(1)}%</b> menor na 2ª metade do período em relação à 1ª. Vale entender o motivo antes que aperte o caixa.`;
+  } else if (desUp && !recUp) {
+    tier = 'warn';
+    texto = `As despesas cresceram <b>${tendDes.toFixed(1)}%</b> na 2ª metade do período sem um crescimento parecido na arrecadação (${tendRec>=0?'+':''}${tendRec.toFixed(1)}%). Vale entender o que puxou o aumento.`;
+  } else if (recUp && !desUp) {
+    tier = 'good';
+    texto = `Boa notícia: a arrecadação cresceu <b>${tendRec.toFixed(1)}%</b> na 2ª metade do período com as despesas sob controle (${tendDes>=0?'+':''}${tendDes.toFixed(1)}%) — o saldo acumulado (${brl(saldoAcumulado)}) está numa trajetória saudável.`;
+  } else {
+    return '';
+  }
+  const icon = tier === 'good' ? ICON_CHECK : ICON_ALERT;
+  return `<div class="alerta-card ${tier}">${icon}<span>${texto}</span></div>`;
+}
+function renderVisaoGeral() {
+  const meses = mesesInRange();
+  const receitaVals = meses.map(m => DATA.totalReceitas[m]||0);
+  const despesaVals = meses.map(m => DATA.totalDespesas[m]||0);
+  const totalReceitas = receitaVals.reduce((a,b)=>a+b,0);
+  const totalDespesas = despesaVals.reduce((a,b)=>a+b,0);
+  const saldoPeriodo = totalReceitas - totalDespesas;
+
+  const [ , ateIdx] = currentRangeIdx();
+  const acumMeses = allMeses.slice(0, ateIdx+1);
+  const saldoAcumulado = (DATA.saldoInicial||0) + acumMeses.reduce((s,m)=>s+(DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0), 0);
+
+  const prevMeses = previousRangeMeses();
+  const hasPrev = !!prevMeses;
+  const prevReceitas = hasPrev ? sumRange(DATA.totalReceitas, prevMeses) : 0;
+  const prevDespesas = hasPrev ? sumRange(DATA.totalDespesas, prevMeses) : 0;
+  const prevSaldo = prevReceitas - prevDespesas;
+
+  const saldoVals = meses.map((m,i) => receitaVals[i] - despesaVals[i]);
+  const melhorIdx = saldoVals.length ? saldoVals.indexOf(Math.max(...saldoVals)) : -1;
+  const piorIdx = saldoVals.length ? saldoVals.indexOf(Math.min(...saldoVals)) : -1;
+
+  document.getElementById('vg-insight').innerHTML = buildInsightGeral(meses, receitaVals, despesaVals, saldoAcumulado);
+
+  document.getElementById('vg-kpis').innerHTML =
+    kpiCard('Receitas Totais', brl(totalReceitas), ICON_UP, 'good', deltaHtml(totalReceitas, prevReceitas, hasPrev)) +
+    kpiCard('Despesas Totais', brl(totalDespesas), ICON_DOWN, 'critical', deltaHtml(totalDespesas, prevDespesas, hasPrev)) +
+    kpiCard('Saldo do Período', brlSigned(saldoPeriodo), ICON_WALLET, 'info', deltaHtml(saldoPeriodo, prevSaldo, hasPrev)) +
+    kpiCard('Saldo Acumulado', brlSigned(saldoAcumulado), ICON_BANK, 'accent', `<span class="kpi-delta flat">até ${mesLabelCurto(allMeses[ateIdx])}</span>`) +
+    kpiCard('Melhor Mês', melhorIdx>=0?brlSigned(saldoVals[melhorIdx]):'—', ICON_UP, 'good', `<span class="kpi-delta flat">${melhorIdx>=0?mesLabelLongo(meses[melhorIdx]):''}</span>`) +
+    kpiCard('Pior Mês', piorIdx>=0?brlSigned(saldoVals[piorIdx]):'—', ICON_DOWN, 'critical', `<span class="kpi-delta flat">${piorIdx>=0?mesLabelLongo(meses[piorIdx]):''}</span>`);
+
+  buildComboChart(document.getElementById('vg-combo'), meses, receitaVals, despesaVals);
+
+  // Donut despesas: top 5 + "Outras"
+  const despesaCats = sortedCats(DATA.despesas, meses).filter(c => c !== 'A revisar');
+  const arevisarTotal = sumRange(DATA.despesas['A revisar']||{}, meses);
+  const totals = despesaCats.map(c => sumRange(DATA.despesas[c], meses));
+  const dark = isDarkMode();
+  let top = despesaCats.map((c,i)=>({cat:c,val:totals[i]})).slice(0,5);
+  let outrosVal = despesaCats.slice(5).reduce((s,c)=>s+sumRange(DATA.despesas[c],meses),0) + arevisarTotal;
+  let labels = top.map(t=>t.cat), vals = top.map(t=>t.val), colors = labels.map((_,i)=>categoryColor(i,dark));
+  if (outrosVal > 0) { labels.push('Outras'); vals.push(outrosVal); colors.push(cssVar('--ink-mute','#8A90A6')); }
+  buildDonut(document.getElementById('vg-donut'), document.getElementById('vg-donut-legend'), labels, vals, colors, vals.reduce((a,b)=>a+b,0));
+  document.getElementById('vg-outras-detalhe').innerHTML = outrosVal > 0 ? buildOutrasDetalhe(despesaCats, meses, arevisarTotal) : '';
+
+  buildSaldoTable(document.getElementById('vg-saldo-table'), meses);
+
+  const movs = DATA.transacoes.filter(t => meses.includes(t.mesAno)).sort((a,b)=>parseDataBR(b.data)-parseDataBR(a.data)).slice(0,8);
+  document.getElementById('vg-mov-table').innerHTML = movTableHtml(movs);
+}
+
+function buildSaldoTable(tableEl, meses) {
+  let thead = '<thead><tr><th class="left">Mês</th><th>Saldo Anterior</th><th>Receitas</th><th>Despesas</th><th>Saldo Final</th><th>Resultado do Mês</th></tr></thead>';
+  let tbody = '<tbody>';
+  const startIdx = allMeses.indexOf(meses[0]);
+  let saldoAnterior = startIdx >= 0
+    ? (DATA.saldoInicial||0) + allMeses.slice(0, startIdx).reduce((s,m)=>s+(DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0), 0)
+    : (DATA.saldoInicial||0);
+  meses.forEach(m => {
+    const rec = DATA.totalReceitas[m]||0, des = DATA.totalDespesas[m]||0;
+    const saldoMes = rec - des;
+    const saldoFinal = saldoAnterior + saldoMes;
+    const pillClass = saldoMes < 0 ? 'critical' : 'good';
+    tbody += `<tr><td class="left">${mesLabelCurto(m)}</td><td>${brlSigned(saldoAnterior)}</td><td>${brl(rec)}</td><td>${brl(des)}</td><td><b>${brlSigned(saldoFinal)}</b></td><td><span class="pill ${pillClass}">${brlSigned(saldoMes)}</span></td></tr>`;
+    saldoAnterior = saldoFinal;
+  });
+  tbody += '</tbody>';
+  tableEl.innerHTML = thead + tbody;
+}
+
+function parseDataBR(d) { if (!d || typeof d !== 'string') return 0; const [dd,mm,yy] = d.split('/'); if (!dd || !mm || !yy) return 0; return new Date(+yy,+mm-1,+dd).getTime(); }
+function movTableHtml(list) {
+  let thead = '<thead><tr><th class="left">Data</th><th class="left">Descrição</th><th class="left">Categoria</th><th>Tipo</th><th>Valor</th></tr></thead>';
+  let tbody = '<tbody>' + list.map(t => {
+    const isReceita = t.entrada > 0;
+    return `<tr><td class="left">${t.data}</td><td class="left">${t.descricao}</td><td class="left">${t.categoria}</td>
+      <td><span class="pill ${isReceita?'good':'critical'}">${isReceita?'Receita':'Despesa'}</span></td>
+      <td class="${isReceita?'':''}">${isReceita?brl(t.entrada):'-'+brl(t.saida)}</td></tr>`;
+  }).join('') + '</tbody>';
+  if (list.length === 0) tbody = '<tbody><tr><td colspan="5" style="text-align:center;color:var(--ink-mute);padding:24px">Nenhuma movimentação no período.</td></tr></tbody>';
+  return thead + tbody;
+}
+
+/* ============ RECEITAS ============ */
+function buildAlertaReceitas(meses, cats, totals, total) {
+  if (meses.length < 2 || total <= 0 || !cats.length) return '';
+  const catsFiltradas = cats.filter(c => c !== 'A revisar');
+  if (!catsFiltradas.length) return '';
+  const topCat = catsFiltradas[0];
+  const topVal = totals[cats.indexOf(topCat)];
+  const topPct = (topVal/total)*100;
+
+  const metade = Math.floor(meses.length/2);
+  const vals = meses.map(m => DATA.totalReceitas[m]||0);
+  const p1 = vals.slice(0, metade).reduce((a,b)=>a+b, 0) / (metade||1);
+  const p2 = vals.slice(vals.length-metade).reduce((a,b)=>a+b, 0) / (metade||1);
+  const tendenciaPct = p1 > 0 ? ((p2-p1)/p1)*100 : 0;
+  const caindo = tendenciaPct < -5;
+
+  if (topPct < 80 && !caindo) return '';
+
+  let tier, texto;
+  if (topPct >= 85 && caindo) {
+    tier = 'critical';
+    texto = `<b>${topPct.toFixed(1)}%</b> de tudo que entra vem só de <b>${topCat}</b>, e essa arrecadação está em queda (${tendenciaPct.toFixed(1)}% da 1ª pra 2ª metade do período) — alta dependência de uma única fonte, justo quando ela está recuando. Vale reforçar outras formas de entrada.`;
+  } else if (topPct >= 85) {
+    tier = 'warn';
+    texto = `<b>${topPct.toFixed(1)}%</b> da arrecadação vem só de <b>${topCat}</b> — pouca diversificação. Se essa fonte cair num mês, o caixa sente na hora. Vale estimular outras formas de contribuição.`;
+  } else if (caindo) {
+    tier = 'warn';
+    texto = `A arrecadação está em queda: média <b>${Math.abs(tendenciaPct).toFixed(1)}%</b> menor na 2ª metade do período frente à 1ª. Vale entender o motivo antes que vire tendência.`;
+  } else {
+    return '';
+  }
+  return `<div class="alerta-card ${tier}">${ICON_ALERT}<span>${texto}</span></div>`;
+}
+function renderReceitas() {
+  const meses = mesesInRange();
+  const vals = meses.map(m => DATA.totalReceitas[m]||0);
+  const total = vals.reduce((a,b)=>a+b,0);
+  const prevMeses = previousRangeMeses(); const hasPrev = !!prevMeses;
+  const prevTotal = hasPrev ? sumRange(DATA.totalReceitas, prevMeses) : 0;
+  const media = vals.length ? total/vals.length : 0;
+  const maiorIdx = vals.indexOf(Math.max(...vals));
+
+  document.getElementById('rc-kpis').innerHTML =
+    kpiCard('Total de Receitas', brl(total), ICON_UP, 'good', deltaHtml(total, prevTotal, hasPrev)) +
+    kpiCard('Média Mensal', brl(media), ICON_WALLET, 'info', `<span class="kpi-delta flat">${meses.length} meses</span>`) +
+    kpiCard('Melhor Mês', vals.length?brl(vals[maiorIdx]):'—', ICON_BANK, 'accent', `<span class="kpi-delta flat">${vals.length?mesLabelLongo(meses[maiorIdx]):''}</span>`) +
+    kpiCard('Dízimos no Período', brl(sumRange(DATA.receitas['Dízimo']||{}, meses)), ICON_UP, 'good', `<span class="kpi-delta flat">${total>0?((sumRange(DATA.receitas['Dízimo']||{},meses)/total)*100).toFixed(1):'0'}% do total</span>`);
+
+  buildTrendChart(document.getElementById('rc-trend'), meses, vals, cssVar('--good','#1E8E5A'), cssVar('--critical','#C0453B'));
+
+  const cats = sortedCats(DATA.receitas, meses);
+  const totals = cats.map(c => sumRange(DATA.receitas[c], meses));
+  document.getElementById('rc-alerta').innerHTML = buildAlertaReceitas(meses, cats, totals, total);
+  const dark = isDarkMode();
+  const colors = cats.map((c,i) => c==='A revisar' ? cssVar('--ink-mute','#8A90A6') : categoryColor(i,dark));
+  buildDonut(document.getElementById('rc-donut'), document.getElementById('rc-donut-legend'), cats, totals, colors, totals.reduce((a,b)=>a+b,0));
+
+  buildCatTable(document.getElementById('rc-table'), cats, DATA.receitas, meses);
+}
+
+/* ============ DESPESAS ============ */
+function buildAlertaDespesas(meses) {
+  if (meses.length < 2) return '';
+  const resultados = meses.map(m => (DATA.totalReceitas[m]||0) - (DATA.totalDespesas[m]||0));
+  const mesesDeficit = resultados.filter(r => r < 0).length;
+  if (mesesDeficit === 0) return '';
+  const mediaResultado = resultados.reduce((a,b)=>a+b, 0) / resultados.length;
+  const endIdxGlobal = allMeses.indexOf(meses[meses.length-1]);
+  const saldoAcumulado = (DATA.saldoInicial||0) + allMeses.slice(0, endIdxGlobal+1).reduce((s,m)=>s+(DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0), 0);
+  let tier = 'info';
+  let texto = `<b>${mesesDeficit} de ${meses.length} meses</b> do período fecharam com despesas maiores que as receitas, mas na média o período fica positivo (${brlSigned(mediaResultado)}/mês) — vale de olho, mas sem urgência.`;
+  if (mediaResultado < 0) {
+    if (saldoAcumulado > 0) {
+      const runway = Math.floor(saldoAcumulado / Math.abs(mediaResultado));
+      tier = 'warn';
+      texto = `<b>${mesesDeficit} de ${meses.length} meses</b> do período fecharam no negativo, e na média as despesas superam as receitas em <b>${brl(Math.abs(mediaResultado))}/mês</b>. É o saldo acumulado (hoje <b>${brl(saldoAcumulado)}</b>) que está cobrindo essa diferença — no ritmo atual, ele se esgotaria em cerca de <b>${runway} ${runway===1?'mês':'meses'}</b> se nada mudar. Pode ser hora de rever despesas ou reforçar a arrecadação.`;
+    } else {
+      tier = 'critical';
+      texto = `<b>${mesesDeficit} de ${meses.length} meses</b> do período fecharam no negativo e o saldo acumulado já não é suficiente para cobrir a diferença (${brlSigned(saldoAcumulado)} hoje). Recomenda-se ação imediata sobre despesas e/ou arrecadação.`;
+    }
+  }
+  return `<div class="alerta-card ${tier}">${ICON_ALERT}<span>${texto}</span></div>`;
+}
+const CUSTOS_ESSENCIAIS_FIXOS = [
+  { cat: 'Folha Pastoral', valor: 3026.11 },
+  { cat: 'Aplicação Cooperativa', valor: 55 },
+  { cat: 'Tarifa Bancária', valor: 42 },
+  { cat: 'Água', valor: 310 },
+  { cat: 'Energia', valor: 155 },
+  { cat: 'Monitoramento/Segurança', valor: 133 },
+  { cat: 'Repasse Associação', valor: 700 },
+  { cat: 'Oferta Missões', valor: 150 },
+];
+function buildCustoEssencial() {
+  const totalFixo = CUSTOS_ESSENCIAIS_FIXOS.reduce((s,l) => s + l.valor, 0);
+  let html = '<div class="essencial-box">';
+  html += '<div class="essencial-title">Custo Essencial Mensal (fixo aproximado)</div>';
+  html += '<div class="essencial-list">';
+  CUSTOS_ESSENCIAIS_FIXOS.forEach(l => {
+    html += `<div class="essencial-row"><span class="essencial-label">${l.cat}</span><span class="essencial-value">${brl(l.valor)}</span></div>`;
+  });
+  html += `<div class="essencial-row essencial-total"><span class="essencial-label">Total essencial/mês</span><span class="essencial-value">${brl(totalFixo)}</span></div>`;
+  html += '</div>';
+  html += `<div class="essencial-note">Valores fixos aproximados (definidos manualmente) — é o "chão" mínimo que a arrecadação do mês precisa cobrir pra manter a igreja funcionando.</div>`;
+  html += '</div>';
+  return html;
+}
+function buildTrendStatsDespesas(meses, vals) {
+  if (vals.length < 3) return '';
+  let maiorAltaIdx = -1, maiorAltaPct = -Infinity;
+  let maiorQuedaIdx = -1, maiorQuedaPct = Infinity;
+  for (let i = 1; i < vals.length; i++) {
+    if (!vals[i-1]) continue;
+    const pct = ((vals[i] - vals[i-1]) / vals[i-1]) * 100;
+    if (pct > maiorAltaPct) { maiorAltaPct = pct; maiorAltaIdx = i; }
+    if (pct < maiorQuedaPct) { maiorQuedaPct = pct; maiorQuedaIdx = i; }
+  }
+  const metade = Math.floor(vals.length / 2);
+  const primeira = vals.slice(0, metade);
+  const segunda = vals.slice(vals.length - metade);
+  const mediaPrimeira = primeira.reduce((a,b)=>a+b, 0) / (primeira.length || 1);
+  const mediaSegunda = segunda.reduce((a,b)=>a+b, 0) / (segunda.length || 1);
+  const tendenciaPct = mediaPrimeira > 0 ? ((mediaSegunda - mediaPrimeira) / mediaPrimeira) * 100 : 0;
+  const tendenciaUp = tendenciaPct > 1, tendenciaDown = tendenciaPct < -1;
+  const tendenciaClasse = tendenciaUp ? 'critical' : tendenciaDown ? 'good' : '';
+  const tendenciaSeta = tendenciaUp ? '▲' : tendenciaDown ? '▼' : '→';
+
+  let html = '<div class="trend-stats">';
+  html += `<div class="trend-stat"><span class="trend-stat-label">Tendência</span><span class="trend-stat-value ${tendenciaClasse}">${tendenciaSeta} ${Math.abs(tendenciaPct).toFixed(1)}%</span><span class="trend-stat-note">${tendenciaUp?'aumento':tendenciaDown?'queda':'estável'} da 1ª pra 2ª metade do período</span></div>`;
+  if (maiorAltaIdx >= 0 && isFinite(maiorAltaPct)) {
+    html += `<div class="trend-stat"><span class="trend-stat-label">Maior alta mês a mês</span><span class="trend-stat-value critical">▲ ${maiorAltaPct.toFixed(1)}%</span><span class="trend-stat-note">${mesLabelLongo(meses[maiorAltaIdx])}</span></div>`;
+  }
+  if (maiorQuedaIdx >= 0 && isFinite(maiorQuedaPct)) {
+    html += `<div class="trend-stat"><span class="trend-stat-label">Maior queda mês a mês</span><span class="trend-stat-value good">▼ ${Math.abs(maiorQuedaPct).toFixed(1)}%</span><span class="trend-stat-note">${mesLabelLongo(meses[maiorQuedaIdx])}</span></div>`;
+  }
+  html += '</div>';
+  return html;
+}
+function hbarColor(pctTotal) {
+  if (pctTotal >= 20) return cssVar('--critical','#C0453B');
+  if (pctTotal >= 10) return cssVar('--accent','#B9852A');
+  if (pctTotal >= 5) return cssVar('--info','#2F6FE0');
+  return cssVar('--good','#1E8E5A');
+}
+function hbarLegendHtml() {
+  return `<div class="hbar-legend">
+    <span><span class="hbar-legend-dot" style="background:${cssVar('--critical','#C0453B')}"></span>≥ 20% do total</span>
+    <span><span class="hbar-legend-dot" style="background:${cssVar('--accent','#B9852A')}"></span>10–20%</span>
+    <span><span class="hbar-legend-dot" style="background:${cssVar('--info','#2F6FE0')}"></span>5–10%</span>
+    <span><span class="hbar-legend-dot" style="background:${cssVar('--good','#1E8E5A')}"></span>&lt; 5%</span>
+  </div>`;
+}
+function renderDespesas() {
+  const meses = mesesInRange();
+  const vals = meses.map(m => DATA.totalDespesas[m]||0);
+  const total = vals.reduce((a,b)=>a+b,0);
+  const prevMeses = previousRangeMeses(); const hasPrev = !!prevMeses;
+  const prevTotal = hasPrev ? sumRange(DATA.totalDespesas, prevMeses) : 0;
+  const media = vals.length ? total/vals.length : 0;
+  const maiorIdx = vals.indexOf(Math.max(...vals));
+
+  document.getElementById('ds-alerta').innerHTML = buildAlertaDespesas(meses);
+
+  document.getElementById('ds-kpis').innerHTML =
+    kpiCard('Total de Despesas', brl(total), ICON_DOWN, 'critical', deltaHtml(total, prevTotal, hasPrev)) +
+    kpiCard('Média Mensal', brl(media), ICON_WALLET, 'info', `<span class="kpi-delta flat">${meses.length} meses</span>`) +
+    kpiCard('Maior Mês', vals.length?brl(vals[maiorIdx]):'—', ICON_BANK, 'accent', `<span class="kpi-delta flat">${vals.length?mesLabelLongo(meses[maiorIdx]):''}</span>`) +
+    kpiCard('Folha Pastoral no Período', brl(sumRange(DATA.despesas['Folha Pastoral']||{}, meses)), ICON_DOWN, 'critical', `<span class="kpi-delta flat">${total>0?((sumRange(DATA.despesas['Folha Pastoral']||{},meses)/total)*100).toFixed(1):'0'}% do total</span>`);
+
+  buildTrendChart(document.getElementById('ds-trend'), meses, vals, cssVar('--critical','#C0453B'), cssVar('--good','#1E8E5A'));
+  document.getElementById('ds-trend-stats').innerHTML = buildTrendStatsDespesas(meses, vals);
+  document.getElementById('ds-essencial').innerHTML = buildCustoEssencial();
+
+  const cats = sortedCats(DATA.despesas, meses);
+  const totals = cats.map(c => sumRange(DATA.despesas[c], meses));
+  const maxV = Math.max(...totals, 1);
+  document.getElementById('ds-hbars').innerHTML = cats.map((cat,i) => {
+    const pending = cat === 'A revisar';
+    const widthPct = Math.max(1.5, (totals[i]/maxV)*100);
+    const pctTotal = total > 0 ? (totals[i]/total)*100 : 0;
+    const barColor = pending ? cssVar('--ink-mute','#8A90A6') : hbarColor(pctTotal);
+    return `<div class="hbar-row${pending?' pending':''}">
+      <span class="hbar-label" title="${cat}">${cat}${pending?' *':''}</span>
+      <span class="hbar-track"><span class="hbar-fill" style="width:${widthPct}%;background:${barColor}"></span></span>
+      <span class="hbar-value" title="${pctTotal.toFixed(1)}% do total">${brl(totals[i])}</span>
+    </div>`;
+  }).join('') + hbarLegendHtml();
+
+  buildCatTable(document.getElementById('ds-table'), cats, DATA.despesas, meses);
+}
+
+/* ============ MOVIMENTAÇÕES ============ */
+let movPage = 0;
+const MOV_PAGE_SIZE = 40;
+
+function allCategoriasUnicas() {
+  const set = new Set();
+  DATA.transacoes.forEach(t => set.add(t.categoria));
+  return Array.from(set).sort();
+}
+let movCatOptionsBuilt = false;
+function ensureMovFilters() {
+  if (movCatOptionsBuilt) return;
+  const sel = document.getElementById('mov-categoria');
+  allCategoriasUnicas().forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o); });
+  movCatOptionsBuilt = true;
+}
+
+function renderMovimentacoes() {
+  ensureMovFilters();
+  const meses = mesesInRange();
+  const search = document.getElementById('mov-search').value.trim().toLowerCase();
+  const catFilter = document.getElementById('mov-categoria').value;
+  const contaFilter = document.getElementById('mov-conta').value;
+  const tipoFilter = document.getElementById('mov-tipo').value;
+
+  let list = DATA.transacoes.filter(t => meses.includes(t.mesAno));
+  if (search) list = list.filter(t => (t.descricao||'').toLowerCase().includes(search));
+  if (catFilter) list = list.filter(t => t.categoria === catFilter);
+  if (contaFilter) list = list.filter(t => t.conta === contaFilter);
+  if (tipoFilter === 'receita') list = list.filter(t => t.entrada > 0);
+  if (tipoFilter === 'despesa') list = list.filter(t => t.saida > 0);
+  list = list.slice().sort((a,b) => parseDataBR(b.data) - parseDataBR(a.data));
+
+  const totalPages = Math.max(1, Math.ceil(list.length / MOV_PAGE_SIZE));
+  if (movPage >= totalPages) movPage = totalPages - 1;
+  if (movPage < 0) movPage = 0;
+  const pageItems = list.slice(movPage*MOV_PAGE_SIZE, movPage*MOV_PAGE_SIZE + MOV_PAGE_SIZE);
+
+  document.getElementById('mov-table').innerHTML = movTableHtml(pageItems);
+  document.getElementById('mov-count').textContent = list.length + ' lançamento' + (list.length===1?'':'s');
+  document.getElementById('mov-page-info').textContent = `Página ${movPage+1} de ${totalPages}`;
+  document.getElementById('mov-prev').disabled = movPage === 0;
+  document.getElementById('mov-next').disabled = movPage >= totalPages - 1;
+}
+['mov-search','mov-categoria','mov-conta','mov-tipo'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => { movPage = 0; renderMovimentacoes(); });
+});
+document.getElementById('mov-prev').addEventListener('click', () => { movPage--; renderMovimentacoes(); });
+document.getElementById('mov-next').addEventListener('click', () => { movPage++; renderMovimentacoes(); });
+
+/* ============ COMPARATIVO ============ */
+let compTipo = 'receitas';
+document.querySelectorAll('#comp-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    compTipo = btn.dataset.tipo;
+    document.querySelectorAll('#comp-toggle button').forEach(b => b.classList.toggle('active', b === btn));
+    renderComparativo();
+  });
+});
+
+function renderComparativo() {
+  const totals = compTipo === 'receitas' ? DATA.totalReceitas : DATA.totalDespesas;
+  const meses = mesesInRange();
+  const years = Array.from(new Set(meses.map(m => m.split('/')[1]))).sort();
+  const dark = isDarkMode();
+  const yearColors = years.map((y,i) => i === years.length-1 ? cssVar('--accent','#B9852A') : categoryColor(i, dark));
+
+  const W = 900, H = 280;
+  const M = { top: 14, right: 16, bottom: 26, left: 62 };
+  const plotW = W-M.left-M.right, plotH = H-M.top-M.bottom;
+  const groupW = plotW/12;
+  const barW = Math.min(14, (groupW*0.7)/Math.max(years.length,1));
+
+  let maxVal = 1;
+  const matrix = {};
+  years.forEach(y => { matrix[y] = new Array(12).fill(0); });
+  meses.forEach(m => { const [mm,yy] = m.split('/'); matrix[yy][parseInt(mm,10)-1] = totals[m]||0; });
+  years.forEach(y => matrix[y].forEach(v => { if (v>maxVal) maxVal = v; }));
+  const yMax = maxVal*1.1;
+  const yScale = v => plotH - (v/yMax)*plotH;
+
+  const cLine = cssVar('--line','#E7E9F1'), cMute = cssVar('--ink-mute','#8A90A6');
+  let gridlines='', steps=4;
+  for (let i=0;i<=steps;i++){ const v=yMax*(i/steps); const y=yScale(v);
+    gridlines += `<line x1="0" y1="${y}" x2="${plotW}" y2="${y}" stroke="${cLine}" stroke-width="1"/><text x="-8" y="${y+4}" text-anchor="end" font-size="10" fill="${cMute}">${brl(v)}</text>`; }
+
+  let bars='', xLabels='';
+  for (let mi=0; mi<12; mi++) {
+    const gx = mi*groupW, groupStart = gx + groupW/2 - (years.length*barW)/2;
+    years.forEach((y,yi) => {
+      const v = matrix[y][mi], yy = yScale(v), h = plotH-yy;
+      if (v>0) bars += `<rect data-mi="${mi}" data-yi="${yi}" x="${groupStart+yi*barW}" y="${yy}" width="${barW-2}" height="${Math.max(h,0.5)}" rx="2" fill="${yearColors[yi]}"/>`;
+    });
+    xLabels += `<text x="${gx+groupW/2}" y="${plotH+18}" text-anchor="middle" font-size="10.5" fill="${cMute}">${MESES_PT[mi]}</text>`;
+  }
+
+  document.getElementById('comp-chart').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><g transform="translate(${M.left},${M.top})">${gridlines}${bars}${xLabels}</g></svg>`;
+  document.getElementById('comp-legend').innerHTML = years.map((y,i) => `<span class="legend-item"><span class="legend-swatch" style="background:${yearColors[i]}"></span>${y}</span>`).join('');
+
+  renderDizimistas(meses);
+}
+
+function renderDizimistas(meses) {
+  const counts = meses.map(m => DATA.transacoes.filter(t => t.mesAno === m && t.categoria === 'Dízimo' && (t.entrada||0) > 0).length);
+  const media = counts.length ? counts.reduce((a,b)=>a+b, 0) / counts.length : 0;
+  const fmtInt = v => Math.round(v).toString();
+  buildTrendChart(document.getElementById('comp-dizimistas-chart'), meses, counts, cssVar('--good','#1E8E5A'), cssVar('--critical','#C0453B'), fmtInt);
+
+  let html = '<div class="essencial-box"><div class="essencial-list">';
+  html += `<div class="essencial-row essencial-total"><span class="essencial-label">Média mensal de dizimistas</span><span class="essencial-value">${media.toFixed(1)} ${Math.round(media)===1?'lançamento/mês':'lançamentos/mês'}</span></div>`;
+  html += '</div>';
+  html += '<div class="essencial-note">Contagem baseada no número de lançamentos de Dízimo por mês (não em pessoas cadastradas) — se alguém dizimar mais de uma vez no mesmo mês, cada lançamento conta separadamente.</div>';
+  html += '</div>';
+  document.getElementById('comp-dizimistas-stats').innerHTML = html;
+}
+
+/* ============ APLICAÇÕES ============ */
+const APLICACOES_CATS = ['Aplicação Fundo Pastoral', 'Aplicação Cooperativa'];
+function renderAplicacoes() {
+  const meses = mesesInRange();
+  const [ , ateIdx] = currentRangeIdx();
+  const acumMeses = allMeses.slice(0, ateIdx+1);
+
+  const saldoFundo = sumRange(DATA.despesas['Aplicação Fundo Pastoral']||{}, acumMeses);
+  const saldoCoop = sumRange(DATA.despesas['Aplicação Cooperativa']||{}, acumMeses);
+  const saldoTotal = saldoFundo + saldoCoop;
+
+  const valsFundo = meses.map(m => (DATA.despesas['Aplicação Fundo Pastoral']||{})[m] || 0);
+  const valsCoop = meses.map(m => (DATA.despesas['Aplicação Cooperativa']||{})[m] || 0);
+  const valsTotal = meses.map((m,i) => valsFundo[i] + valsCoop[i]);
+  const aporteNoPeriodo = valsTotal.reduce((a,b)=>a+b, 0);
+
+  document.getElementById('aplic-kpis').innerHTML =
+    kpiCard('Saldo — Fundo Pastoral', brl(saldoFundo), ICON_BANK, 'accent', `<span class="kpi-delta flat">até ${mesLabelCurto(allMeses[ateIdx])}</span>`) +
+    kpiCard('Saldo — Aplicação Cooperativa', brl(saldoCoop), ICON_BANK, 'info', `<span class="kpi-delta flat">até ${mesLabelCurto(allMeses[ateIdx])}</span>`) +
+    kpiCard('Total em Aplicações', brl(saldoTotal), ICON_WALLET, 'good', `<span class="kpi-delta flat">até ${mesLabelCurto(allMeses[ateIdx])}</span>`) +
+    kpiCard('Aportes no Período', brl(aporteNoPeriodo), ICON_UP, 'good', `<span class="kpi-delta flat">${meses.length} meses</span>`);
+
+  buildTrendChart(document.getElementById('aplic-chart'), meses, valsTotal, cssVar('--accent','#B9852A'), cssVar('--info','#2F6FE0'));
+
+  let thead = '<thead><tr><th class="left">Mês</th><th>Fundo Pastoral</th><th>Aplicação Cooperativa</th><th>Total do Mês</th></tr></thead>';
+  let tbody = '<tbody>';
+  meses.forEach((m,i) => {
+    tbody += `<tr><td class="left">${mesLabelCurto(m)}</td><td>${brl(valsFundo[i])}</td><td>${brl(valsCoop[i])}</td><td><b>${brl(valsTotal[i])}</b></td></tr>`;
+  });
+  const totFundoPeriodo = valsFundo.reduce((a,b)=>a+b, 0), totCoopPeriodo = valsCoop.reduce((a,b)=>a+b, 0);
+  tbody += `<tr class="subtotal"><td class="left">Total do período</td><td>${brl(totFundoPeriodo)}</td><td>${brl(totCoopPeriodo)}</td><td><b>${brl(aporteNoPeriodo)}</b></td></tr>`;
+  tbody += '</tbody>';
+  document.getElementById('aplic-table').innerHTML = thead + tbody;
+}
+
+/* ============ DRE ============ */
+let dreExportData = null;
+
+function dreBlocoHtml(receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, saldoAnterior, resultado, saldoFinal, compact) {
+  let rows = '<tr class="dre-section-title"><td colspan="2">Receitas</td></tr>';
+  receitaCats.forEach((c,i) => { if (receitaTotais[i]>0) rows += `<tr><td class="dre-cat-label">${c}</td><td class="dre-value">${brl(receitaTotais[i])}</td></tr>`; });
+  rows += `<tr class="dre-subtotal"><td>Total de Receitas</td><td class="dre-value">${brl(totalReceitas)}</td></tr>`;
+
+  rows += '<tr class="dre-section-title"><td colspan="2">Despesas</td></tr>';
+  despesaCats.forEach((c,i) => { if (despesaTotais[i]>0) rows += `<tr><td class="dre-cat-label">${c}${c==='A revisar'?' *':''}</td><td class="dre-value">${brl(despesaTotais[i])}</td></tr>`; });
+  rows += `<tr class="dre-subtotal"><td>Total de Despesas</td><td class="dre-value">${brl(totalDespesas)}</td></tr>`;
+
+  rows += `<tr class="dre-result ${resultado>=0?'positive':'negative'}"><td>Resultado do Período</td><td class="dre-value">${brlSigned(resultado)}</td></tr>`;
+
+  rows += '<tr class="dre-section-title"><td colspan="2">Saldo em Caixa</td></tr>';
+  rows += `<tr><td class="dre-cat-label">Saldo Anterior</td><td class="dre-value">${brlSigned(saldoAnterior)}</td></tr>`;
+  rows += `<tr><td class="dre-cat-label">Resultado do Período</td><td class="dre-value">${brlSigned(resultado)}</td></tr>`;
+  rows += `<tr class="dre-subtotal"><td>Saldo Final</td><td class="dre-value">${brlSigned(saldoFinal)}</td></tr>`;
+  return `<table class="dre-table${compact?' dre-table-compact':''}">${rows}</table>`;
+}
+
+function renderDRE() {
+  const meses = mesesInRange();
+  const receitaCats = sortedCats(DATA.receitas, meses);
+  const despesaCats = sortedCats(DATA.despesas, meses);
+  const receitaTotais = receitaCats.map(c => sumRange(DATA.receitas[c], meses));
+  const despesaTotais = despesaCats.map(c => sumRange(DATA.despesas[c], meses));
+  const totalReceitas = receitaTotais.reduce((a,b)=>a+b, 0);
+  const totalDespesas = despesaTotais.reduce((a,b)=>a+b, 0);
+  const resultado = totalReceitas - totalDespesas;
+
+  const startIdx = allMeses.indexOf(meses[0]);
+  const saldoAnterior = startIdx >= 0
+    ? (DATA.saldoInicial||0) + allMeses.slice(0, startIdx).reduce((s,m)=>s+(DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0), 0)
+    : (DATA.saldoInicial||0);
+  const saldoFinal = saldoAnterior + resultado;
+
+  const periodoLabel = !meses.length ? '' : meses.length===1 ? mesLabelLongo(meses[0]) : mesLabelLongo(meses[0])+' a '+mesLabelLongo(meses[meses.length-1]);
+
+  const blocoPrincipal = dreBlocoHtml(receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, saldoAnterior, resultado, saldoFinal, false);
+
+  document.getElementById('dre-geral-content').innerHTML = `
+    <div id="dre-print-geral">
+      <div class="dre-header">
+        <div class="dre-igreja">Igreja Evangélica Nazareno Guarapuava</div>
+        <div class="dre-periodo">DRE — Demonstração do Resultado — ${periodoLabel}</div>
+      </div>
+      ${blocoPrincipal}
+    </div>`;
+
+  let mensalCols = '';
+  const mensalDados = [];
+  if (meses.length > 1) {
+    let saldoCorrente = saldoAnterior;
+    meses.forEach(m => {
+      const recCatsMes = receitaCats.filter(c => ((DATA.receitas[c]||{})[m]||0) > 0);
+      const recTotaisMes = recCatsMes.map(c => (DATA.receitas[c]||{})[m]||0);
+      const totRecMes = recTotaisMes.reduce((a,b)=>a+b, 0);
+      const desCatsMes = despesaCats.filter(c => ((DATA.despesas[c]||{})[m]||0) > 0);
+      const desTotaisMes = desCatsMes.map(c => (DATA.despesas[c]||{})[m]||0);
+      const totDesMes = desTotaisMes.reduce((a,b)=>a+b, 0);
+      const resMes = totRecMes - totDesMes;
+      const saldoIni = saldoCorrente;
+      const saldoFimMes = saldoIni + resMes;
+      saldoCorrente = saldoFimMes;
+      mensalCols += `<div class="dre-mes-col"><div class="dre-mensal-title">${mesLabelCurto(m)}</div>` +
+        dreBlocoHtml(recCatsMes, recTotaisMes, totRecMes, desCatsMes, desTotaisMes, totDesMes, saldoIni, resMes, saldoFimMes, true) +
+        '</div>';
+      mensalDados.push({ m, recCats: recCatsMes, recTotais: recTotaisMes, totRec: totRecMes, desCats: desCatsMes, desTotais: desTotaisMes, totDes: totDesMes, saldoIni, resMes, saldoFim: saldoFimMes });
+    });
+  }
+
+  document.getElementById('dre-mensal-content').innerHTML = meses.length > 1 ? `
+    <div id="dre-print-mensal">
+      <div class="dre-header">
+        <div class="dre-igreja">Igreja Evangélica Nazareno Guarapuava</div>
+        <div class="dre-periodo">DRE Mensal — Mês a Mês — ${periodoLabel}</div>
+      </div>
+      <div class="dre-mensal-row">${mensalCols}</div>
+    </div>` : `<div class="essencial-note">Selecione um período com mais de um mês para ver o detalhamento mensal.</div>`;
+
+  dreExportData = { periodoLabel, receitaCats, receitaTotais, totalReceitas, despesaCats, despesaTotais, totalDespesas, resultado, saldoAnterior, saldoFinal, mensalDados };
+}
+
+function imprimirDRE(alvo) {
+  document.body.setAttribute('data-print-alvo', alvo);
+  window.print();
+}
+document.getElementById('dre-export-pdf-geral').addEventListener('click', () => imprimirDRE('geral'));
+document.getElementById('dre-export-pdf-mensal').addEventListener('click', () => imprimirDRE('mensal'));
+
+document.getElementById('dre-export-xlsx-geral').addEventListener('click', () => {
+  if (!dreExportData || typeof XLSX === 'undefined') return;
+  const d = dreExportData;
+  const aoa = [];
+  aoa.push(['Igreja Evangélica Nazareno Guarapuava']);
+  aoa.push(['DRE — Demonstração do Resultado — ' + d.periodoLabel]);
+  aoa.push([]);
+  aoa.push(['RECEITAS']);
+  d.receitaCats.forEach((c,i) => { if (d.receitaTotais[i]>0) aoa.push([c, d.receitaTotais[i]]); });
+  aoa.push(['Total de Receitas', d.totalReceitas]);
+  aoa.push([]);
+  aoa.push(['DESPESAS']);
+  d.despesaCats.forEach((c,i) => { if (d.despesaTotais[i]>0) aoa.push([c + (c==='A revisar'?' *':''), d.despesaTotais[i]]); });
+  aoa.push(['Total de Despesas', d.totalDespesas]);
+  aoa.push([]);
+  aoa.push(['Resultado do Período', d.resultado]);
+  aoa.push([]);
+  aoa.push(['SALDO EM CAIXA']);
+  aoa.push(['Saldo Anterior', d.saldoAnterior]);
+  aoa.push(['Resultado do Período', d.resultado]);
+  aoa.push(['Saldo Final', d.saldoFinal]);
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{ wch: 38 }, { wch: 16 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'DRE');
+  XLSX.writeFile(wb, 'DRE_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.xlsx');
+});
+
+document.getElementById('dre-export-xlsx-mensal').addEventListener('click', () => {
+  if (!dreExportData || typeof XLSX === 'undefined' || !dreExportData.mensalDados || dreExportData.mensalDados.length < 2) return;
+  const d = dreExportData;
+  const aoaMensal = [
+    ['Igreja Evangélica Nazareno Guarapuava'],
+    ['DRE Mensal — Mês a Mês — ' + d.periodoLabel],
+  ];
+  d.mensalDados.forEach(md => {
+    aoaMensal.push([]);
+    aoaMensal.push([mesLabelLongo(md.m).toUpperCase()]);
+    aoaMensal.push(['RECEITAS']);
+    md.recCats.forEach((c,i) => aoaMensal.push([c, md.recTotais[i]]));
+    aoaMensal.push(['Total de Receitas', md.totRec]);
+    aoaMensal.push(['DESPESAS']);
+    md.desCats.forEach((c,i) => aoaMensal.push([c + (c==='A revisar'?' *':''), md.desTotais[i]]));
+    aoaMensal.push(['Total de Despesas', md.totDes]);
+    aoaMensal.push(['Resultado do Período', md.resMes]);
+    aoaMensal.push(['Saldo Anterior', md.saldoIni]);
+    aoaMensal.push(['Saldo Final', md.saldoFim]);
+  });
+  const wsMensal = XLSX.utils.aoa_to_sheet(aoaMensal);
+  wsMensal['!cols'] = [{ wch: 38 }, { wch: 16 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, wsMensal, 'DRE Mensal');
+  XLSX.writeFile(wb, 'DRE_Mensal_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.xlsx');
+});
+
+/* ============ APRESENTAÇÃO ============ */
+let apresData = null;
+
+function apresSlideHtml(kind, contentHtml) {
+  return `<div class="apres-slide ${kind}">${contentHtml}</div>`;
+}
+
+function renderApresentacao() {
+  const meses = mesesInRange();
+  if (!meses.length) { document.getElementById('apres-content').innerHTML = ''; apresData = null; return; }
+
+  const periodoLabel = meses.length===1 ? mesLabelLongo(meses[0]) : mesLabelLongo(meses[0])+' a '+mesLabelLongo(meses[meses.length-1]);
+  const receitaVals = meses.map(m => DATA.totalReceitas[m]||0);
+  const despesaVals = meses.map(m => DATA.totalDespesas[m]||0);
+  const totalReceitas = receitaVals.reduce((a,b)=>a+b, 0);
+  const totalDespesas = despesaVals.reduce((a,b)=>a+b, 0);
+  const mediaReceita = totalReceitas / meses.length;
+  const mediaDespesa = totalDespesas / meses.length;
+
+  const dizimistasCounts = meses.map(m => DATA.transacoes.filter(t => t.mesAno===m && t.categoria==='Dízimo' && (t.entrada||0)>0).length);
+  const mediaDizimistas = dizimistasCounts.reduce((a,b)=>a+b, 0) / meses.length;
+
+  const resultadoVals = meses.map((m,i) => receitaVals[i]-despesaVals[i]);
+  const melhorIdx = resultadoVals.indexOf(Math.max(...resultadoVals));
+  const piorIdx = resultadoVals.indexOf(Math.min(...resultadoVals));
+
+  const slides = [];
+
+  slides.push({ kind:'dark', html:`
+    <div class="apres-capa-igreja">Igreja Evangélica Nazareno Guarapuava</div>
+    <div class="apres-capa-sub">Relatório Financeiro</div>
+    <div class="apres-capa-periodo">${periodoLabel}</div>` });
+
+  slides.push({ kind:'light', html:`
+    <div class="apres-eyebrow">Receitas Totais</div>
+    <div class="apres-big good">${brl(totalReceitas)}</div>
+    <div class="apres-sub">${periodoLabel}</div>` });
+
+  slides.push({ kind:'light', html:`
+    <div class="apres-eyebrow">Despesas Totais</div>
+    <div class="apres-big critical">${brl(totalDespesas)}</div>
+    <div class="apres-sub">${periodoLabel}</div>` });
+
+  slides.push({ kind:'light', html:`
+    <div class="apres-eyebrow">Média Mensal</div>
+    <div class="apres-cols">
+      <div class="apres-col"><div class="apres-eyebrow">Receitas</div><div class="apres-big good" style="font-size:clamp(28px,4.5vw,56px)">${brl(mediaReceita)}</div></div>
+      <div class="apres-divider"></div>
+      <div class="apres-col"><div class="apres-eyebrow">Despesas</div><div class="apres-big critical" style="font-size:clamp(28px,4.5vw,56px)">${brl(mediaDespesa)}</div></div>
+    </div>
+    <div class="apres-sub">${meses.length} meses — ${periodoLabel}</div>` });
+
+  slides.push({ kind:'light', html:`
+    <div class="apres-eyebrow">Dizimistas — Média Mensal</div>
+    <div class="apres-big accent">${mediaDizimistas.toFixed(1)}</div>
+    <div class="apres-sub">lançamentos de dízimo por mês, em média</div>` });
+
+  slides.push({ kind:'light', html:`
+    <div class="apres-eyebrow">Melhor Mês × Pior Mês</div>
+    <div class="apres-cols">
+      <div class="apres-col"><div class="apres-eyebrow">Melhor Mês</div><div class="apres-big good" style="font-size:clamp(24px,4vw,48px)">${brlSigned(resultadoVals[melhorIdx])}</div><div class="apres-sub">${mesLabelLongo(meses[melhorIdx])}</div></div>
+      <div class="apres-divider"></div>
+      <div class="apres-col"><div class="apres-eyebrow">Pior Mês</div><div class="apres-big critical" style="font-size:clamp(24px,4vw,48px)">${brlSigned(resultadoVals[piorIdx])}</div><div class="apres-sub">${mesLabelLongo(meses[piorIdx])}</div></div>
+    </div>` });
+
+  document.getElementById('apres-content').innerHTML = `<div id="apres-print-area">${slides.map(s=>apresSlideHtml(s.kind, s.html)).join('')}</div>`;
+
+  apresData = { periodoLabel, totalReceitas, totalDespesas, mediaReceita, mediaDespesa, mediaDizimistas,
+    melhorMes: { label: mesLabelLongo(meses[melhorIdx]), valor: resultadoVals[melhorIdx] },
+    piorMes: { label: mesLabelLongo(meses[piorIdx]), valor: resultadoVals[piorIdx] } };
+}
+
+document.getElementById('apres-export-pdf').addEventListener('click', () => {
+  document.body.setAttribute('data-print-alvo', 'apresentacao');
+  window.print();
+});
+
+document.getElementById('apres-export-pptx').addEventListener('click', () => {
+  if (!apresData || typeof PptxGenJS === 'undefined') return;
+  const d = apresData;
+  const pptx = new PptxGenJS();
+  pptx.defineLayout({ name: 'CHURCH', width: 13.33, height: 7.5 });
+  pptx.layout = 'CHURCH';
+  const NAVY = '17213D', GREEN = '1E8E5A', RED = 'C0453B', GOLD = 'B9852A', MUTE = '8A90A6', WHITE = 'FFFFFF';
+
+  let s = pptx.addSlide();
+  s.background = { color: NAVY };
+  s.addText('Igreja Evangélica Nazareno Guarapuava', { x:0.5, y:2.9, w:12.33, h:1, align:'center', fontSize:32, bold:true, color:WHITE });
+  s.addText('Relatório Financeiro', { x:0.5, y:3.9, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:GOLD });
+  s.addText(d.periodoLabel, { x:0.5, y:4.6, w:12.33, h:0.6, align:'center', fontSize:16, color:'CBD5E1' });
+
+  s = pptx.addSlide();
+  s.background = { color: WHITE };
+  s.addText('RECEITAS TOTAIS', { x:0.5, y:1.4, w:12.33, h:0.8, align:'center', fontSize:24, bold:true, color:MUTE });
+  s.addText(brl(d.totalReceitas), { x:0.5, y:2.4, w:12.33, h:2, align:'center', fontSize:88, bold:true, color:GREEN });
+  s.addText(d.periodoLabel, { x:0.5, y:4.7, w:12.33, h:0.6, align:'center', fontSize:18, color:MUTE });
+
+  s = pptx.addSlide();
+  s.background = { color: WHITE };
+  s.addText('DESPESAS TOTAIS', { x:0.5, y:1.4, w:12.33, h:0.8, align:'center', fontSize:24, bold:true, color:MUTE });
+  s.addText(brl(d.totalDespesas), { x:0.5, y:2.4, w:12.33, h:2, align:'center', fontSize:88, bold:true, color:RED });
+  s.addText(d.periodoLabel, { x:0.5, y:4.7, w:12.33, h:0.6, align:'center', fontSize:18, color:MUTE });
+
+  s = pptx.addSlide();
+  s.background = { color: WHITE };
+  s.addText('MÉDIA MENSAL', { x:0.5, y:0.7, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:MUTE });
+  s.addText('Receitas', { x:0.5, y:2.0, w:6.16, h:0.6, align:'center', fontSize:20, bold:true, color:MUTE });
+  s.addText(brl(d.mediaReceita), { x:0.5, y:2.7, w:6.16, h:1.4, align:'center', fontSize:48, bold:true, color:GREEN });
+  s.addText('Despesas', { x:6.66, y:2.0, w:6.16, h:0.6, align:'center', fontSize:20, bold:true, color:MUTE });
+  s.addText(brl(d.mediaDespesa), { x:6.66, y:2.7, w:6.16, h:1.4, align:'center', fontSize:48, bold:true, color:RED });
+  s.addText(d.periodoLabel, { x:0.5, y:4.6, w:12.33, h:0.6, align:'center', fontSize:16, color:MUTE });
+
+  s = pptx.addSlide();
+  s.background = { color: WHITE };
+  s.addText('DIZIMISTAS — MÉDIA MENSAL', { x:0.5, y:1.4, w:12.33, h:0.8, align:'center', fontSize:24, bold:true, color:MUTE });
+  s.addText(d.mediaDizimistas.toFixed(1), { x:0.5, y:2.4, w:12.33, h:2, align:'center', fontSize:88, bold:true, color:GOLD });
+  s.addText('lançamentos de dízimo por mês, em média', { x:0.5, y:4.7, w:12.33, h:0.6, align:'center', fontSize:16, color:MUTE });
+
+  s = pptx.addSlide();
+  s.background = { color: WHITE };
+  s.addText('MELHOR MÊS × PIOR MÊS', { x:0.5, y:0.7, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:MUTE });
+  s.addText('Melhor Mês', { x:0.5, y:1.9, w:6.16, h:0.6, align:'center', fontSize:18, bold:true, color:MUTE });
+  s.addText(brlSigned(d.melhorMes.valor), { x:0.5, y:2.6, w:6.16, h:1.2, align:'center', fontSize:40, bold:true, color:GREEN });
+  s.addText(d.melhorMes.label, { x:0.5, y:3.75, w:6.16, h:0.5, align:'center', fontSize:16, color:MUTE });
+  s.addText('Pior Mês', { x:6.66, y:1.9, w:6.16, h:0.6, align:'center', fontSize:18, bold:true, color:MUTE });
+  s.addText(brlSigned(d.piorMes.valor), { x:6.66, y:2.6, w:6.16, h:1.2, align:'center', fontSize:40, bold:true, color:RED });
+  s.addText(d.piorMes.label, { x:6.66, y:3.75, w:6.16, h:0.5, align:'center', fontSize:16, color:MUTE });
+
+  pptx.writeFile({ fileName: 'Apresentacao_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.pptx' });
+});
+
+/* ============ MEU PAINEL (apresentação personalizada) ============ */
+const MP_STORAGE_KEY = 'tesouraria-meupainel';
+const MP_DEFAULT_SELECTED = ['receitas-totais', 'despesas-totais', 'media-receitas', 'media-despesas', 'dizimistas-media', 'melhor-mes', 'pior-mes'];
+
+function mpPeriodoLabel(meses) {
+  if (!meses.length) return '';
+  return meses.length===1 ? mesLabelLongo(meses[0]) : mesLabelLongo(meses[0])+' a '+mesLabelLongo(meses[meses.length-1]);
+}
+
+const MP_METRICAS = [
+  { id: 'receitas-totais', label: 'Receitas Totais', compute: (meses) =>
+      ({ value: brl(sumRange(DATA.totalReceitas, meses)), color: 'good', sub: mpPeriodoLabel(meses) }) },
+  { id: 'despesas-totais', label: 'Despesas Totais', compute: (meses) =>
+      ({ value: brl(sumRange(DATA.totalDespesas, meses)), color: 'critical', sub: mpPeriodoLabel(meses) }) },
+  { id: 'saldo-periodo', label: 'Saldo do Período', compute: (meses) => {
+      const saldo = sumRange(DATA.totalReceitas, meses) - sumRange(DATA.totalDespesas, meses);
+      return { value: brlSigned(saldo), color: saldo>=0?'good':'critical', sub: mpPeriodoLabel(meses) };
+    } },
+  { id: 'saldo-acumulado', label: 'Saldo Acumulado', compute: () => {
+      const [, ateIdx] = currentRangeIdx();
+      const acumMeses = allMeses.slice(0, ateIdx+1);
+      const saldo = (DATA.saldoInicial||0) + acumMeses.reduce((s,m)=>s+(DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0), 0);
+      return { value: brlSigned(saldo), color: 'accent', sub: 'até '+mesLabelCurto(allMeses[ateIdx]) };
+    } },
+  { id: 'melhor-mes', label: 'Melhor Mês', compute: (meses) => {
+      if (!meses.length) return { value: '—', color: 'good', sub: '' };
+      const vals = meses.map(m => (DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0));
+      const idx = vals.indexOf(Math.max(...vals));
+      return { value: brlSigned(vals[idx]), color: 'good', sub: mesLabelLongo(meses[idx]) };
+    } },
+  { id: 'pior-mes', label: 'Pior Mês', compute: (meses) => {
+      if (!meses.length) return { value: '—', color: 'critical', sub: '' };
+      const vals = meses.map(m => (DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0));
+      const idx = vals.indexOf(Math.min(...vals));
+      return { value: brlSigned(vals[idx]), color: 'critical', sub: mesLabelLongo(meses[idx]) };
+    } },
+  { id: 'media-receitas', label: 'Média Mensal de Receitas', compute: (meses) => {
+      const media = meses.length ? sumRange(DATA.totalReceitas, meses)/meses.length : 0;
+      return { value: brl(media), color: 'good', sub: meses.length+' meses — '+mpPeriodoLabel(meses) };
+    } },
+  { id: 'media-despesas', label: 'Média Mensal de Despesas', compute: (meses) => {
+      const media = meses.length ? sumRange(DATA.totalDespesas, meses)/meses.length : 0;
+      return { value: brl(media), color: 'critical', sub: meses.length+' meses — '+mpPeriodoLabel(meses) };
+    } },
+  { id: 'dizimistas-media', label: 'Dizimistas — Média Mensal', compute: (meses) => {
+      const counts = meses.map(m => DATA.transacoes.filter(t => t.mesAno===m && t.categoria==='Dízimo' && (t.entrada||0)>0).length);
+      const media = counts.length ? counts.reduce((a,b)=>a+b,0)/counts.length : 0;
+      return { value: media.toFixed(1), color: 'accent', sub: 'lançamentos de dízimo por mês, em média' };
+    } },
+  { id: 'saldo-aplicacoes', label: 'Saldo em Aplicações', compute: () => {
+      const [, ateIdx] = currentRangeIdx();
+      const acumMeses = allMeses.slice(0, ateIdx+1);
+      const saldo = APLICACOES_CATS.reduce((s,c) => s + sumRange(DATA.despesas[c]||{}, acumMeses), 0);
+      return { value: brl(saldo), color: 'accent', sub: 'até '+mesLabelCurto(allMeses[ateIdx]) };
+    } },
+];
+
+const MP_CHARTS = [
+  { id: 'donut-despesas', label: 'Distribuição das Despesas', matriz: 'despesas' },
+  { id: 'donut-receitas', label: 'Distribuição das Receitas', matriz: 'receitas' },
+];
+
+function mpChartCatsTotals(chartId, meses) {
+  if (chartId === 'donut-despesas') {
+    const allCats = sortedCats(DATA.despesas, meses).filter(c => c !== 'A revisar');
+    const arevisarTotal = sumRange(DATA.despesas['A revisar']||{}, meses);
+    const top = allCats.slice(0, 5);
+    const outrosVal = allCats.slice(5).reduce((s,c)=>s+sumRange(DATA.despesas[c],meses), 0) + arevisarTotal;
+    const cats = top.slice(), totals = top.map(c => sumRange(DATA.despesas[c], meses));
+    if (outrosVal > 0) { cats.push('Outras'); totals.push(outrosVal); }
+    return { cats, totals };
+  }
+  const cats = sortedCats(DATA.receitas, meses);
+  const totals = cats.map(c => sumRange(DATA.receitas[c], meses));
+  return { cats, totals };
+}
+
+function mpGetSelected() {
+  try {
+    const raw = localStorage.getItem(MP_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return MP_DEFAULT_SELECTED.slice();
+}
+function mpSetSelected(ids) {
+  try { localStorage.setItem(MP_STORAGE_KEY, JSON.stringify(ids)); } catch (e) {}
+}
+
+function renderMeuPainelOpcoes(selected) {
+  const grupoHtml = (titulo, itens) => {
+    const itensHtml = itens.map(it => `<label class="mp-check-item"><input type="checkbox" data-mp-id="${it.id}" ${selected.includes(it.id)?'checked':''}>${it.label}</label>`).join('');
+    return `<div><div class="mp-group-title">${titulo}</div><div class="mp-group-items">${itensHtml}</div></div>`;
+  };
+  document.getElementById('mp-opcoes').innerHTML = `<div class="mp-groups">
+    ${grupoHtml('Indicadores', MP_METRICAS)}
+    ${grupoHtml('Gráficos', MP_CHARTS)}
+  </div>`;
+  document.getElementById('mp-opcoes').querySelectorAll('input[data-mp-id]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const sel = mpGetSelected();
+      const id = inp.getAttribute('data-mp-id');
+      const idx = sel.indexOf(id);
+      if (inp.checked && idx===-1) sel.push(id);
+      if (!inp.checked && idx!==-1) sel.splice(idx,1);
+      mpSetSelected(sel);
+      renderMeuPainelSlides(sel);
+    });
+  });
+}
+
+let mpData = null;
+
+function renderMeuPainelSlides(selected) {
+  const meses = mesesInRange();
+  const metricasSelected = MP_METRICAS.filter(m => selected.includes(m.id));
+  const chartsSelected = MP_CHARTS.filter(c => selected.includes(c.id));
+
+  if (!metricasSelected.length && !chartsSelected.length) {
+    document.getElementById('mp-content').innerHTML = '<div class="mp-empty">Nenhum item selecionado. Marque acima o que você quer na sua apresentação.</div>';
+    mpData = null;
+    return;
+  }
+
+  const periodoLabel = mpPeriodoLabel(meses);
+  let slidesHtml = apresSlideHtml('dark', `
+    <div class="apres-capa-igreja">Igreja Evangélica Nazareno Guarapuava</div>
+    <div class="apres-capa-sub">Minha Apresentação</div>
+    <div class="apres-capa-periodo">${periodoLabel}</div>`);
+
+  const metricasData = metricasSelected.map(m => ({ label: m.label, ...m.compute(meses) }));
+  metricasData.forEach(m => {
+    slidesHtml += apresSlideHtml('light', `
+      <div class="apres-eyebrow">${m.label}</div>
+      <div class="apres-big ${m.color}">${m.value}</div>
+      <div class="apres-sub">${m.sub}</div>`);
+  });
+
+  const chartsData = chartsSelected.map(c => ({ id: c.id, label: c.label, ...mpChartCatsTotals(c.id, meses) }));
+  chartsData.forEach(c => {
+    slidesHtml += apresSlideHtml('light', `
+      <div class="apres-eyebrow">${c.label}</div>
+      <div class="apres-donut-body"><div class="donut-wrap" id="mp-donut-${c.id}"></div><div class="mini-legend" id="mp-legend-${c.id}"></div></div>`);
+  });
+
+  document.getElementById('mp-content').innerHTML = `<div id="mp-print-area">${slidesHtml}</div>`;
+
+  const dark = isDarkMode();
+  chartsData.forEach(c => {
+    const colors = c.cats.map((cat,i) => (cat==='A revisar'||cat==='Outras') ? cssVar('--ink-mute','#8A90A6') : categoryColor(i,dark));
+    buildDonut(document.getElementById('mp-donut-'+c.id), document.getElementById('mp-legend-'+c.id), c.cats, c.totals, colors, c.totals.reduce((a,b)=>a+b,0));
+  });
+
+  mpData = { periodoLabel, metricas: metricasData, charts: chartsData };
+}
+
+function renderMeuPainel() {
+  const selected = mpGetSelected();
+  renderMeuPainelOpcoes(selected);
+  renderMeuPainelSlides(selected);
+}
+
+document.getElementById('mp-toggle-personalizar').addEventListener('click', function () {
+  const opcoesEl = document.getElementById('mp-opcoes');
+  const hidden = opcoesEl.style.display === 'none';
+  opcoesEl.style.display = hidden ? '' : 'none';
+  this.textContent = hidden ? 'Ocultar opções' : 'Mostrar opções';
+});
+
+document.getElementById('mp-export-pdf').addEventListener('click', () => {
+  document.body.setAttribute('data-print-alvo', 'meupainel');
+  window.print();
+});
+
+document.getElementById('mp-export-pptx').addEventListener('click', () => {
+  if (!mpData || typeof PptxGenJS === 'undefined') return;
+  const d = mpData;
+  const pptx = new PptxGenJS();
+  pptx.defineLayout({ name: 'CHURCH', width: 13.33, height: 7.5 });
+  pptx.layout = 'CHURCH';
+  const NAVY = '17213D', GREEN = '1E8E5A', RED = 'C0453B', GOLD = 'B9852A', MUTE = '8A90A6', WHITE = 'FFFFFF';
+  const colorMap = { good: GREEN, critical: RED, accent: GOLD };
+
+  let s = pptx.addSlide();
+  s.background = { color: NAVY };
+  s.addText('Igreja Evangélica Nazareno Guarapuava', { x:0.5, y:2.9, w:12.33, h:1, align:'center', fontSize:32, bold:true, color:WHITE });
+  s.addText('Minha Apresentação', { x:0.5, y:3.9, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:GOLD });
+  s.addText(d.periodoLabel, { x:0.5, y:4.6, w:12.33, h:0.6, align:'center', fontSize:16, color:'CBD5E1' });
+
+  d.metricas.forEach(m => {
+    s = pptx.addSlide();
+    s.background = { color: WHITE };
+    s.addText(m.label.toUpperCase(), { x:0.5, y:1.4, w:12.33, h:0.8, align:'center', fontSize:24, bold:true, color:MUTE });
+    s.addText(m.value, { x:0.5, y:2.4, w:12.33, h:2, align:'center', fontSize:76, bold:true, color: colorMap[m.color]||MUTE });
+    s.addText(m.sub||'', { x:0.5, y:4.7, w:12.33, h:0.6, align:'center', fontSize:18, color:MUTE });
+  });
+
+  d.charts.forEach(c => {
+    s = pptx.addSlide();
+    s.background = { color: WHITE };
+    s.addText(c.label.toUpperCase(), { x:0.5, y:0.4, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:MUTE });
+    const chartData = [{ name: c.label, labels: c.cats, values: c.totals }];
+    s.addChart(pptx.ChartType.pie, chartData, { x:2.5, y:1.2, w:8.33, h:5.8, showLegend:true, legendPos:'r', showPercent:true, dataLabelFontSize:12 });
+  });
+
+  pptx.writeFile({ fileName: 'MeuPainel_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.pptx' });
+});
+
+/* ============ Carregamento de dados (JSONP) ============ */
+function carregarDadosJSONP(senha) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'tesourariaCb_' + Date.now() + '_' + Math.floor(Math.random()*100000);
+    const scriptEl = document.createElement('script');
+    const timeoutId = setTimeout(() => { cleanup(); reject(new Error('Tempo esgotado ao conectar. Verifique sua internet e tente novamente.')); }, 35000);
+    function cleanup() {
+      clearTimeout(timeoutId);
+      delete window[cbName];
+      if (scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
+    }
+    window[cbName] = function (payload) {
+      cleanup();
+      if (payload && payload.ok) resolve(payload.dados);
+      else reject(new Error((payload && payload.error) || 'Senha incorreta.'));
+    };
+    scriptEl.crossOrigin = 'anonymous';
+    scriptEl.src = API_URL + '?senha=' + encodeURIComponent(senha) + '&callback=' + cbName;
+    scriptEl.onerror = function () { cleanup(); reject(new Error('Falha ao conectar ao servidor.')); };
+    document.body.appendChild(scriptEl);
+  });
+}
+
+function initDashboard() {
+  allMeses = DATA.meses;
+  selDe.innerHTML = allMeses.map((m,i) => `<option value="${i}">${mesLabelCurto(m)}</option>`).join('');
+  selAte.innerHTML = allMeses.map((m,i) => `<option value="${i}">${mesLabelCurto(m)}</option>`).join('');
+  selDe.value = 0;
+  selAte.value = allMeses.length - 1;
+  goToSection('geral');
+}
+
+/* ============ Login ============ */
+(function () {
+  const overlay = document.getElementById('login-overlay');
+  const form = document.getElementById('login-form');
+  const userInput = document.getElementById('login-user');
+  const input = document.getElementById('login-senha');
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-submit');
+  const rememberEl = document.getElementById('login-remember');
+  const eyeBtn = document.getElementById('login-eye');
+  const eyeIcon = document.getElementById('login-eye-icon');
+  const forgotBtn = document.getElementById('login-forgot');
+  const forgotMsg = document.getElementById('login-forgot-msg');
+
+  const ICON_EYE = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/>';
+  const ICON_EYE_OFF = '<path d="M17.94 17.94A10.94 10.94 0 0112 19c-7 0-11-7-11-7a18.66 18.66 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 7 11 7a18.5 18.5 0 01-2.16 3.19"/><path d="M14.12 14.12a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+
+  eyeBtn.addEventListener('click', function () {
+    const isPw = input.type === 'password';
+    input.type = isPw ? 'text' : 'password';
+    eyeIcon.innerHTML = isPw ? ICON_EYE_OFF : ICON_EYE;
+  });
+
+  forgotBtn.addEventListener('click', function () {
+    forgotMsg.style.display = forgotMsg.style.display === 'block' ? 'none' : 'block';
+  });
+
+  function tentarLogin(usuario, senha) {
+    if (String(usuario||'').trim().toLowerCase() !== 'admin') {
+      errEl.textContent = 'Usuário ou senha incorretos.';
+      errEl.style.display = 'block';
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'Conectando… (pode levar alguns segundos)';
+    errEl.style.display = 'none';
+    carregarDadosJSONP(senha).then(function (dados) {
+      DATA = dados;
+      if (rememberEl.checked) {
+        try { localStorage.setItem('tesouraria-senha', senha); localStorage.setItem('tesouraria-user', usuario); } catch (e) {}
+      } else {
+        try { localStorage.removeItem('tesouraria-senha'); localStorage.removeItem('tesouraria-user'); } catch (e) {}
+      }
+      overlay.style.display = 'none';
+      initDashboard();
+    }).catch(function (err) {
+      btn.disabled = false; btn.textContent = 'Acessar Sistema';
+      errEl.textContent = err.message || 'Senha incorreta.';
+      errEl.style.display = 'block';
+      input.value = '';
+      input.focus();
+    });
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    tentarLogin(userInput.value, input.value);
+  });
+
+  let savedUser = null, savedSenha = null;
+  try { savedUser = localStorage.getItem('tesouraria-user'); savedSenha = localStorage.getItem('tesouraria-senha'); } catch (e) {}
+  if (savedUser) userInput.value = savedUser;
+  if (savedSenha) { input.value = savedSenha; rememberEl.checked = true; }
+})();
+</script>
+</body>
+</html>
