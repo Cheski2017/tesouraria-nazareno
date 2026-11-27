@@ -903,6 +903,98 @@
 @media print { .page-eyebrow, .range-caption, .login-intro { display: none !important; } }
 
 </style>
+<style id="nazacontrol-projector-style">
+/* Apresentações para leitura à distância. As cores dos slides independem do tema da interface. */
+.projection-intro {display:flex;justify-content:space-between;gap:24px;align-items:center;padding:28px 30px;border-radius:16px;background:#12334d;color:#fff;}
+.projection-intro h2 {font-size:clamp(1.5rem,2.5vw,2rem);line-height:1.2;letter-spacing:-.035em;margin:6px 0 10px;}
+.projection-intro p {color:#c6d9e8;font-size:.9375rem;max-width:650px;margin:0;line-height:1.65;}
+.projection-kicker {font-size:.75rem;font-weight:750;color:#8ce7c5;letter-spacing:.12em;}
+.projection-tag {display:inline-flex;align-items:center;gap:8px;color:#d8e6f3;font-size:.875rem;white-space:nowrap;border:1px solid #4d6b84;padding:10px 14px;border-radius:100px;}
+.projection-primary {background:#08775e !important;color:#fff !important;border:1px solid #08775e !important;font-weight:750;min-height:46px;padding:10px 20px !important;border-radius:9px;cursor:pointer;font-size:.9375rem;}
+.projection-primary:hover {filter:brightness(1.12);}
+.projection-primary:disabled {opacity:.5;cursor:default;}
+.projection-toolbar {display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--line);}
+.projection-toolbar-title {display:flex;flex-direction:column;gap:5px;}
+.projection-toolbar-title strong {font-size:1.0625rem;}
+.projection-toolbar-title span {font-size:.875rem;color:var(--ink-soft);}
+.projection-help {font-size:.875rem;color:var(--ink-soft);line-height:1.6;margin:0;}
+.projection-deck {display:flex;flex-direction:column;gap:28px;}
+.projection-preview {margin:0;width:100%;min-width:0;}
+.projection-preview figcaption {display:flex;align-items:baseline;gap:14px;margin-bottom:10px;line-height:1.5;}
+.projection-preview figcaption span {font-size:.75rem;letter-spacing:.08em;font-weight:750;color:var(--accent);white-space:nowrap;}
+.projection-preview figcaption strong {font-size:.9375rem;color:var(--ink);}
+.projection-slide {width:100%;aspect-ratio:16/9;overflow:hidden;border:1px solid var(--card-border);border-radius:10px;background:#fff;box-shadow:var(--shadow);}
+.projection-slide svg {display:block;width:100%;height:100%;}
+.projection-presets {display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:18px;border-radius:10px;background:var(--page-bg);margin-bottom:24px;}
+.projection-presets span {font-size:.875rem;color:var(--ink-soft);margin-right:8px;}
+.projection-presets button {font-size:.875rem;min-height:40px;padding:8px 14px;border:1px solid var(--card-border);color:var(--ink);background:var(--card-bg);border-radius:8px;cursor:pointer;}
+.projection-presets button:hover {border-color:var(--accent);color:var(--accent);}
+.projection-options {display:flex;flex-direction:column;gap:26px;}
+.projection-options fieldset {min-width:0;border:0;padding:0;margin:0;}
+.projection-options legend {font-size:.875rem;font-weight:750;color:var(--ink);margin-bottom:14px;padding:0;}
+.projection-option-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.projection-option {display:flex;align-items:flex-start;gap:10px;position:relative;min-width:0;padding:18px 14px;border:1px solid var(--card-border);border-radius:12px;cursor:pointer;transition:border-color .12s,background .12s;}
+.projection-option input {position:absolute;right:12px;top:12px;width:18px;height:18px;accent-color:var(--accent);}
+.projection-option:has(input:checked) {border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent);}
+.projection-option:has(input:focus-visible) {outline:3px solid var(--accent);outline-offset:3px;}
+.projection-option-icon {width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--info-soft);color:var(--info);border-radius:10px;flex-shrink:0;}
+.tone-green .projection-option-icon {background:var(--good-soft);color:var(--good);}
+.tone-red .projection-option-icon {background:var(--critical-soft);color:var(--critical);}
+.projection-option strong {display:block;padding-right:16px;font-size:.875rem;line-height:1.4;color:var(--ink);}
+.projection-option small {display:block;margin-top:7px;font-size:.8125rem;line-height:1.5;color:var(--ink-soft);}
+#projection-export-status {font-size:.875rem;color:var(--ink-soft);}
+#projection-export-status:empty {display:none;}
+#projector-overlay[hidden] {display:none !important;}
+#projector-overlay {position:fixed;inset:0;z-index:1000000;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#030c16;color:#fff;padding:16px 20px 94px;}
+#projector-stage {width:min(100%,calc((100dvh - 130px)*16/9));aspect-ratio:16/9;max-height:calc(100dvh - 130px);background:#fff;box-shadow:0 12px 60px #0009;}
+#projector-stage svg {display:block;width:100%;height:100%;}
+.projector-controls {position:absolute;bottom:16px;left:20px;right:20px;display:flex;align-items:center;gap:12px;justify-content:space-between;}
+.projector-controls button {min-height:44px;min-width:44px;padding:10px 16px;border:1px solid #45617a;background:#17334c;border-radius:8px;color:#fff;font-size:.875rem;cursor:pointer;}
+.projector-controls button:hover {background:#285576;}
+.projector-controls button:disabled {opacity:.35;cursor:default;}
+.projector-status {display:flex;flex-direction:column;gap:3px;max-width:50%;}
+#projector-position {font-size:.875rem;}
+.projector-status small {font-size:.75rem;color:#b8cfdf;}
+.projector-buttons {display:flex;gap:8px;}
+.projector-progress-track {position:absolute;bottom:0;left:0;right:0;height:4px;background:#17334c;}
+#projector-progress {height:100%;background:#88edc5;}
+@media (max-width:1180px) {.projection-option-grid {grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media (max-width:600px) {
+  .projection-intro {padding:24px 20px;flex-direction:column;align-items:flex-start;gap:18px;}
+  .projection-tag {font-size:.8125rem;}
+  .projection-option-grid {grid-template-columns:minmax(0,1fr);}
+  .projection-toolbar .dre-export-actions {width:100%;}
+  .projection-toolbar .dre-export-actions button {flex:1;}
+  .projection-preview figcaption {gap:8px;}
+  #projector-overlay {padding:8px 6px 130px;}
+  #projector-stage {width:min(100%,calc((100dvh - 140px)*16/9));max-height:calc(100dvh - 140px);}
+  .projector-controls {flex-wrap:wrap;left:12px;right:12px;}
+  .projector-status {max-width:100%;width:100%;}
+  .projector-status small {display:none;}
+}
+@media (prefers-reduced-motion:reduce) {.projection-option {transition:none;}}
+@media print {
+  @page projection {size:320mm 180mm;margin:0;}
+  body.printing-projection {margin:0 !important;padding:0 !important;background:#fff !important;}
+  body.printing-projection .shell, body.printing-projection .main, body.printing-projection .content {display:block !important;margin:0 !important;padding:0 !important;}
+  body.printing-projection .sidebar, body.printing-projection .topbar, body.printing-projection #projector-overlay,
+  body.printing-projection .projection-intro, body.printing-projection .projection-toolbar,
+  body.printing-projection .projection-help, body.printing-projection #mp-config-card,
+  body.printing-projection #projection-export-status {display:none !important;}
+  body.printing-projection .section {display:none !important;}
+  body.printing-projection[data-print-alvo="apresentacao"] #sec-apresentacao,
+  body.printing-projection[data-print-alvo="meupainel"] #sec-meupainel {display:block !important;}
+  body.printing-projection .card {display:block !important;padding:0 !important;margin:0 !important;border:0 !important;box-shadow:none !important;}
+  body.printing-projection #apres-content, body.printing-projection #mp-content {margin:0 !important;}
+  body.printing-projection .projection-deck {position:static !important;display:block !important;width:100% !important;margin:0 !important;padding:0 !important;}
+  body.printing-projection .projection-preview {page:projection;break-inside:avoid;break-after:page;page-break-after:always;display:block !important;margin:0 !important;padding:0 !important;height:auto;}
+  body.printing-projection .projection-preview:last-child {break-after:auto;page-break-after:auto;}
+  body.printing-projection .projection-preview figcaption {display:none !important;}
+  body.printing-projection .projection-slide {border:0 !important;border-radius:0 !important;box-shadow:none !important;width:100% !important;height:auto !important;aspect-ratio:16/9;print-color-adjust:exact;-webkit-print-color-adjust:exact;}
+  body.printing-projection svg {display:block;width:100%;height:auto;}
+}
+
+</style>
 </head>
 <body>
 
@@ -1182,46 +1274,16 @@
       </section>
 
       <!-- ===== APRESENTAÇÃO ===== -->
-      <section class="section" id="sec-apresentacao">
-        <div class="card">
-          <div class="card-head">
-            <span class="card-title">Apresentação — Slides para Projetor</span>
-            <div class="dre-export-actions">
-              <button class="btn-dre-export" id="apres-export-pptx" type="button">Exportar PowerPoint</button>
-              <button class="btn-dre-export" id="apres-export-pdf" type="button">Exportar PDF</button>
-            </div>
-          </div>
-          <div class="apres-actions-note">Dica: no PDF, escolha orientação Paisagem na caixa de impressão para os slides ficarem cheios na tela.</div>
-          <div id="apres-content" style="margin-top:18px;"></div>
-        </div>
-      </section>
-
+      <section class="section" id="sec-apresentacao"><div class="projection-intro"><div><span class="projection-kicker">PRESTAÇÃO DE CONTAS</span><h2>Os números ganham o palco.</h2><p>Um roteiro pronto para apresentar as finanças da igreja, com resumos, comparações e gráficos que se enxergam à distância.</p></div><span class="projection-tag">16:9 · alto contraste</span></div><div class="card"><div class="projection-toolbar"><div class="projection-toolbar-title"><strong>Apresentação financeira</strong><span id="apres-slide-count" aria-live="polite"></span></div><div class="dre-export-actions"><button class="projection-primary" type="button" id="apres-present">Apresentar</button><button class="btn-dre-export" id="apres-export-pptx" type="button">Exportar PowerPoint</button><button class="btn-dre-export" id="apres-export-pdf" type="button">Exportar PDF</button></div></div><p class="projection-help">Apresente em tela cheia e avance pelas teclas de direção ou pelo controle do projetor. Esc encerra a apresentação. PDF e PowerPoint são gerados em formato panorâmico 16:9.</p><div id="apres-content"></div></div></section>
       <!-- ===== MEU PAINEL ===== -->
-      <section class="section" id="sec-meupainel">
-        <div class="card">
-          <div class="card-head">
-            <span class="card-title">Personalizar Apresentação</span>
-            <button class="card-link" id="mp-toggle-personalizar" type="button">Ocultar opções</button>
-          </div>
-          <div id="mp-opcoes"></div>
-        </div>
-        <div class="card">
-          <div class="card-head">
-            <span class="card-title">Minha Apresentação</span>
-            <div class="dre-export-actions">
-              <button class="btn-dre-export" id="mp-export-pptx" type="button">Exportar PowerPoint</button>
-              <button class="btn-dre-export" id="mp-export-pdf" type="button">Exportar PDF</button>
-            </div>
-          </div>
-          <div class="apres-actions-note">Dica: no PDF, escolha orientação Paisagem na caixa de impressão para os slides ficarem cheios na tela.</div>
-          <div id="mp-content" style="margin-top:18px;"></div>
-        </div>
-      </section>
+      <section class="section" id="sec-meupainel"><div class="projection-intro"><div><span class="projection-kicker">SEU ROTEIRO, SUA APRESENTAÇÃO</span><h2>Monte uma apresentação com a sua cara.</h2><p>Escolha os conteúdos abaixo. Cada seleção gera slides com cores, gráficos e números grandes para o projetor.</p></div><span class="projection-tag">16:9 · alto contraste</span></div><div class="card" id="mp-config-card"><div class="card-head"><span class="card-title">Escolha o que vai para o telão</span><button class="card-link" id="mp-toggle-personalizar" type="button" aria-expanded="true" aria-controls="mp-opcoes">Ocultar opções</button></div><div id="mp-opcoes"></div></div><div class="card"><div class="projection-toolbar"><div class="projection-toolbar-title"><strong>Minha apresentação</strong><span id="mp-slide-count" aria-live="polite"></span></div><div class="dre-export-actions"><button class="projection-primary" type="button" id="mp-present">Apresentar</button><button class="btn-dre-export" id="mp-export-pptx" type="button">Exportar PowerPoint</button><button class="btn-dre-export" id="mp-export-pdf" type="button">Exportar PDF</button></div></div><p class="projection-help">Apresente em tela cheia e avance pelas teclas de direção ou pelo controle do projetor. Esc encerra a apresentação. PDF e PowerPoint são gerados em formato panorâmico 16:9.</p><div id="mp-content"></div></div></section>
+      <div id="projection-export-status" role="status" aria-live="polite"></div>
 
     </div>
   </main>
 </div>
 
+<div id="projector-overlay" hidden role="dialog" aria-modal="true" aria-label="Apresentação em tela cheia"><div id="projector-stage"></div><div class="projector-controls"><div class="projector-status"><span id="projector-position" aria-live="polite"></span><small>Teclas de direção para navegar · Esc para sair</small></div><div class="projector-buttons"><button type="button" id="projector-prev" aria-label="Slide anterior">Anterior</button><button type="button" id="projector-next" aria-label="Próximo slide">Próximo</button><button type="button" id="projector-exit">Encerrar</button></div></div><div class="projector-progress-track"><div id="projector-progress"></div></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <script>
@@ -1324,7 +1386,7 @@ const SECTIONS = [
   { id: 'aplic', label: 'Aplicações', title: 'Aplicações', sub: 'Saldo em fundos e aplicações financeiras', icon: navIcon('aplic', true) },
   { id: 'dre', label: 'DRE', title: 'DRE', sub: 'Demonstração do Resultado do período selecionado', icon: navIcon('dre', true) },
   { id: 'apresentacao', label: 'Apresentação', title: 'Apresentação', sub: 'Slides com os principais números para exibir no projetor', icon: navIcon('apres', true) },
-  { id: 'meupainel', label: 'Meu Painel', title: 'Meu Painel', sub: 'Escolha os indicadores, gráficos e tabelas que quer ver aqui', icon: navIcon('meupainel', false) },
+  { id: 'meupainel', label: 'Meu Painel', title: 'Meu Painel', sub: 'Escolha os conteúdos e monte sua apresentação para o projetor', icon: navIcon('meupainel', false) },
 ];
 
 let currentSection = 'geral';
@@ -2200,343 +2262,364 @@ document.getElementById('dre-export-xlsx-mensal').addEventListener('click', () =
   XLSX.writeFile(wb, 'DRE_Mensal_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.xlsx');
 });
 
-/* ============ APRESENTAÇÃO ============ */
-let apresData = null;
-
-function apresSlideHtml(kind, contentHtml) {
-  return `<div class="apres-slide ${kind}">${contentHtml}</div>`;
-}
-
-function renderApresentacao() {
-  const meses = mesesInRange();
-  if (!meses.length) { document.getElementById('apres-content').innerHTML = ''; apresData = null; return; }
-
-  const periodoLabel = meses.length===1 ? mesLabelLongo(meses[0]) : mesLabelLongo(meses[0])+' a '+mesLabelLongo(meses[meses.length-1]);
-  const receitaVals = meses.map(m => DATA.totalReceitas[m]||0);
-  const despesaVals = meses.map(m => DATA.totalDespesas[m]||0);
-  const totalReceitas = receitaVals.reduce((a,b)=>a+b, 0);
-  const totalDespesas = despesaVals.reduce((a,b)=>a+b, 0);
-  const mediaReceita = totalReceitas / meses.length;
-  const mediaDespesa = totalDespesas / meses.length;
-
-  const dizimistasCounts = meses.map(m => DATA.transacoes.filter(t => t.mesAno===m && t.categoria==='Dízimo' && (t.entrada||0)>0).length);
-  const mediaDizimistas = dizimistasCounts.reduce((a,b)=>a+b, 0) / meses.length;
-
-  const resultadoVals = meses.map((m,i) => receitaVals[i]-despesaVals[i]);
-  const melhorIdx = resultadoVals.indexOf(Math.max(...resultadoVals));
-  const piorIdx = resultadoVals.indexOf(Math.min(...resultadoVals));
-
-  const slides = [];
-
-  slides.push({ kind:'dark', html:`
-    <div class="apres-capa-igreja">Igreja Evangélica Nazareno Guarapuava</div>
-    <div class="apres-capa-sub">Relatório Financeiro</div>
-    <div class="apres-capa-periodo">${periodoLabel}</div>` });
-
-  slides.push({ kind:'light', html:`
-    <div class="apres-eyebrow">Receitas Totais</div>
-    <div class="apres-big good">${brl(totalReceitas)}</div>
-    <div class="apres-sub">${periodoLabel}</div>` });
-
-  slides.push({ kind:'light', html:`
-    <div class="apres-eyebrow">Despesas Totais</div>
-    <div class="apres-big critical">${brl(totalDespesas)}</div>
-    <div class="apres-sub">${periodoLabel}</div>` });
-
-  slides.push({ kind:'light', html:`
-    <div class="apres-eyebrow">Média Mensal</div>
-    <div class="apres-cols">
-      <div class="apres-col"><div class="apres-eyebrow">Receitas</div><div class="apres-big good" style="font-size:clamp(28px,4.5vw,56px)">${brl(mediaReceita)}</div></div>
-      <div class="apres-divider"></div>
-      <div class="apres-col"><div class="apres-eyebrow">Despesas</div><div class="apres-big critical" style="font-size:clamp(28px,4.5vw,56px)">${brl(mediaDespesa)}</div></div>
-    </div>
-    <div class="apres-sub">${meses.length} meses — ${periodoLabel}</div>` });
-
-  slides.push({ kind:'light', html:`
-    <div class="apres-eyebrow">Dizimistas — Média Mensal</div>
-    <div class="apres-big accent">${mediaDizimistas.toFixed(1)}</div>
-    <div class="apres-sub">lançamentos de dízimo por mês, em média</div>` });
-
-  slides.push({ kind:'light', html:`
-    <div class="apres-eyebrow">Melhor Mês × Pior Mês</div>
-    <div class="apres-cols">
-      <div class="apres-col"><div class="apres-eyebrow">Melhor Mês</div><div class="apres-big good" style="font-size:clamp(24px,4vw,48px)">${brlSigned(resultadoVals[melhorIdx])}</div><div class="apres-sub">${mesLabelLongo(meses[melhorIdx])}</div></div>
-      <div class="apres-divider"></div>
-      <div class="apres-col"><div class="apres-eyebrow">Pior Mês</div><div class="apres-big critical" style="font-size:clamp(24px,4vw,48px)">${brlSigned(resultadoVals[piorIdx])}</div><div class="apres-sub">${mesLabelLongo(meses[piorIdx])}</div></div>
-    </div>` });
-
-  document.getElementById('apres-content').innerHTML = `<div id="apres-print-area">${slides.map(s=>apresSlideHtml(s.kind, s.html)).join('')}</div>`;
-
-  apresData = { periodoLabel, totalReceitas, totalDespesas, mediaReceita, mediaDespesa, mediaDizimistas,
-    melhorMes: { label: mesLabelLongo(meses[melhorIdx]), valor: resultadoVals[melhorIdx] },
-    piorMes: { label: mesLabelLongo(meses[piorIdx]), valor: resultadoVals[piorIdx] } };
-}
-
-document.getElementById('apres-export-pdf').addEventListener('click', () => {
-  document.body.setAttribute('data-print-alvo', 'apresentacao');
-  window.print();
-});
-
-document.getElementById('apres-export-pptx').addEventListener('click', () => {
-  if (!apresData || typeof PptxGenJS === 'undefined') return;
-  const d = apresData;
-  const pptx = new PptxGenJS();
-  pptx.defineLayout({ name: 'CHURCH', width: 13.33, height: 7.5 });
-  pptx.layout = 'CHURCH';
-  const NAVY = '17213D', GREEN = '1E8E5A', RED = 'C0453B', GOLD = 'B9852A', MUTE = '8A90A6', WHITE = 'FFFFFF';
-
-  let s = pptx.addSlide();
-  s.background = { color: NAVY };
-  s.addText('Igreja Evangélica Nazareno Guarapuava', { x:0.5, y:2.9, w:12.33, h:1, align:'center', fontSize:32, bold:true, color:WHITE });
-  s.addText('Relatório Financeiro', { x:0.5, y:3.9, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:GOLD });
-  s.addText(d.periodoLabel, { x:0.5, y:4.6, w:12.33, h:0.6, align:'center', fontSize:16, color:'CBD5E1' });
-
-  s = pptx.addSlide();
-  s.background = { color: WHITE };
-  s.addText('RECEITAS TOTAIS', { x:0.5, y:1.4, w:12.33, h:0.8, align:'center', fontSize:24, bold:true, color:MUTE });
-  s.addText(brl(d.totalReceitas), { x:0.5, y:2.4, w:12.33, h:2, align:'center', fontSize:88, bold:true, color:GREEN });
-  s.addText(d.periodoLabel, { x:0.5, y:4.7, w:12.33, h:0.6, align:'center', fontSize:18, color:MUTE });
-
-  s = pptx.addSlide();
-  s.background = { color: WHITE };
-  s.addText('DESPESAS TOTAIS', { x:0.5, y:1.4, w:12.33, h:0.8, align:'center', fontSize:24, bold:true, color:MUTE });
-  s.addText(brl(d.totalDespesas), { x:0.5, y:2.4, w:12.33, h:2, align:'center', fontSize:88, bold:true, color:RED });
-  s.addText(d.periodoLabel, { x:0.5, y:4.7, w:12.33, h:0.6, align:'center', fontSize:18, color:MUTE });
-
-  s = pptx.addSlide();
-  s.background = { color: WHITE };
-  s.addText('MÉDIA MENSAL', { x:0.5, y:0.7, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:MUTE });
-  s.addText('Receitas', { x:0.5, y:2.0, w:6.16, h:0.6, align:'center', fontSize:20, bold:true, color:MUTE });
-  s.addText(brl(d.mediaReceita), { x:0.5, y:2.7, w:6.16, h:1.4, align:'center', fontSize:48, bold:true, color:GREEN });
-  s.addText('Despesas', { x:6.66, y:2.0, w:6.16, h:0.6, align:'center', fontSize:20, bold:true, color:MUTE });
-  s.addText(brl(d.mediaDespesa), { x:6.66, y:2.7, w:6.16, h:1.4, align:'center', fontSize:48, bold:true, color:RED });
-  s.addText(d.periodoLabel, { x:0.5, y:4.6, w:12.33, h:0.6, align:'center', fontSize:16, color:MUTE });
-
-  s = pptx.addSlide();
-  s.background = { color: WHITE };
-  s.addText('DIZIMISTAS — MÉDIA MENSAL', { x:0.5, y:1.4, w:12.33, h:0.8, align:'center', fontSize:24, bold:true, color:MUTE });
-  s.addText(d.mediaDizimistas.toFixed(1), { x:0.5, y:2.4, w:12.33, h:2, align:'center', fontSize:88, bold:true, color:GOLD });
-  s.addText('lançamentos de dízimo por mês, em média', { x:0.5, y:4.7, w:12.33, h:0.6, align:'center', fontSize:16, color:MUTE });
-
-  s = pptx.addSlide();
-  s.background = { color: WHITE };
-  s.addText('MELHOR MÊS × PIOR MÊS', { x:0.5, y:0.7, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:MUTE });
-  s.addText('Melhor Mês', { x:0.5, y:1.9, w:6.16, h:0.6, align:'center', fontSize:18, bold:true, color:MUTE });
-  s.addText(brlSigned(d.melhorMes.valor), { x:0.5, y:2.6, w:6.16, h:1.2, align:'center', fontSize:40, bold:true, color:GREEN });
-  s.addText(d.melhorMes.label, { x:0.5, y:3.75, w:6.16, h:0.5, align:'center', fontSize:16, color:MUTE });
-  s.addText('Pior Mês', { x:6.66, y:1.9, w:6.16, h:0.6, align:'center', fontSize:18, bold:true, color:MUTE });
-  s.addText(brlSigned(d.piorMes.valor), { x:6.66, y:2.6, w:6.16, h:1.2, align:'center', fontSize:40, bold:true, color:RED });
-  s.addText(d.piorMes.label, { x:6.66, y:3.75, w:6.16, h:0.5, align:'center', fontSize:16, color:MUTE });
-
-  pptx.writeFile({ fileName: 'Apresentacao_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.pptx' });
-});
-
-/* ============ MEU PAINEL (apresentação personalizada) ============ */
+/* ============ APRESENTAÇÃO E MEU PAINEL — PROJETOR ============ */
 const MP_STORAGE_KEY = 'tesouraria-meupainel';
-const MP_DEFAULT_SELECTED = ['receitas-totais', 'despesas-totais', 'media-receitas', 'media-despesas', 'dizimistas-media', 'melhor-mes', 'pior-mes'];
-
-function mpPeriodoLabel(meses) {
-  if (!meses.length) return '';
-  return meses.length===1 ? mesLabelLongo(meses[0]) : mesLabelLongo(meses[0])+' a '+mesLabelLongo(meses[meses.length-1]);
-}
-
+const MP_DEFAULT_SELECTED = ['resumo', 'receitas-totais', 'despesas-totais', 'saldo-periodo', 'fluxo-mensal', 'donut-despesas', 'comparativo-meses'];
+const PROJ = { navy:'#102C46', blue:'#184BCA', green:'#08775E', mint:'#88EDC5', red:'#B83950', coral:'#FFE0E5', gold:'#FFD46A', white:'#FFFFFF', pale:'#F0F5FC', mute:'#50667D', line:'#D6E1EF' };
 const MP_METRICAS = [
-  { id: 'receitas-totais', label: 'Receitas Totais', compute: (meses) =>
-      ({ value: brl(sumRange(DATA.totalReceitas, meses)), color: 'good', sub: mpPeriodoLabel(meses) }) },
-  { id: 'despesas-totais', label: 'Despesas Totais', compute: (meses) =>
-      ({ value: brl(sumRange(DATA.totalDespesas, meses)), color: 'critical', sub: mpPeriodoLabel(meses) }) },
-  { id: 'saldo-periodo', label: 'Saldo do Período', compute: (meses) => {
-      const saldo = sumRange(DATA.totalReceitas, meses) - sumRange(DATA.totalDespesas, meses);
-      return { value: brlSigned(saldo), color: saldo>=0?'good':'critical', sub: mpPeriodoLabel(meses) };
-    } },
-  { id: 'saldo-acumulado', label: 'Saldo Acumulado', compute: () => {
-      const [, ateIdx] = currentRangeIdx();
-      const acumMeses = allMeses.slice(0, ateIdx+1);
-      const saldo = (DATA.saldoInicial||0) + acumMeses.reduce((s,m)=>s+(DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0), 0);
-      return { value: brlSigned(saldo), color: 'accent', sub: 'até '+mesLabelCurto(allMeses[ateIdx]) };
-    } },
-  { id: 'melhor-mes', label: 'Melhor Mês', compute: (meses) => {
-      if (!meses.length) return { value: '—', color: 'good', sub: '' };
-      const vals = meses.map(m => (DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0));
-      const idx = vals.indexOf(Math.max(...vals));
-      return { value: brlSigned(vals[idx]), color: 'good', sub: mesLabelLongo(meses[idx]) };
-    } },
-  { id: 'pior-mes', label: 'Pior Mês', compute: (meses) => {
-      if (!meses.length) return { value: '—', color: 'critical', sub: '' };
-      const vals = meses.map(m => (DATA.totalReceitas[m]||0)-(DATA.totalDespesas[m]||0));
-      const idx = vals.indexOf(Math.min(...vals));
-      return { value: brlSigned(vals[idx]), color: 'critical', sub: mesLabelLongo(meses[idx]) };
-    } },
-  { id: 'media-receitas', label: 'Média Mensal de Receitas', compute: (meses) => {
-      const media = meses.length ? sumRange(DATA.totalReceitas, meses)/meses.length : 0;
-      return { value: brl(media), color: 'good', sub: meses.length+' meses — '+mpPeriodoLabel(meses) };
-    } },
-  { id: 'media-despesas', label: 'Média Mensal de Despesas', compute: (meses) => {
-      const media = meses.length ? sumRange(DATA.totalDespesas, meses)/meses.length : 0;
-      return { value: brl(media), color: 'critical', sub: meses.length+' meses — '+mpPeriodoLabel(meses) };
-    } },
-  { id: 'dizimistas-media', label: 'Dizimistas — Média Mensal', compute: (meses) => {
-      const counts = meses.map(m => DATA.transacoes.filter(t => t.mesAno===m && t.categoria==='Dízimo' && (t.entrada||0)>0).length);
-      const media = counts.length ? counts.reduce((a,b)=>a+b,0)/counts.length : 0;
-      return { value: media.toFixed(1), color: 'accent', sub: 'lançamentos de dízimo por mês, em média' };
-    } },
-  { id: 'saldo-aplicacoes', label: 'Saldo em Aplicações', compute: () => {
-      const [, ateIdx] = currentRangeIdx();
-      const acumMeses = allMeses.slice(0, ateIdx+1);
-      const saldo = APLICACOES_CATS.reduce((s,c) => s + sumRange(DATA.despesas[c]||{}, acumMeses), 0);
-      return { value: brl(saldo), color: 'accent', sub: 'até '+mesLabelCurto(allMeses[ateIdx]) };
-    } },
+  {id:'resumo', label:'Resumo financeiro', desc:'Receitas, despesas e resultado juntos.', group:'Visão do período', kind:'summary', color:'blue'},
+  {id:'receitas-totais',label:'Receitas totais',desc:'Arrecadação do período em destaque.',group:'Visão do período',kind:'metric',color:'green'},
+  {id:'despesas-totais',label:'Despesas totais',desc:'Total de saídas com destaque visual.',group:'Visão do período',kind:'metric',color:'red'},
+  {id:'saldo-periodo',label:'Resultado do período',desc:'Diferença entre receitas e despesas.',group:'Visão do período',kind:'metric',color:'blue'},
+  {id:'saldo-acumulado',label:'Saldo acumulado',desc:'Inclui o saldo inicial e os meses anteriores.',group:'Visão do período',kind:'metric',color:'blue'},
+  {id:'comparativo-meses',label:'Melhor e pior mês',desc:'Dois resultados lado a lado.',group:'Análises e gráficos',kind:'comparison',color:'blue'},
+  {id:'melhor-mes',label:'Melhor mês',desc:'Maior resultado mensal do período.',group:'Análises e gráficos',kind:'metric',color:'green'},
+  {id:'pior-mes',label:'Pior mês',desc:'Menor resultado mensal do período.',group:'Análises e gráficos',kind:'metric',color:'red'},
+  {id:'media-receitas',label:'Média mensal de receitas',desc:'Arrecadação média por mês.',group:'Indicadores complementares',kind:'metric',color:'green'},
+  {id:'media-despesas',label:'Média mensal de despesas',desc:'Despesa média por mês.',group:'Indicadores complementares',kind:'metric',color:'red'},
+  {id:'medias',label:'Médias mensais',desc:'Receitas e despesas médias juntas.',group:'Indicadores complementares',kind:'averages',color:'blue'},
+  {id:'dizimistas-media',label:'Lançamentos de dízimo',desc:'Média de lançamentos por mês; não de pessoas.',group:'Indicadores complementares',kind:'metric',color:'blue'},
+  {id:'saldo-aplicacoes',label:'Saldo em aplicações',desc:'Soma dos aportes, sem rendimentos.',group:'Indicadores complementares',kind:'metric',color:'green'}
 ];
-
 const MP_CHARTS = [
-  { id: 'donut-despesas', label: 'Distribuição das Despesas', matriz: 'despesas' },
-  { id: 'donut-receitas', label: 'Distribuição das Receitas', matriz: 'receitas' },
+  {id:'fluxo-mensal',label:'Receitas e despesas por mês',desc:'Barras grandes, até seis meses por slide.',group:'Análises e gráficos',kind:'flow',color:'blue'},
+  {id:'donut-despesas',label:'Distribuição das despesas',desc:'Categorias com valores e percentuais legíveis.',group:'Análises e gráficos',kind:'categories',color:'red'},
+  {id:'donut-receitas',label:'Distribuição das receitas',desc:'Participação de cada categoria na arrecadação.',group:'Análises e gráficos',kind:'categories',color:'green'}
 ];
+const PROJ_OPTIONS = [...MP_METRICAS, ...MP_CHARTS];
+const PROJ_DEFAULT_DECK = ['resumo','receitas-totais','despesas-totais','saldo-periodo','fluxo-mensal','donut-despesas','medias','comparativo-meses','dizimistas-media'];
+let apresData = null, mpData = null;
+let projectorSession = null, projectorReturnFocus = null, projectorScrollStyle = '';
 
-function mpChartCatsTotals(chartId, meses) {
-  if (chartId === 'donut-despesas') {
-    const allCats = sortedCats(DATA.despesas, meses).filter(c => c !== 'A revisar');
-    const arevisarTotal = sumRange(DATA.despesas['A revisar']||{}, meses);
-    const top = allCats.slice(0, 5);
-    const outrosVal = allCats.slice(5).reduce((s,c)=>s+sumRange(DATA.despesas[c],meses), 0) + arevisarTotal;
-    const cats = top.slice(), totals = top.map(c => sumRange(DATA.despesas[c], meses));
-    if (outrosVal > 0) { cats.push('Outras'); totals.push(outrosVal); }
-    return { cats, totals };
-  }
-  const cats = sortedCats(DATA.receitas, meses);
-  const totals = cats.map(c => sumRange(DATA.receitas[c], meses));
-  return { cats, totals };
+function projEscape(value) { return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function mpPeriodoLabel(meses) { return !meses.length ? '' : meses.length===1 ? mesLabelLongo(meses[0]) : mesLabelLongo(meses[0])+' a '+mesLabelLongo(meses[meses.length-1]); }
+function projNumber(value) { return Number.isFinite(+value) ? +value : 0; }
+function projMoney(value) { return brlFull(projNumber(value)); }
+function projContext() {
+  const meses = mesesInRange();
+  const rec = meses.map(m=>projNumber(DATA.totalReceitas[m]));
+  const des = meses.map(m=>projNumber(DATA.totalDespesas[m]));
+  const resultados = rec.map((v,i)=>v-des[i]);
+  const totalRec = rec.reduce((s,v)=>s+v,0), totalDes = des.reduce((s,v)=>s+v,0);
+  const ate = allMeses.indexOf(meses[meses.length-1]);
+  const anteriores = allMeses.slice(0, ate+1);
+  const acumulado = projNumber(DATA.saldoInicial)+anteriores.reduce((s,m)=>s+projNumber(DATA.totalReceitas[m])-projNumber(DATA.totalDespesas[m]),0);
+  const count = DATA.transacoes.filter(t=>meses.includes(t.mesAno)&&t.categoria==='Dízimo'&&t.entrada>0).length;
+  const aplicacoes = APLICACOES_CATS.reduce((s,c)=>s+sumRange(DATA.despesas[c]||{},anteriores),0);
+  return {meses,rec,des,resultados,totalRec,totalDes,resultado:totalRec-totalDes,acumulado,count,aplicacoes,period:mpPeriodoLabel(meses),shortPeriod:meses.length ? mesLabelCurto(meses[0])+(meses.length>1?' — '+mesLabelCurto(meses[meses.length-1]):''):'',melhor:resultados.indexOf(Math.max(...resultados)),pior:resultados.indexOf(Math.min(...resultados))};
 }
-
 function mpGetSelected() {
-  try {
-    const raw = localStorage.getItem(MP_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch (e) {}
+  try { const raw=JSON.parse(localStorage.getItem(MP_STORAGE_KEY)); if(Array.isArray(raw))return [...new Set(raw)].filter(id=>PROJ_OPTIONS.some(o=>o.id===id)); } catch(e) {}
   return MP_DEFAULT_SELECTED.slice();
 }
-function mpSetSelected(ids) {
-  try { localStorage.setItem(MP_STORAGE_KEY, JSON.stringify(ids)); } catch (e) {}
-}
-
-function renderMeuPainelOpcoes(selected) {
-  const grupoHtml = (titulo, itens) => {
-    const itensHtml = itens.map(it => `<label class="mp-check-item"><input type="checkbox" data-mp-id="${it.id}" ${selected.includes(it.id)?'checked':''}>${it.label}</label>`).join('');
-    return `<div><div class="mp-group-title">${titulo}</div><div class="mp-group-items">${itensHtml}</div></div>`;
+function mpSetSelected(ids) { try {localStorage.setItem(MP_STORAGE_KEY,JSON.stringify(ids));}catch(e){} }
+function projMetric(id,c) {
+  const best=c.melhor, worst=c.pior, n=c.meses.length||1;
+  const map={
+    'receitas-totais':{value:projMoney(c.totalRec),note:'Entradas registradas no período',tone:'green',tag:'RECEITAS'},
+    'despesas-totais':{value:projMoney(c.totalDes),note:'Saídas registradas no período',tone:'red',tag:'DESPESAS'},
+    'saldo-periodo':{value:brlSigned(c.resultado),note:c.resultado>0?'Receitas superiores às despesas':c.resultado<0?'Despesas superiores às receitas':'Receitas e despesas em equilíbrio',tone:c.resultado<0?'red':'blue',tag:'RESULTADO'},
+    'saldo-acumulado':{value:brlSigned(c.acumulado),note:'Saldo inicial + resultados acumulados até '+(c.meses.length?mesLabelCurto(c.meses[c.meses.length-1]):''),tone:c.acumulado<0?'red':'blue',tag:'SALDO EM CAIXA'},
+    'media-receitas':{value:projMoney(c.totalRec/n),note:'Receitas totais divididas por '+n+' '+(n===1?'mês':'meses'),tone:'green',tag:'MÉDIA MENSAL'},
+    'media-despesas':{value:projMoney(c.totalDes/n),note:'Despesas totais divididas por '+n+' '+(n===1?'mês':'meses'),tone:'red',tag:'MÉDIA MENSAL'},
+    'melhor-mes':{value:brlSigned(c.resultados[best]||0),note:best>=0?mesLabelLongo(c.meses[best]):'Sem movimentação',tone:(c.resultados[best]||0)<0?'red':'green',tag:'MAIOR RESULTADO'},
+    'pior-mes':{value:brlSigned(c.resultados[worst]||0),note:worst>=0?mesLabelLongo(c.meses[worst]):'Sem movimentação',tone:(c.resultados[worst]||0)<0?'red':'blue',tag:'MENOR RESULTADO'},
+    'dizimistas-media':{value:(c.count/n).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}),note:'Lançamentos por mês, em média. Não representa pessoas únicas.',tone:'blue',tag:'LANÇAMENTOS DE DÍZIMO'},
+    'saldo-aplicacoes':{value:projMoney(c.aplicacoes),note:'Soma dos aportes até '+(c.meses.length?mesLabelCurto(c.meses[c.meses.length-1]):'')+' · sem juros ou rendimentos',tone:'green',tag:'APLICAÇÕES'}
   };
-  document.getElementById('mp-opcoes').innerHTML = `<div class="mp-groups">
-    ${grupoHtml('Indicadores', MP_METRICAS)}
-    ${grupoHtml('Gráficos', MP_CHARTS)}
-  </div>`;
-  document.getElementById('mp-opcoes').querySelectorAll('input[data-mp-id]').forEach(inp => {
-    inp.addEventListener('change', () => {
-      const sel = mpGetSelected();
-      const id = inp.getAttribute('data-mp-id');
-      const idx = sel.indexOf(id);
-      if (inp.checked && idx===-1) sel.push(id);
-      if (!inp.checked && idx!==-1) sel.splice(idx,1);
-      mpSetSelected(sel);
-      renderMeuPainelSlides(sel);
+  return map[id];
+}
+// A mesma cena gera SVG, impressão e objetos editáveis no PowerPoint.
+function projScene(title,c,tone='blue',dark=false) {
+  const items=[];
+  const scene={title,tone,dark,items,period:c.period};
+  scene.rect=(x,y,w,h,fill,rx=0)=>items.push({type:'rect',x,y,w,h,fill,rx});
+  scene.circle=(x,y,r,fill)=>items.push({type:'circle',x,y,r,fill});
+  scene.text=(text,x,y,w,size=36,color=PROJ.navy,bold=false,h=size*1.3)=>items.push({type:'text',text:String(text),x,y,w,h,size,color,bold});
+  scene.rect(0,0,1600,900,dark?PROJ.navy:PROJ.white);
+  scene.rect(0,0,16,900,PROJ[tone]||PROJ.blue);
+  scene.text('NAZACONTROL  /  TESOURARIA',80,45,1100,26,dark?'#B4D4F2':PROJ.mute,true);
+  scene.rect(80,830,1440,2,dark?'#33516D':PROJ.line);
+  scene.text('Igreja Nazareno · Guarapuava',80,851,790,24,dark?'#C7DAEE':PROJ.mute);
+  scene.text(c.shortPeriod,1070,851,330,24,dark?'#C7DAEE':PROJ.mute);
+  return scene;
+}
+function projFit(text,size,w) {
+  // Estimativa conservadora de largura para fontes do sistema e valores longos.
+  const units=[...String(text)].reduce((n,ch)=>n+(/[ilI1.,:;!|' ]/.test(ch)?.30:/[MW@%]/.test(ch)?.85:.60),0);
+  return Math.min(size,w/Math.max(units,1));
+}
+function projText(s,text,x,y,w,size,color,bold=false) { s.text(text,x,y,w,projFit(text,size,w),color,bold); }
+function projWrap(text,width,size,maxLines=2) {
+  const words=String(text).split(/\s+/).flatMap(word=>{
+    if(projFit(word,size,width)>=size)return [word];
+    const chunks=[];let chunk='';
+    for(const ch of word){if(chunk&&projFit(chunk+ch,size,width)<size){chunks.push(chunk);chunk=ch;}else chunk+=ch;}
+    if(chunk)chunks.push(chunk);return chunks;
+  }),lines=[]; let line='';
+  for(const word of words){const next=line?line+' '+word:word;if(projFit(next,size,width)<size&&line){lines.push(line);line=word;}else line=next;}
+  if(line)lines.push(line);
+  // Nunca descarta partes do nome; reduz o tamanho quando são necessárias mais linhas.
+  if(lines.length>maxLines)return projWrap(text,width,size*.88,maxLines);
+  return {lines,size};
+}
+function projTitle(s,title,sub) {
+  projText(s,title,80,108,1440,68,s.dark?PROJ.white:PROJ.navy,true);
+  if(sub)projText(s,sub,80,198,1440,32,s.dark?'#C7DAEE':PROJ.mute);
+}
+function projCover(c,custom) {
+  const s=projScene(custom?'Minha apresentação':'Relatório financeiro',c,'green',true);
+  s.text('PRESTAÇÃO DE CONTAS',80,190,830,30,PROJ.mint,true);
+  s.text(custom?'Minha':'Relatório',80,264,820,112,PROJ.white,true);
+  s.text(custom?'apresentação':'financeiro',80,398,850,104,PROJ.mint,true);
+  const wrapped=projWrap(c.period,800,38,2);
+  wrapped.lines.forEach((line,i)=>s.text(line,80,566+i*50,800,wrapped.size,'#E2EDF8'));
+  s.text('Transparência em cada recurso.',80,728,840,32,'#C7DAEE');
+  const cards=[['RECEITAS',projMoney(c.totalRec),PROJ.mint,PROJ.navy],['DESPESAS',projMoney(c.totalDes),PROJ.coral,PROJ.navy],['RESULTADO',brlSigned(c.resultado),PROJ.blue,PROJ.white]];
+  cards.forEach((v,i)=>{const y=190+i*191;s.rect(1000,y,520,164,v[2],18);s.text(v[0],1032,y+25,450,26,v[3],true);projText(s,v[1],1032,y+72,450,56,v[3],true);});
+  return s;
+}
+function projSummary(c) {
+  const s=projScene('O período em números',c);
+  projTitle(s,'O período em números','Uma visão conjunta das entradas, saídas e resultado.');
+  const rows=[['RECEITAS',projMoney(c.totalRec),'Entradas do período',PROJ.green,PROJ.mint],['DESPESAS',projMoney(c.totalDes),'Saídas do período',PROJ.red,PROJ.coral],['RESULTADO',brlSigned(c.resultado),c.resultado<0?'Déficit do período':c.resultado>0?'Superávit do período':'Resultado equilibrado',PROJ.blue,'#DBE7FF']];
+  rows.forEach((r,i)=>{const x=80+i*490;s.rect(x,300,460,345,r[4],20);s.rect(x+26,332,50,7,r[3],3);s.text(r[0],x+26,381,408,30,PROJ.navy,true);projText(s,r[1],x+26,450,408,63,PROJ.navy,true);s.text(r[2],x+26,562,408,29,PROJ.navy);});
+  s.text('Resultado = receitas − despesas',80,718,1440,36,PROJ.mute);
+  return s;
+}
+function projMetricScene(option,c) {
+  const m=projMetric(option.id,c),s=projScene(option.label,c,m.tone);
+  const main=PROJ[m.tone],soft=m.tone==='green'?PROJ.mint:m.tone==='red'?PROJ.coral:'#DBE7FF';
+  projTitle(s,option.label,c.period);
+  s.rect(80,292,1440,357,main,24);
+  s.text(m.tag,120,329,1350,30,PROJ.white,true);
+  projText(s,m.value,120,410,1350,152,PROJ.white,true);
+  s.rect(80,690,10,84,main,5);
+  const note=projWrap(m.note,1360,36,2);
+  note.lines.forEach((line,i)=>s.text(line,113,695+i*46,1360,note.size,PROJ.navy));
+  s.rect(1405,115,115,12,soft,6);
+  return s;
+}
+function projDual(c,averages=false) {
+  const s=projScene(averages?'Médias mensais':'Melhor e pior mês',c);
+  projTitle(s,s.title,averages?'Valores médios por mês no período selecionado.':'Comparação pelo resultado mensal: receitas menos despesas.');
+  const rows=averages?[['RECEITAS',c.totalRec/(c.meses.length||1),'Média mensal',PROJ.green,PROJ.mint],['DESPESAS',c.totalDes/(c.meses.length||1),'Média mensal',PROJ.red,PROJ.coral]]:[['MELHOR MÊS',c.resultados[c.melhor]||0,c.melhor>=0?mesLabelLongo(c.meses[c.melhor]):'Sem dados',PROJ.green,PROJ.mint],['PIOR MÊS',c.resultados[c.pior]||0,c.pior>=0?mesLabelLongo(c.meses[c.pior]):'Sem dados',PROJ.blue,'#DBE7FF']];
+  rows.forEach((r,i)=>{const x=80+i*740;s.rect(x,306,700,372,r[4],22);s.text(r[0],x+38,350,624,33,PROJ.navy,true);projText(s,averages?projMoney(r[1]):brlSigned(r[1]),x+38,430,624,88,r[1]<0?PROJ.red:r[3],true);projText(s,r[2],x+38,573,624,38,PROJ.navy);});
+  s.text(averages?c.meses.length+' '+(c.meses.length===1?'mês considerado':'meses considerados'):'Melhor e pior são relativos ao período escolhido.',80,729,1440,32,PROJ.mute);
+  return s;
+}
+function projCategories(option,c) {
+  const matrix=DATA[option.id==='donut-despesas'?'despesas':'receitas'];
+  const rows=sortedCats(matrix,c.meses).map(cat=>({cat,value:sumRange(matrix[cat]||{},c.meses)})).filter(r=>r.value!==0);
+  const total=rows.reduce((s,r)=>s+r.value,0),pages=[];
+  const max=Math.max(1,...rows.map(r=>Math.abs(r.value)));
+  for(let start=0;start<Math.max(1,rows.length);start+=5){
+    const s=projScene(option.label,c,option.color);
+    projTitle(s,option.label,'Total do período: '+projMoney(total)+(rows.length>5?' · categorias '+(start+1)+' a '+Math.min(start+5,rows.length):''));
+    if(!rows.length)s.text('Nenhum valor registrado neste período.',80,414,1440,54,PROJ.mute,true);
+    rows.slice(start,start+5).forEach((r,i)=>{
+      const y=278+i*101,col=[PROJ[option.color],PROJ.blue,PROJ.green,'#7150B9','#946013'][i];
+      s.rect(80,y+4,8,72,col,4);
+      const label=projWrap(r.cat,680,36,2);
+      label.lines.forEach((line,j)=>s.text(line,108,y+j*39,680,label.size,PROJ.navy,true));
+      const pct=total!==0?((r.value/total)*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%':'—';
+      projText(s,projMoney(r.value)+'  ·  '+pct,835,y,685,38,PROJ.navy,true);
+      s.rect(835,y+56,685,12,PROJ.pale,6);
+      s.rect(835,y+56,Math.max(2,685*Math.abs(r.value)/max),12,col,6);
     });
-  });
-}
-
-let mpData = null;
-
-function renderMeuPainelSlides(selected) {
-  const meses = mesesInRange();
-  const metricasSelected = MP_METRICAS.filter(m => selected.includes(m.id));
-  const chartsSelected = MP_CHARTS.filter(c => selected.includes(c.id));
-
-  if (!metricasSelected.length && !chartsSelected.length) {
-    document.getElementById('mp-content').innerHTML = '<div class="mp-empty">Nenhum item selecionado. Marque acima o que você quer na sua apresentação.</div>';
-    mpData = null;
-    return;
+    pages.push(s);
   }
-
-  const periodoLabel = mpPeriodoLabel(meses);
-  let slidesHtml = apresSlideHtml('dark', `
-    <div class="apres-capa-igreja">Igreja Evangélica Nazareno Guarapuava</div>
-    <div class="apres-capa-sub">Minha Apresentação</div>
-    <div class="apres-capa-periodo">${periodoLabel}</div>`);
-
-  const metricasData = metricasSelected.map(m => ({ label: m.label, ...m.compute(meses) }));
-  metricasData.forEach(m => {
-    slidesHtml += apresSlideHtml('light', `
-      <div class="apres-eyebrow">${m.label}</div>
-      <div class="apres-big ${m.color}">${m.value}</div>
-      <div class="apres-sub">${m.sub}</div>`);
-  });
-
-  const chartsData = chartsSelected.map(c => ({ id: c.id, label: c.label, ...mpChartCatsTotals(c.id, meses) }));
-  chartsData.forEach(c => {
-    slidesHtml += apresSlideHtml('light', `
-      <div class="apres-eyebrow">${c.label}</div>
-      <div class="apres-donut-body"><div class="donut-wrap" id="mp-donut-${c.id}"></div><div class="mini-legend" id="mp-legend-${c.id}"></div></div>`);
-  });
-
-  document.getElementById('mp-content').innerHTML = `<div id="mp-print-area">${slidesHtml}</div>`;
-
-  const dark = isDarkMode();
-  chartsData.forEach(c => {
-    const colors = c.cats.map((cat,i) => (cat==='A revisar'||cat==='Outras') ? cssVar('--ink-mute','#8A90A6') : categoryColor(i,dark));
-    buildDonut(document.getElementById('mp-donut-'+c.id), document.getElementById('mp-legend-'+c.id), c.cats, c.totals, colors, c.totals.reduce((a,b)=>a+b,0));
-  });
-
-  mpData = { periodoLabel, metricas: metricasData, charts: chartsData };
+  return pages;
 }
-
-function renderMeuPainel() {
-  const selected = mpGetSelected();
-  renderMeuPainelOpcoes(selected);
-  renderMeuPainelSlides(selected);
+function projFlow(c) {
+  const pages=[];
+  for(let start=0;start<c.meses.length;start+=6){
+    const s=projScene('Receitas e despesas por mês',c);
+    projTitle(s,s.title,'Comparação mensal · valores em reais');
+    s.rect(80,257,24,24,PROJ.green,4);s.text('Receitas',116,251,250,30,PROJ.navy,true);
+    s.rect(345,257,24,24,PROJ.red,4);s.text('Despesas',381,251,270,30,PROJ.navy,true);
+    const months=c.meses.slice(start,start+6),n=months.length,gw=1440/n;
+    const vals=[...c.rec.slice(start,start+6),...c.des.slice(start,start+6)];
+    const max=Math.max(1,...vals),min=Math.min(0,...vals),span=max-min;
+    const scale=v=>696-(v-min)/span*310,zero=scale(0);
+    s.rect(80,zero,1440,2,PROJ.line);
+    months.forEach((m,i)=>{
+      const x=80+i*gw,mid=x+gw/2,bw=Math.min(64,gw*.24);
+      [c.rec[start+i],c.des[start+i]].forEach((v,j)=>{
+        const bx=mid+(j===0?-bw-7:7),y=scale(v),color=j===0?PROJ.green:PROJ.red;
+        s.rect(bx,Math.min(zero,y),bw,Math.max(2,Math.abs(zero-y)),color,5);
+        const label=Math.abs(v)>=1000000?(v/1000000).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi':Math.abs(v)>=1000?(v/1000).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mil':v.toLocaleString('pt-BR');
+        projText(s,label,bx-22,v>=0?y-47:y+8,bw+44,30,color,true);
+      });
+      projText(s,mesLabelCurto(m),x+12,742,gw-24,34,PROJ.navy,true);
+    });
+    pages.push(s);
+  }
+  return pages;
 }
-
-document.getElementById('mp-toggle-personalizar').addEventListener('click', function () {
-  const opcoesEl = document.getElementById('mp-opcoes');
-  const hidden = opcoesEl.style.display === 'none';
-  opcoesEl.style.display = hidden ? '' : 'none';
-  this.textContent = hidden ? 'Ocultar opções' : 'Mostrar opções';
-});
-
-document.getElementById('mp-export-pdf').addEventListener('click', () => {
-  document.body.setAttribute('data-print-alvo', 'meupainel');
-  window.print();
-});
-
-document.getElementById('mp-export-pptx').addEventListener('click', () => {
-  if (!mpData || typeof PptxGenJS === 'undefined') return;
-  const d = mpData;
-  const pptx = new PptxGenJS();
-  pptx.defineLayout({ name: 'CHURCH', width: 13.33, height: 7.5 });
-  pptx.layout = 'CHURCH';
-  const NAVY = '17213D', GREEN = '1E8E5A', RED = 'C0453B', GOLD = 'B9852A', MUTE = '8A90A6', WHITE = 'FFFFFF';
-  const colorMap = { good: GREEN, critical: RED, accent: GOLD };
-
-  let s = pptx.addSlide();
-  s.background = { color: NAVY };
-  s.addText('Igreja Evangélica Nazareno Guarapuava', { x:0.5, y:2.9, w:12.33, h:1, align:'center', fontSize:32, bold:true, color:WHITE });
-  s.addText('Minha Apresentação', { x:0.5, y:3.9, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:GOLD });
-  s.addText(d.periodoLabel, { x:0.5, y:4.6, w:12.33, h:0.6, align:'center', fontSize:16, color:'CBD5E1' });
-
-  d.metricas.forEach(m => {
-    s = pptx.addSlide();
-    s.background = { color: WHITE };
-    s.addText(m.label.toUpperCase(), { x:0.5, y:1.4, w:12.33, h:0.8, align:'center', fontSize:24, bold:true, color:MUTE });
-    s.addText(m.value, { x:0.5, y:2.4, w:12.33, h:2, align:'center', fontSize:76, bold:true, color: colorMap[m.color]||MUTE });
-    s.addText(m.sub||'', { x:0.5, y:4.7, w:12.33, h:0.6, align:'center', fontSize:18, color:MUTE });
+function projBuildDeck(ids,custom=false) {
+  const c=projContext();
+  if(!c.meses.length||!ids.length)return [];
+  const slides=[projCover(c,custom)];
+  ids.forEach(id=>{
+    const opt=PROJ_OPTIONS.find(o=>o.id===id);if(!opt)return;
+    if(opt.kind==='summary')slides.push(projSummary(c));
+    if(opt.kind==='metric')slides.push(projMetricScene(opt,c));
+    if(opt.kind==='comparison')slides.push(projDual(c));
+    if(opt.kind==='averages')slides.push(projDual(c,true));
+    if(opt.kind==='categories')slides.push(...projCategories(opt,c));
+    if(opt.kind==='flow')slides.push(...projFlow(c));
   });
+  slides.forEach((s,i)=>s.text((i+1)+' / '+slides.length,1418,851,102,24,s.dark?'#C7DAEE':PROJ.mute));
+  return slides;
+}
+function projSvg(s) {
+  const els=s.items.map(it=>{
+    if(it.type==='rect')return `<rect x="${it.x}" y="${it.y}" width="${it.w}" height="${it.h}" rx="${it.rx}" fill="${it.fill}"/>`;
+    if(it.type==='circle')return `<circle cx="${it.x}" cy="${it.y}" r="${it.r}" fill="${it.fill}"/>`;
+    return `<text x="${it.x}" y="${it.y}" font-family="Arial, sans-serif" font-size="${it.size}" font-weight="${it.bold?'700':'400'}" fill="${it.color}" dominant-baseline="hanging">${projEscape(it.text)}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${projEscape(s.title)}"><title>${projEscape(s.title)}</title>${els}</svg>`;
+}
+function projRenderDeck(slides,target,printId) {
+  document.getElementById(target).innerHTML=slides.length?`<div id="${printId}" class="projection-deck">${slides.map((s,i)=>`<figure class="projection-preview"><figcaption><span>SLIDE ${String(i+1).padStart(2,'0')}</span><strong>${projEscape(s.title)}</strong></figcaption><div class="projection-slide">${projSvg(s)}</div></figure>`).join('')}</div>`:'<div class="mp-empty">Escolha os conteúdos acima para montar sua apresentação.</div>';
+}
+function renderApresentacao() {
+  apresData=projBuildDeck(PROJ_DEFAULT_DECK);
+  projRenderDeck(apresData,'apres-content','apres-print-area');
+  document.getElementById('apres-slide-count').textContent=apresData.length+' slides · formato 16:9';
+}
+function renderMeuPainelOpcoes(selected) {
+  const groupNames=['Visão do período','Análises e gráficos','Indicadores complementares'];
+  document.getElementById('mp-opcoes').innerHTML=`<div class="projection-presets" role="group" aria-label="Modelos de seleção"><span>Comece com um modelo</span><button type="button" data-proj-preset="essential">Essencial</button><button type="button" data-proj-preset="complete">Completo</button><button type="button" data-proj-preset="clear">Limpar seleção</button></div><div class="projection-options">${groupNames.map(name=>`<fieldset><legend>${name}</legend><div class="projection-option-grid">${PROJ_OPTIONS.filter(o=>o.group===name).map(o=>`<label class="projection-option tone-${o.color}"><input type="checkbox" data-mp-id="${o.id}" ${selected.includes(o.id)?'checked':''}><span class="projection-option-icon" aria-hidden="true">${navIcon(o.kind==='flow'?'comp':o.kind==='categories'?'meupainel':o.color==='red'?'despesas':o.color==='green'?'receitas':'geral',true)}</span><span><strong>${o.label}</strong><small>${o.desc}</small></span></label>`).join('')}</div></fieldset>`).join('')}</div>`;
+  document.querySelectorAll('#mp-opcoes input[data-mp-id]').forEach(inp=>inp.addEventListener('change',()=>{
+    const ids=[...document.querySelectorAll('#mp-opcoes input[data-mp-id]:checked')].map(el=>el.dataset.mpId);
+    mpSetSelected(ids);renderMeuPainelSlides(ids);
+  }));
+  document.querySelectorAll('[data-proj-preset]').forEach(btn=>btn.addEventListener('click',()=>{
+    const ids=btn.dataset.projPreset==='complete'?PROJ_OPTIONS.map(o=>o.id):btn.dataset.projPreset==='essential'?MP_DEFAULT_SELECTED.slice():[];
+    mpSetSelected(ids);renderMeuPainelOpcoes(ids);renderMeuPainelSlides(ids);
+    document.querySelector('[data-proj-preset="'+btn.dataset.projPreset+'"]').focus();
+  }));
+}
+function renderMeuPainelSlides(selected) {
+  mpData=projBuildDeck(selected,true);
+  projRenderDeck(mpData,'mp-content','mp-print-area');
+  document.getElementById('mp-slide-count').textContent=selected.length+' conteúdos · '+mpData.length+' slides';
+  ['mp-present','mp-export-pptx','mp-export-pdf'].forEach(id=>document.getElementById(id).disabled=!mpData.length);
+}
+function renderMeuPainel() {const selected=mpGetSelected();renderMeuPainelOpcoes(selected);renderMeuPainelSlides(selected);}
 
-  d.charts.forEach(c => {
-    s = pptx.addSlide();
-    s.background = { color: WHITE };
-    s.addText(c.label.toUpperCase(), { x:0.5, y:0.4, w:12.33, h:0.7, align:'center', fontSize:22, bold:true, color:MUTE });
-    const chartData = [{ name: c.label, labels: c.cats, values: c.totals }];
-    s.addChart(pptx.ChartType.pie, chartData, { x:2.5, y:1.2, w:8.33, h:5.8, showLegend:true, legendPos:'r', showPercent:true, dataLabelFontSize:12 });
-  });
-
-  pptx.writeFile({ fileName: 'MeuPainel_' + d.periodoLabel.replace(/[^a-zA-Z0-9]+/g, '_') + '.pptx' });
+function projSessionDraw() {
+  if(!projectorSession)return;
+  const p=projectorSession;
+  document.getElementById('projector-stage').innerHTML=projSvg(p.slides[p.index]);
+  document.getElementById('projector-position').textContent='Slide '+(p.index+1)+' de '+p.slides.length+' · '+p.slides[p.index].title;
+  document.getElementById('projector-prev').disabled=p.index===0;
+  document.getElementById('projector-next').disabled=p.index===p.slides.length-1;
+  document.getElementById('projector-progress').style.width=((p.index+1)/p.slides.length*100)+'%';
+}
+function projOpen(slides) {
+  if(!slides||!slides.length)return;
+  projectorReturnFocus=document.activeElement;
+  projectorSession={slides,index:0,enteredFullscreen:false};
+  const overlay=document.getElementById('projector-overlay');
+  overlay.hidden=false; projectorScrollStyle=document.body.style.overflow;document.body.style.overflow='hidden';
+  projSessionDraw();document.getElementById('projector-exit').focus();
+  if(!document.fullscreenElement&&overlay.requestFullscreen){overlay.requestFullscreen().then(()=>{if(projectorSession)projectorSession.enteredFullscreen=true;}).catch(()=>{});}
+}
+function projClose() {
+  if(!projectorSession)return;
+  const exitFs=projectorSession.enteredFullscreen;projectorSession=null;
+  document.getElementById('projector-overlay').hidden=true;document.getElementById('projector-stage').innerHTML='';
+  document.body.style.overflow=projectorScrollStyle;
+  if(exitFs&&document.fullscreenElement)document.exitFullscreen().catch(()=>{});
+  if(projectorReturnFocus&&projectorReturnFocus.isConnected)projectorReturnFocus.focus();
+}
+function projStep(delta) {if(projectorSession){projectorSession.index=Math.max(0,Math.min(projectorSession.slides.length-1,projectorSession.index+delta));projSessionDraw();}}
+document.addEventListener('keydown',e=>{
+  if(!projectorSession)return;
+  if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();projStep(1);}
+  if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();projStep(-1);}
+  if(e.key==='Home'){e.preventDefault();projectorSession.index=0;projSessionDraw();}
+  if(e.key==='End'){e.preventDefault();projectorSession.index=projectorSession.slides.length-1;projSessionDraw();}
+  if(e.key==='Escape'){e.preventDefault();projClose();}
+  if(e.key==='Tab'){
+    const controls=[...document.querySelectorAll('#projector-overlay button:not(:disabled)')];
+    const idx=controls.indexOf(document.activeElement);
+    if(e.shiftKey&&(idx<=0)){e.preventDefault();controls[controls.length-1].focus();}
+    else if(!e.shiftKey&&(idx===controls.length-1)){e.preventDefault();controls[0].focus();}
+  }
 });
+document.addEventListener('fullscreenchange',()=>{if(projectorSession&&projectorSession.enteredFullscreen&&!document.fullscreenElement)projClose();});
+document.getElementById('projector-prev').addEventListener('click',()=>projStep(-1));
+document.getElementById('projector-next').addEventListener('click',()=>projStep(1));
+document.getElementById('projector-exit').addEventListener('click',projClose);
+document.getElementById('apres-present').addEventListener('click',()=>projOpen(apresData));
+document.getElementById('mp-present').addEventListener('click',()=>projOpen(mpData));
+document.getElementById('mp-toggle-personalizar').addEventListener('click',function(){const options=document.getElementById('mp-opcoes');const visible=options.style.display==='none';options.style.display=visible?'':'none';this.textContent=visible?'Ocultar opções':'Mostrar opções';this.setAttribute('aria-expanded',String(visible));});
+
+async function projExportPptx(slides,filename,button) {
+  if(!slides||!slides.length)return;
+  const status=document.getElementById('projection-export-status');
+  if(typeof PptxGenJS==='undefined'){status.textContent='O PowerPoint não carregou. Verifique a conexão e atualize a página.';return;}
+  button.disabled=true;const previous=button.textContent;button.textContent='Gerando PowerPoint…';status.textContent='';
+  try{
+    const pptx=new PptxGenJS();pptx.layout='LAYOUT_WIDE';pptx.author='NazaControl';pptx.subject='Prestação de contas';pptx.title=filename;pptx.lang='pt-BR';
+    for(const scene of slides){
+      const slide=pptx.addSlide();slide.background={color:(scene.dark?PROJ.navy:PROJ.white).slice(1)};
+      scene.items.forEach(it=>{
+        if(it.type==='text')slide.addText(it.text,{x:it.x/120,y:it.y/120,w:it.w/120,h:it.h/120,fontFace:'Arial',fontSize:it.size*.6,bold:it.bold,color:it.color.slice(1),margin:0,breakLine:false,paraSpaceAfterPt:0,valign:'top',fit:'shrink'});
+        if(it.type==='rect')slide.addShape(pptx.ShapeType.rect,{x:it.x/120,y:it.y/120,w:it.w/120,h:it.h/120,line:{color:it.fill.slice(1),transparency:100},fill:{color:it.fill.slice(1)}});
+        if(it.type==='circle')slide.addShape(pptx.ShapeType.ellipse,{x:(it.x-it.r)/120,y:(it.y-it.r)/120,w:it.r/60,h:it.r/60,line:{transparency:100},fill:{color:it.fill.slice(1)}});
+      });
+    }
+    await pptx.writeFile({fileName:filename+'.pptx'});status.textContent='PowerPoint gerado com textos e elementos editáveis.';
+  }catch(err){status.textContent='Não foi possível exportar o PowerPoint. Tente novamente.';console.error('Exportação da apresentação:',err);}
+  finally{button.disabled=false;button.textContent=previous;}
+}
+// PDF vetorial: a cena permanece nítida no projetor, mesmo com zoom.
+function projPdfBytes(slides) {
+  const objects=[null,'','', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'];
+  const pages=[];
+  const n=v=>Number(v.toFixed(3)).toString();
+  const rgb=hex=>[1,3,5].map(i=>n(parseInt(hex.slice(i,i+2),16)/255)).join(' ');
+  const extra={'€':128,'‚':130,'ƒ':131,'„':132,'…':133,'†':134,'‡':135,'ˆ':136,'‰':137,'Š':138,'‹':139,'Œ':140,'Ž':142,'‘':145,'’':146,'“':147,'”':148,'•':149,'–':150,'—':151,'˜':152,'™':153,'š':154,'›':155,'œ':156,'ž':158,'Ÿ':159,'−':45};
+  const hexText=text=>[...String(text)].map(ch=>{const cp=ch.codePointAt(0);return (extra[ch]??(cp<=255?cp:63)).toString(16).padStart(2,'0');}).join('');
+  slides.forEach(scene=>{
+    let content='';
+    scene.items.forEach(it=>{
+      if(it.type==='rect')content+=`${rgb(it.fill)} rg ${n(it.x*.6)} ${n((900-it.y-it.h)*.6)} ${n(it.w*.6)} ${n(it.h*.6)} re f\n`;
+      if(it.type==='text')content+=`BT /${it.bold?'F2':'F1'} ${n(it.size*.6)} Tf ${rgb(it.color)} rg 1 0 0 1 ${n(it.x*.6)} ${n((900-it.y-it.size*.85)*.6)} Tm <${hexText(it.text)}> Tj ET\n`;
+      if(it.type==='circle'){
+        const x=it.x*.6,y=(900-it.y)*.6,r=it.r*.6,k=r*.55228475;
+        content+=`${rgb(it.fill)} rg ${n(x+r)} ${n(y)} m ${n(x+r)} ${n(y+k)} ${n(x+k)} ${n(y+r)} ${n(x)} ${n(y+r)} c ${n(x-k)} ${n(y+r)} ${n(x-r)} ${n(y+k)} ${n(x-r)} ${n(y)} c ${n(x-r)} ${n(y-k)} ${n(x-k)} ${n(y-r)} ${n(x)} ${n(y-r)} c ${n(x+k)} ${n(y-r)} ${n(x+r)} ${n(y-k)} ${n(x+r)} ${n(y)} c f\n`;
+      }
+    });
+    const streamId=objects.length;objects.push(`<< /Length ${content.length} >>\nstream\n${content}endstream`);
+    const pageId=objects.length;objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 960 540] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${streamId} 0 R >>`);pages.push(pageId);
+  });
+  objects[1]='<< /Type /Catalog /Pages 2 0 R >>';objects[2]=`<< /Type /Pages /Count ${pages.length} /Kids [${pages.map(id=>id+' 0 R').join(' ')}] >>`;
+  let output='%PDF-1.4\n',offsets=[0];
+  for(let i=1;i<objects.length;i++){offsets[i]=output.length;output+=`${i} 0 obj\n${objects[i]}\nendobj\n`;}
+  const start=output.length;
+  output+=`xref\n0 ${objects.length}\n0000000000 65535 f \n`+offsets.slice(1).map(pos=>String(pos).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${start}\n%%EOF\n`;
+  return new TextEncoder().encode(output);
+}
+function projExportPdf(slides,filename) {
+  if(!slides||!slides.length)return;
+  const status=document.getElementById('projection-export-status');
+  try{
+    const url=URL.createObjectURL(new Blob([projPdfBytes(slides)],{type:'application/pdf'}));
+    const link=document.createElement('a');link.href=url;link.download=filename+'.pdf';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+    status.textContent='PDF gerado em formato 16:9, com todos os slides.';
+  }catch(err){status.textContent='Não foi possível gerar o PDF. Tente novamente.';console.error('Exportação PDF:',err);}
+}
+document.getElementById('apres-export-pdf').addEventListener('click',()=>projExportPdf(apresData,'Apresentacao_'+projContext().shortPeriod.replace(/[^a-zA-Z0-9]+/g,'_')));
+document.getElementById('mp-export-pdf').addEventListener('click',()=>projExportPdf(mpData,'MeuPainel_'+projContext().shortPeriod.replace(/[^a-zA-Z0-9]+/g,'_')));
+document.getElementById('apres-export-pptx').addEventListener('click',function(){projExportPptx(apresData,'Apresentacao_'+projContext().shortPeriod.replace(/[^a-zA-Z0-9]+/g,'_'),this);});
+document.getElementById('mp-export-pptx').addEventListener('click',function(){projExportPptx(mpData,'MeuPainel_'+projContext().shortPeriod.replace(/[^a-zA-Z0-9]+/g,'_'),this);});
+
 
 /* ============ Carregamento de dados (JSONP) ============ */
 function carregarDadosJSONP(senha) {
